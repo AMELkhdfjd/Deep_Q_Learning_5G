@@ -146,6 +146,8 @@ class Controlador:
     def run(self):
         self.simulation.run(self)
 
+
+## simulation class
 class Sim:
     def __init__(self):
         self.eventos = []
