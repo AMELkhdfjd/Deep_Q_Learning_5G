@@ -107,7 +107,7 @@ n_actions = len(actions)
 class Evento:
     def __init__(self, type, start, extra, function):
         self.type = type
-        self.start = start
+        self.start = start ## need to figure out what means the start here !!
         self.extra = extra
         self.function = function
 
@@ -154,7 +154,7 @@ class Controlador:
 ## simulation class
 class Sim:
     def __init__(self):
-        self.eventos = []
+        self.eventos = []## the list of events
         self.total_events = 0
         self.window_req_list = [[],[],[]] #for the three services
         #self.window_req_list = []
@@ -179,7 +179,7 @@ class Sim:
     # def set_substrate(self,substrate):
     #     self.substrate = substrate
 
-    def create_event(self, type, start, extra=None, f=None):
+    def create_event(self, type, start, extra=None, f=None): ## creation of an event with parameters and its time must be greater than the schedule to take place
         if start<self.horario:
             print("***false")
             return False
@@ -187,7 +187,7 @@ class Sim:
         e = Evento(type, start, extra, f)
         return e
 
-    def binary_search (self, arr, l, r, x):
+    def binary_search (self, arr, l, r, x):   ## binary search for the index of the value x in the array arr returns the index in case found, else the left index l is returned
         if r >= l:       
             mid = int(l + (r - l)/2)
             if arr[mid].start == x: 
@@ -200,7 +200,7 @@ class Sim:
             return l
 
 
-    def add_event(self, evt):        
+    def add_event(self, evt):  ## inserting a new event into the list of events evt in order       
         request = {}
         #encontrar indice y adicionar evt en esa posicion
         # index = 0
@@ -210,16 +210,18 @@ class Sim:
         #         break
         #     else:
         #         index = i+1 
-        index = self.binary_search(self.eventos, 0, len(self.eventos)-1, evt.start)
-        self.eventos = self.eventos[:index] + [evt] + self.eventos[index:] 
+        index = self.binary_search(self.eventos, 0, len(self.eventos)-1, evt.start) ## find where to insert the new event evt since its an ordered array
+        self.eventos = self.eventos[:index] + [evt] + self.eventos[index:]  ## insert the new event
         # self.eventos.insert(index,evt)
-        # self.eventos[index:index] = [evt]
+        # self.eventos[index:index] = [evt]  ## maybe here its another alternative
 
-        if evt.type == "arrival":            
-            #agregar nslrs en window list
-            self.total_reqs += 1
-            service_type = evt.extra["service_type"]#
-            request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)#
+        if evt.type == "arrival":       ## if its an arrival type     
+            #add nslrs in window list
+            self.total_reqs += 1  ## increase the number of requests
+            service_type = evt.extra["service_type"]## maybe the extra means the additional parameters for the event here we are assigining the service_type
+            request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)## here we are calling the fonction from the file imported ATT
+              ## self.total_reqs: to define the id of the new nslr, 
+              ## mean_operation_time = 15 as a global variable
 
             if evt.extra["service_type"] == "embb":
                 self.total_embb_reqs += 1
