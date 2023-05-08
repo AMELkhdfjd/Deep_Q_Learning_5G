@@ -39,7 +39,8 @@ avble_edge_size = 10
 avble_central_size = 10
 avble_bw_size = 10
 
-pct_inst_embb_size = 10 #porcentaje de slices instanciados de tipo embb
+pct_inst_embb_size = 10 #percentage of instantiated slices of type embb
+                        ## maybe we need this percentage for the action vector
 pct_inst_urllc_size = 10
 pct_inst_miot_size = 10
 
@@ -114,7 +115,7 @@ class Evento:
 class Controlador:
     def __init__(self):
         #metricas
-        self.total_profit = 0
+        self.total_profit = 0   ## profit for different types: node, links, services, type of nodes
         self.node_profit=0
         self.link_profit=0
         self.embb_profit = 0
@@ -123,13 +124,13 @@ class Controlador:
         self.edge_profit = 0
         self.central_profit = 0
 
-        self.acpt_rate = 0
+        self.acpt_rate = 0     ## we define acceptence rate
         self.embb_acpt_rate = 0
         self.urllc_acpt_rate = 0
         self.miot_acpt_rate = 0
         
-        self.total_utl = 0
-        self.node_utl = 0
+        self.total_utl = 0   ## here the utl means utilisation
+        self.node_utl = 0    
         self.link_utl = 0
         self.edge_utl = 0
         self.central_utl = 0
