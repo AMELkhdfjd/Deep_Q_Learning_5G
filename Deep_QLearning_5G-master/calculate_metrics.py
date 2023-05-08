@@ -1,3 +1,6 @@
+### definition of functions to calculate the profit for nodes and links used in the deep main file ###
+
+
 def calculate_profit_nodes(nslr,end_simulation_time):
     #Calculates profit per time unit and then multiplies it by the nslr op. time
     #profit = revenue-cost 
