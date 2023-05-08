@@ -105,14 +105,14 @@ n_actions = len(actions)
 
 ## class for the events
 class Evento:
-    def __init__(self, type, inicio, extra, function):
+    def __init__(self, type, start, extra, function):
         self.type = type
-        self.inicio = inicio
+        self.start = start
         self.extra = extra
         self.function = function
 
     def __str__(self):
-        return "("+self.type+","+str(self.inicio)+","+str(self.extra)+")"
+        return "("+self.type+","+str(self.start)+","+str(self.extra)+")"
 
 
 ## class for the controller
@@ -179,20 +179,20 @@ class Sim:
     # def set_substrate(self,substrate):
     #     self.substrate = substrate
 
-    def create_event(self, type, inicio, extra=None, f=None):
-        if inicio<self.horario:
+    def create_event(self, type, start, extra=None, f=None):
+        if start<self.horario:
             print("***false")
             return False
         # else:     
-        e = Evento(type, inicio, extra, f)
+        e = Evento(type, start, extra, f)
         return e
 
     def binary_search (self, arr, l, r, x):
         if r >= l:       
             mid = int(l + (r - l)/2)
-            if arr[mid].inicio == x: 
+            if arr[mid].start == x: 
                 return mid
-            elif arr[mid].inicio > x: 
+            elif arr[mid].start > x: 
                 return self.binary_search(arr, l, mid-1, x) 
             else: 
                 return self.binary_search(arr, mid+1, r, x)   
@@ -205,12 +205,12 @@ class Sim:
         #encontrar indice y adicionar evt en esa posicion
         # index = 0
         # for i in range(len(self.eventos)):
-        #     if self.eventos[i].inicio > evt.inicio: 
+        #     if self.eventos[i].start > evt.start: 
         #         index = i 
         #         break
         #     else:
         #         index = i+1 
-        index = self.binary_search(self.eventos, 0, len(self.eventos)-1, evt.inicio)
+        index = self.binary_search(self.eventos, 0, len(self.eventos)-1, evt.start)
         self.eventos = self.eventos[:index] + [evt] + self.eventos[index:] 
         # self.eventos.insert(index,evt)
         # self.eventos[index:index] = [evt]
@@ -238,7 +238,7 @@ class Sim:
     def print_eventos(self):
         print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
         for i in range(len(self.eventos)): 
-            print(self.eventos[i].type,self.eventos[i].inicio, end=" > ")
+            print(self.eventos[i].type,self.eventos[i].start, end=" > ")
         #print("++list: ",len(self.window_req_list[0])+len(self.window_req_list[1])+len(self.window_req_list[2]))
 
         print("\n")
@@ -248,7 +248,7 @@ class Sim:
             return None
         else:
             p = self.eventos.pop(0)
-            self.horario = p.inicio
+            self.horario = p.start
             return p
 
     def run(self,c):
@@ -447,7 +447,7 @@ def resource_allocation(cn): #cn=controller
             req.set_end_time(sim.horario+req.operation_time)
             graph = req.nsl_graph_reduced
             update_resources(substrate,req,False)#instantiation, occupy resources
-            evt = sim.create_event(type="termination",inicio=req.end_time, extra=req, f=func_terminate)
+            evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate)
             sim.add_event(evt) 
 
             #calculo de metricas (profit, acpt_rate, contadores)            
@@ -639,7 +639,7 @@ def func_arrival(c,evt): #NSL arrival
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    s.add_event(s.create_event(type="arrival",inicio=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
+    s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
 
 
 contador_termination = 0
@@ -711,21 +711,21 @@ def func_twindow(c,evt):
     else:
         end_state = False
     
-    evt = sim.create_event(type="twindow_end",inicio=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)    
+    evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)    
     sim.add_event(evt)
     sim.window_req_list = [[],[],[]] #
     #sim.window_req_list = []
     sim.granted_req_list = [] 
   
 def prepare_sim(s):
-    evt = s.create_event(type="arrival",inicio=s.horario+get_interarrival_time(embb_arrival_rate),extra={"service_type":"embb","arrival_rate":embb_arrival_rate},f=func_arrival)
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(embb_arrival_rate),extra={"service_type":"embb","arrival_rate":embb_arrival_rate},f=func_arrival)
     s.add_event(evt)
-    evt = s.create_event(type="arrival",inicio=s.horario+get_interarrival_time(urllc_arrival_rate),extra={"service_type":"urllc","arrival_rate":urllc_arrival_rate},f=func_arrival)
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_arrival_rate),extra={"service_type":"urllc","arrival_rate":urllc_arrival_rate},f=func_arrival)
     s.add_event(evt)
-    evt = s.create_event(type="arrival",inicio=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)
     s.add_event(evt)
 
-    evt = s.create_event(type="twindow_end",inicio=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)
+    evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)
     s.add_event(evt)
 
 
