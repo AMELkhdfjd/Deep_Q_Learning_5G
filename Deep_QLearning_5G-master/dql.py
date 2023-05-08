@@ -175,7 +175,7 @@ class Agent(object):
         self.experience_replay = Memory(replay_memory_size)## is not used confirm that
 
         
-#Note: the difference between exprience replay and the memory, edir: we dont use the experience replay here
+#Note: the difference between exprience replay and the memory, edit: we dont use the experience replay here
 
     def handle_episode_start(self):
         self.last_state, self.last_action = None, None
