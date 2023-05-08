@@ -41,10 +41,10 @@ class Qagent:
 
     def take_action(self,s,first_state):
         if first_state:
-            action = epsilon_greedy(self.Q,self.epsilon,self.n_actions,s,False)
+            action = epsilon_greedy(self.Q,self.epsilon,self.n_actions,s,False)## we take it randomly at the begining
         else:
             s_=s
-            action = np.argmax(self.Q[s_, :])
+            action = np.argmax(self.Q[s_, :]) ## wonder why we dont use directly the epsilon greedy function 
         return action
 
     def updateQ(self,reward,s,a,s_,a_,end_sate):
