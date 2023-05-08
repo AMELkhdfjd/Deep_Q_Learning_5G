@@ -1,0 +1,420 @@
+"""                                                                           *** RAM Module ***
+    This code allows to determine if an  NSLR (Network Slice Request)
+    can be granted or not based on the available resources from the substrate
+    several vnfs can be accepted in the same node
+    
+    23 oct 19:
+    function reduce_nslr_graph is added to reduce the size of the nslr graph
+
+    04 nov 19:
+    functionality is added to be able to map vnfs in nodes of another type
+    in case the nodes of the required type have no resources available;
+    In this way, accepting nslrs from a use case will have a greater influence on
+    nslrs acceptance of another use cas
+"""
+
+## orderring the vnfs starting from the backup ones
+## vnfs on the same node are groups and called virtual node to reduce the nslr graph
+
+import copy
+import networkx as nx
+from operator import itemgetter, attrgetter, methodcaller 
+import graph_generator as ggen
+
+## amel
+import nsl_request as nslr
+import substrate_graphs as substrate_graph
+import matplotlib
+matplotlib.use("agg")
+import matplotlib.pyplot as plt
+
+ranked_nodes_cpu = []
+nsl_graph_red = {} #reduced nsl graph
+
+def nsl_placement(nslr, substrate):  ## need to know why we are passing the substrate
+
+    global ranked_nodes_cpu
+    profit_nodes = 0
+    profit_links = 0
+    centralized_vnfs = []
+    # local_vnfs = []
+    edge_vnfs = []      
+
+    vnfs = nslr.nsl_graph["vnfs"] #considerar rankear vnfs tambien
+    reduce_nslr_graph(nslr) #builds a reduced version of the nsl_graph to reduce the size of it based on if we have seccessor backups we put them in one virtual node
+    
+    vnodes = nslr.nsl_graph_reduced["vnodes"]    ## !! if its not working check here for the return of the above function
+
+
+    #Amel code to avoid reducing the nslr graph
+    #vnodes=vnfs
+    #nslr.set_nsl_graph_reduced(vnfs) 
+    #nsl_graph_red=vnfs
+
+    ## end code
+
+
+  
+    calculate_resource_potential(substrate,"cpu") ## for each node, sum of its links bw * node's cpu ATTTT: to rank the nodes based on the ones with more conx links and cpu capacity
+    nodes = copy.deepcopy(substrate.graph["nodes"]) #copy to temporarily work with it
+    ranked_nodes_cpu = sort_nodes(nodes,"node_potential") #ranked list of nodes by potential considering cpu and conections     
+    # ranked_nodes_cpu = nodes
+    rejected = False
+    flag = False # to know if a vnode has not been mapped to nodes of the same type
+    
+
+
+      ###### Draw the reduced graph to see how we are grouping vnfs of different types, backup & primary
+    
+      
+    G = nx.Graph()
+
+    # add nodes to the graph
+    for vnf in nsl_graph_red["vnodes"]:
+        G.add_node(vnf["id"], type=vnf["type"])
+
+    # add edges to the graph
+    for vlink in nsl_graph_red["vlinks"]:
+        G.add_edge(vlink["source"], vlink["target"])
+
+    # draw the graph
+    pos = nx.spring_layout(G)
+    nx.draw_networkx_nodes(G, pos)
+    nx.draw_networkx_edges(G, pos)
+    nx.draw_networkx_labels(G, pos)
+    plt.savefig("red_graph_test.png") # save as png 
+
+
+
+
+
+
+
+      
+
+
+
+    ################### vnfs admission #################  
+    ## here we have only two vnodes according if the vnfs are primary or backup, then aleardy will be used to put them in different nodes 
+    rejected = False
+    already = [] #list of nodes that already hold a vnode
+    print("ranked nodes",ranked_nodes_cpu)
+    #print("vnodes list: ", nsl_graph_red["vnodes"])
+    for v in vnodes:
+        if rejected:
+            break
+        for n in ranked_nodes_cpu:  ## loop the list of vnodes sorted according to their ressources
+            #if resource enough and node of the same type and node not used, vnode accepted  
+             
+            
+            if v["cpu"] <= n["cpu"] and v["type"] == n["type"] and n["id"] not in already: 
+                #mapping:
+
+                v["mapped_to"] = n["id"]
+                print(v["id"] , "mapped to ", n["id"])
+                #print(v)
+                print("enter to same type of vnfs backup or not")
+
+                already.append(n["id"])
+                print("already", already)
+                break
+            else: # insufficient resource, vnode rejected    
+                        
+                if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
+                                                                        ## we are in the last vnode
+                    rejected = True    
+                    print("enter to insufficient ressources")
+                    #print("insufficient ressources")
+                    break   
+    ################### ------------- #################                
+    
+    ################## vlinks admission #################
+   # if not rejected:
+    #    rejected = analyze_links(nsl_graph_red,substrate)
+    # else:
+    #     print("\n\n","***rejected by scarce node rsc","\n\n")
+    ################### ------------- #################
+    # if rejected:
+    #     print("\n\n","***rejected by scarce link rsc","\n\n")
+
+    return rejected 
+
+def sort_nodes(node_list,sortby):       
+    sorted_list = sorted(node_list, key=itemgetter(sortby), reverse=True)#sorted list    
+    return sorted_list
+
+def calculate_resource_potential(substrate,resource_type):
+    '''
+        potential or importance of the node
+        the potential of a node to embed vnfs in terms of cpu, str, and bw
+        local_rsc_capacity  =  node resource * sum of bw of all links adjacent to the node
+        degree_centrality = degree/(n-1)
+        node potential = local_rsc_capacity + degree_centrality
+
+    '''
+    nodes = substrate.graph["nodes"]
+    links = substrate.graph["links"]
+    for i in range(len(nodes)):
+        bw_sum = 0
+ 
+        for l in range(len(links)):            
+            if links[l]["source"] == i or links[l]["target"] == i: #links connected to node i
+                bw_sum += links[l]["bw"] #sum of outgoing links bw 
+        
+        local_rsc_capacity = nodes[i].get(resource_type) * bw_sum
+        # nodes[i]["node_potential"] = (local_rsc_capacity/10000) + (nodes[i]["degree_centrality"]*5)
+        nodes[i]["node_potential"] = local_rsc_capacity #+ (nodes[i]["degree_centrality"]*5)
+        #print("+++",local_rsc_capacity)
+        #print("+++",nodes[i]["degree_centrality"])
+
+
+def reduce_nslr_graph(nslr):
+    '''
+        Pre-processing of the nslr graph to reduce its size
+        the vnfs that can be instantiated in the same physical node are grouped as a single virtual node
+    '''
+    centralized_vnfs = []
+    
+    # local_vnfs = []
+    edge_vnfs = []
+
+    #1. Group vnfs by node type: (fill the two above lists)
+    for vnf in nslr.nsl_graph["vnfs"]: #loop vnfs      
+        if vnf["type"] == 0:
+            centralized_vnfs.append(vnf)
+        # elif vnf["type"] == 1:
+        #     local_vnfs.append(vnf)
+        else: 
+            edge_vnfs.append(vnf) 
+
+    #2. Sort the vnfs by backup:
+    centralized_vnfs = sorted(centralized_vnfs, key=itemgetter("backup"))## order the vnfs according to backup from 0 to above to start first with the primary vnfs
+    # local_vnfs = sorted(local_vnfs, key=itemgetter("backup"))
+    edge_vnfs = sorted(edge_vnfs, key=itemgetter("backup"))
+
+    #3. Group vnfs that will be instantiated in the same physical node:
+    nsl_graph_red["vnodes"] = []
+   
+    group_vnfs(centralized_vnfs,0)
+    # group_vnfs(local_vnfs,1)
+    group_vnfs(edge_vnfs,1)
+
+    #4. Create new vlinks considering the virtual nodes created
+    nsl_graph_red["vlinks"] = []
+    new_vlinks(nsl_graph_red,nslr.nsl_graph)
+
+    #5. resulting graph is added to the nslr
+    nslr.set_nsl_graph_reduced(nsl_graph_red) 
+    # nslr["nsl_graph_red"] = nsl_graph_red
+    # print("**",nsl_graph_red)
+
+def group_vnfs(vnfs_list,node_type):  ## here we are grouping the backup vnfs and the primary ones (backups which are the first vnfs in the list after order)
+
+    ## non-backup VNFs may have different functions and requirements, and grouping them together could limit their flexibility and performance.
+    '''
+        creates different vnodes and add them to the reduced graph
+    '''
+    vnode = {}
+    vnode["vnfs"] = [] #ids of the vnfs that make up this vnode
+    vnode["type"] = node_type
+    
+    if len(nsl_graph_red["vnodes"]) == 0:
+        cont = 0
+    else:
+        cont = len(nsl_graph_red["vnodes"])
+    #print("the vnfs_list:  ", vnfs_list)
+    for i in range(len(vnfs_list)):
+        
+       
+        
+        if i==0: ## first vnf (backup maybe)
+            vnode["cpu"] = vnfs_list[i]["cpu"]
+            vnode["vnfs"].append(vnfs_list[i]["id"])
+            if i == len(vnfs_list)-1: ## in case the list of vnfs contains only one, so add it directly to the list of vnodes nsl_graph_red[vnodes] since we wont have another vnf in this list
+                vnode["id"]=cont  ## give it the id of the next index in the list of vnodes in the nsl_graph_red (since it might have previous vnodes)
+                nsl_graph_red["vnodes"].append(vnode.copy())
+                cont += 1
+
+        elif vnfs_list[i]["backup"]==vnfs_list[i-1]["backup"]: ## we need to have the condition backup and primary vnfs are never put in the same node
+            vnode["cpu"] += vnfs_list[i]["cpu"]  ## add the cpu ressources to the virtual node for the next vnf
+            vnode["vnfs"].append(vnfs_list[i]["id"])  
+            print("same backup",vnode["vnfs"])
+            #print(vnfs_list[i], i)
+            if i == len(vnfs_list)-1: ## we are on the last vnf, need to add it the vnodes list
+                vnode["id"]=cont
+                nsl_graph_red["vnodes"].append(vnode.copy())
+                cont += 1
+
+        else:            
+            vnode["id"]=cont 
+            nsl_graph_red["vnodes"].append(vnode.copy())
+            
+            cont += 1
+            vnode["cpu"] = vnfs_list[i]["cpu"]
+            vnode["vnfs"] = []
+            vnode["vnfs"].append(vnfs_list[i]["id"])
+            if i == len(vnfs_list)-1:
+                vnode["id"]=cont
+                nsl_graph_red["vnodes"].append(vnode.copy())
+                cont += 1
+
+    # return nsl_graph_red  ## maybe uncomment the return
+
+def new_vlinks(nsl_graph_red, nsl_graph): ## create the virtual links between the vnodes created before
+    vnfs = nsl_graph["vnfs"]
+    vnodes = nsl_graph_red["vnodes"]
+    new_vlink = {}
+    for vlink in nsl_graph["vlinks"]:     
+        source = next(vnf for vnf in vnfs if vnf["id"]==vlink["source"])
+        target = next(vnf for vnf in vnfs if vnf["id"]==vlink["target"])
+        #if src and target are of the same type and are from the same backup, then do nothing (vlink is not considered)
+        if source["type"] == target["type"] and source["backup"] == target["backup"]:
+            pass
+        else: #otherwise vlink is considered, since the pair of vnfs are in different vnodes
+            new_src = next(vnode for vnode in vnodes if source["id"] in vnode["vnfs"])
+            new_tgt = next(vnode for vnode in vnodes if target["id"] in vnode["vnfs"]) 
+            new_vlink = {"source":new_src["id"],"target":new_tgt["id"],"bw":vlink["bw"]}
+            nsl_graph_red["vlinks"].append(new_vlink)
+
+
+def analyze_links(nsl_graph,substrate):
+    '''
+   Makes the accept or reject decision based on the shortest path
+    Find the shortest path and with enough bw in each link to instantiate
+    a v.link. Max number of hops allowed is 5
+    If there is no path with hops <= 5 and enough bw, the nslr is rejected
+    '''
+ 
+    G = nx.node_link_graph(substrate.graph)#graph format
+    links = copy.deepcopy(substrate.graph["links"])#copy to temporarily work with it
+    reject = False
+    max_hops = 5
+    vlinks = nsl_graph["vlinks"]
+    vnfs = nsl_graph["vnodes"] ## att: we work only with vnodes 
+    for vlink in vlinks:
+        substrate_src = next(vnf["mapped_to"] for vnf in vnfs if vnf["id"] == vlink["source"]) 
+        substrate_dst = next(vnf["mapped_to"] for vnf in vnfs if vnf["id"] == vlink["target"])
+        # print("\n***vlink:",vlink)
+        # que hacer con las vnfs que se instancian en el mismo nodo? cobrar por vlink? cuanto?
+        paths = nx.all_simple_paths(G,source=substrate_src,target=substrate_dst)
+        path_list = [p for p in paths]
+        path_list.sort(key=len)
+        for path in path_list:
+            #check if all the links in the path have sufficient resource
+            enough = True
+            # print("*PATH:",path)
+            if len(path) >= max_hops:
+                reject = True
+                # print("hops number is 5 or higher")
+                break
+            else:    
+                for l in range(len(path)-1):
+
+                    link = next(lk for lk in links if ( (lk["source"]==path[l] and lk["target"]==path[l+1]) or (lk["source"]==path[l+1] and lk["target"]==path[l]) ) )
+                    # print("*",path[l],path[l+1])
+                    # print("link:",link["bw"])
+                    if vlink["bw"] <= link["bw"]: #hay suficiente bw                        
+                        link["bw"] -= vlink["bw"] #resource is updated
+                        # enough bw                       
+                    else:# not enough bw
+                        enough = False
+
+                if enough:
+                    # print("MAPEAR")
+                    vlink["mapped_to"] = path#si hubo bw suficiente en cada link del path, se mapea
+                    break
+                elif enough == False and path_list.index(path) == len(path_list)-1:
+                        reject = True              
+                
+        if reject:
+            break
+
+    return reject
+
+
+#substrate = ggen.ba_graph("amel_test",15) 
+#print(substrate)
+#decision = nsl_placement(NSLR, substrate)
+
+## Amel code
+
+substrate = substrate_graph.get_graph(10)
+
+NSLR = nslr.get_nslr(1,"urllc",50)
+
+decision = nsl_placement(NSLR, substrate)
+print(decision)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## to draw the graph:
+# create an empty graph
+G = nx.Graph()
+
+# add nodes
+for node in substrate.graph["nodes"]:
+    G.add_node(node["id"], cpu=node["cpu"], type=node["type"])
+
+# add edges
+for link in substrate.graph["links"]:
+    G.add_edge(link["source"], link["target"], bw=link["bw"])
+
+# set positions of nodes
+pos = nx.spring_layout(G)
+
+# draw nodes
+nx.draw_networkx_nodes(G, pos, node_size=500, node_color='lightblue')
+
+# draw edges
+nx.draw_networkx_edges(G, pos, width=1, alpha=0.7, edge_color='gray')
+
+# add node labels
+labels = {node["id"]: node["id"] for node in substrate.graph["nodes"]}
+nx.draw_networkx_labels(G, pos, labels, font_size=10, font_color='black')
+
+# add edge labels
+edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in substrate.graph["links"]}
+nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+
+# show plot
+plt.axis('off')
+plt.savefig("graph_test.png") # save as png   
+
+
+
+## to draw the NSLR:
+
+
+# create an empty graph
+G = nx.Graph()
+
+# add nodes to the graph
+for vnf in NSLR.nsl_graph["vnfs"]:
+    G.add_node(vnf["id"], function=vnf["function"], type=vnf["type"], backup=vnf["backup"])
+
+# add edges to the graph
+for vlink in NSLR.nsl_graph["vlinks"]:
+    G.add_edge(vlink["source"], vlink["target"])
+
+# draw the graph
+pos = nx.spring_layout(G)
+nx.draw_networkx_nodes(G, pos)
+nx.draw_networkx_edges(G, pos)
+nx.draw_networkx_labels(G, pos)
+plt.savefig("NSLR_test.png") # save as png  
+
+
+
+
