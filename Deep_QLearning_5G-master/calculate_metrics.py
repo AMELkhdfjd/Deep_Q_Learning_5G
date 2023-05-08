@@ -11,17 +11,18 @@ def calculate_profit_nodes(nslr,end_simulation_time):
         if vnf["type"] == 0:#central
             cf_cpu = 1
         elif vnf["type"] == 1:#edge
-            cf_cpu = 3
+            cf_cpu = 3 ## edge nodes are more valuable
         # else:
         #     cf_cpu = 4 
         cost += vnf["cpu"]*cf_cpu
-        revenue += vnf["cpu"]*cf_cpu*2#revenue es el doble del costo (hasta ahora) 
+        revenue += vnf["cpu"]*cf_cpu*2#revenue is twice the cost (so far)
 
     if nslr.end_time > end_simulation_time:
-        #si es mayor, se considera la porcion de tiempo hasta acabar la simulacion  
-        time = nslr.operation_time - (nslr.end_time-end_simulation_time)
+        #if it is greater, the portion of time until the end of the simulation is considered 
+        time = nslr.operation_time - (nslr.end_time-end_simulation_time) ## if the time of the nslr is greater than the simulation time, we need to substrate this time since we are not consuming it, the simulation ends before that
+
     else:
-        time = nslr.operation_time
+        time = nslr.operation_time ## if the end time is smaller than the simulation time than take all the operation time since the nslr will have the time to
 
     profit = (revenue-cost)*time 
     return profit
@@ -41,18 +42,18 @@ def calculate_profit_links(nslr,end_simulation_time):
         except KeyError:
             hops=0
         cost += vlink["bw"]*cf_bw*hops #cost is proportional to the number of hops
-        revenue += vlink["bw"]*cf_bw*5*1.5 #(5:se cobra considerando el max num de hops permitido y 1.5: un 50% adicional al cost con 5hops)
+        revenue += vlink["bw"]*cf_bw*5*1.5 #(5: charged considering the maximum number of hops allowed and 1.5: an additional 50% to the cost with 5hops)
 
     if nslr.end_time > end_simulation_time:
         #si es mayor, se considera la porcion de tiempo hasta acabar la simulacao  
         time = nslr.operation_time - (nslr.end_time-end_simulation_time)
     else:
-        time = nslr.operation_time
+        time = nslr.operation_time## same as above
 
     profit = (revenue-cost)*time
     return profit
 
-def calculate_request_utilization(nslr,end_simulation_time,substrate):
+def calculate_request_utilization(nslr,end_simulation_time,substrate):## returns how much cpu*time consumed for contral nodes and links
     vnfs = nslr.nsl_graph_reduced["vnodes"]
     vlinks = nslr.nsl_graph_reduced["vlinks"]
     time = 0.0
@@ -74,7 +75,7 @@ def calculate_request_utilization(nslr,end_simulation_time,substrate):
         #si es mayor, se considera la porcion de tiempo hasta acabar la simulacion  
         time = nslr.operation_time - (nslr.end_time-end_simulation_time)
     else:
-        time = nslr.operation_time
+        time = nslr.operation_time## same as above
 
     edge_utl = edge_sum*time
     central_utl = central_sum*time
