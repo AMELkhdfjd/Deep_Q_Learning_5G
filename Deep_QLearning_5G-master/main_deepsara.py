@@ -200,7 +200,7 @@ class Sim:
             return l
 
 
-    def add_event(self, evt):  ## inserting a new event into the list of events evt in order       
+    def add_event(self, evt):  ## inserting a new event into the list of events evt in order and create the nslr and insert it in the appropriate window list according to its service 
         request = {}
         #encontrar indice y adicionar evt en esa posicion
         # index = 0
@@ -225,7 +225,7 @@ class Sim:
 
             if evt.extra["service_type"] == "embb":
                 self.total_embb_reqs += 1
-                self.window_req_list[0].append(copy.deepcopy(request))#
+                self.window_req_list[0].append(copy.deepcopy(request))## add the request to the window list according to the type of the service
             elif evt.extra["service_type"] == "urllc":
                 self.total_urllc_reqs += 1
                 self.window_req_list[1].append(copy.deepcopy(request))#
@@ -237,6 +237,9 @@ class Sim:
             #request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)
             #self.window_req_list.append(copy.deepcopy(request))
 
+
+
+############################### Continue here ###################################
     def print_eventos(self):
         print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
         for i in range(len(self.eventos)): 
