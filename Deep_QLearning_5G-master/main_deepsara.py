@@ -292,11 +292,12 @@ def get_interarrival_time(arrival_rate):   ## generates an interarrival time ran
     return inter_arrival_time
 
 
-def filtro(window_req_list,action):
+def filtro(window_req_list,action): ## still ambigus
     
     granted_req_list = []
     auxiliar_list = []
     for req in window_req_list:
+        ## ATT here bandera means flag, maybe here we are taking the requests with action flags <=(100,100,100)
         if (req.service_type == "embb" and req.bandera <= actions[action][0]*100) or (req.service_type == "urllc" and req.bandera <= actions[action][1]*100) or (req.service_type == "miot" and req.bandera <= actions[action][2]*100):
             # print("**agregando request...")
             granted_req_list.append(req)
@@ -307,7 +308,7 @@ def filtro(window_req_list,action):
 
     return granted_req_list
 
-def prioritizer_v1(window_req_list,action_index): ##v1
+def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the request lists of the window list based on the action choosed before
     #print("****prioritizing...")
     action = actions[action_index]
     # embb_list = []
@@ -315,7 +316,7 @@ def prioritizer_v1(window_req_list,action_index): ##v1
     # miot_list = []
     granted_req_list = []
 
-    #Conversion de accion en proportion ej: #action = (0.75,1,0.25) -> (3,4,1) reresenta 3:4:1
+    #Conversion of action in proportion eg: #action = (0.75,1,0.25) -> (3,4,1) represents 3:4:1
     translated_action = []
     for i in action:
         if i == 1:
@@ -336,7 +337,7 @@ def prioritizer_v1(window_req_list,action_index): ##v1
     #     else:
     #         miot_list.append(req)
 
-    #mientras haya peticiones en las listas se las adiciona a la lista priorizada        
+    #While there are requests in the lists, they are added to the prioritized list        
     embb_list = window_req_list[0]
     urllc_list = window_req_list[1]
     miot_list = window_req_list[2]
