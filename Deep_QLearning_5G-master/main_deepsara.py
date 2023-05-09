@@ -107,7 +107,7 @@ n_actions = len(actions)
 class Evento:
     def __init__(self, type, start, extra, function):
         self.type = type
-        self.start = start ## need to figure out what means the start here !!
+        self.start = start ## need to figure out what means the start here !! maybe the time the event starts
         self.extra = extra
         self.function = function
 
@@ -159,7 +159,7 @@ class Sim:
         self.window_req_list = [[],[],[]] #for the three services
         #self.window_req_list = []
         self.granted_req_list = []
-        self.horario = 0
+        self.horario = 0 
         self.run_till = -1
         self.total_reqs = 0
         self.total_embb_reqs = 0
@@ -240,32 +240,40 @@ class Sim:
 
 
 ############################### Continue here ###################################
-    def print_eventos(self):
+
+
+    def print_eventos(self):## print the infos about an event
         print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
-        for i in range(len(self.eventos)): 
+        for i in range(len(self.eventos)): ## loop the events
             print(self.eventos[i].type,self.eventos[i].start, end=" > ")
         #print("++list: ",len(self.window_req_list[0])+len(self.window_req_list[1])+len(self.window_req_list[2]))
 
         print("\n")
 
-    def get_proximo_evento(self):
+
+
+    def get_next_evento(self):## maybe takes the next event from the list of events bcs in the list we will have only remaining events
         if len(self.eventos)==0:
             return None
         else:
-            p = self.eventos.pop(0)
-            self.horario = p.start
+            p = self.eventos.pop(0) ## remove the first element of the list which means the first event, since they are ordered
+            self.horario = p.start  ## 
             return p
 
-    def run(self,c):
+    def run(self,c):  ## run all events from the list of events, one by one till we reach the end time of the simulation and execute a function for each event
+                      ## need to figure out what the c represents here !!
+
         # self.print_eventos()
-        while self.horario<self.run_till:
+        while self.horario<self.run_till: ## while the start time of the event is less than the time the simulation ends, its ok
             #self.print_eventos()
-            p = self.get_proximo_evento()
+            p = self.get_next_evento()
             if p==None:
                 return    
             p.function(c,p)
  
-def aleatorio(seed):
+
+
+def randoms(seed):  ## which means random just to not confuse
     m = 2**34
     c = 251
     a = 4*c+1
@@ -273,14 +281,16 @@ def aleatorio(seed):
     rand_number = (((a*seed)+b)%m)/m
     return rand_number
 
-def get_interarrival_time(arrival_rate):
-    seed = random.randint(10000000,8000000000)#cambiar solo para cada repetición
-    p = aleatorio(seed) 
+def get_interarrival_time(arrival_rate):   ## generates an interarrival time randomly
+    seed = random.randint(10000000,8000000000)#change only for each repeat
+
+    p = randoms(seed) 
     # print(p)     
     inter_arrival_time = -math.log(1.0 - p)/arrival_rate #the inverse of the CDF of Exponential(_lamnbda)
     # inter_arrival_time = float('{0:,.2f}'.format(inter_arrival_time))
 
     return inter_arrival_time
+
 
 def filtro(window_req_list,action):
     
