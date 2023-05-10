@@ -372,9 +372,9 @@ def takeFirst(elem):## i guess useless
 
 ############################### Continue here ###################################
 
-def prioritizer(window_req_list,action_index): #v2
+def prioritizer(window_req_list,action_index): #v2  ## this version is not clear, need to revieW later
     #print("****prioritizing...")
-    action = actions[action_index]
+    action = actions[action_index]## taken the action passed in argument
     action2 = []
     granted_req_list = []
     remaining_req_list = []
@@ -382,11 +382,11 @@ def prioritizer(window_req_list,action_index): #v2
     #action = (0.75,1,0.25) -> (cant1,cant2,cant3) 
     #traducir action en porcentage a cantidades (entero más cercano)
     action2.append([action[0],round(action[0]*len(window_req_list[0])),0]) #[pctg,cant,type] ej:[0.75,75,0]
-    action2.append([action[1],round(action[1]*len(window_req_list[1])),1])
+    action2.append([action[1],round(action[1]*len(window_req_list[1])),1]) ## wondering if the length here is 100 for all lists or what
     action2.append([action[2],round(action[2]*len(window_req_list[2])),2])
 
-    #de acuerdo a "action", ordenar "action2"
-    action2.sort(key=takeFirst,reverse=True)
+    #according to "action", sort "action2"
+    action2.sort(key=takeFirst,reverse=True)## action2 will be sorted in descending order based on the first element of each element in the list.
 
     for j in action2:
         
