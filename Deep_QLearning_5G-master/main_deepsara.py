@@ -308,6 +308,7 @@ def filtro(window_req_list,action): ## still ambigus
 
     return granted_req_list
 
+
 def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the request lists of the window list based on the action choosed before
                    ## returns the granted list containing the requests that must be sutistied and chosen according to the action passed in argument
                    ## we will loop all the requests of the window list and store the chosen requests in the granted list
@@ -367,6 +368,9 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
 
 def takeFirst(elem):## i guess useless 
     return elem[0]
+
+
+############################### Continue here ###################################
 
 def prioritizer(window_req_list,action_index): #v2
     #print("****prioritizing...")
