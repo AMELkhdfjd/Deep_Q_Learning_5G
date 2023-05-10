@@ -309,6 +309,9 @@ def filtro(window_req_list,action): ## still ambigus
     return granted_req_list
 
 def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the request lists of the window list based on the action choosed before
+                   ## returns the granted list containing the requests that must be sutistied and chosen according to the action passed in argument
+                   ## we will loop all the requests of the window list and store the chosen requests in the granted list
+       
     #print("****prioritizing...")
     action = actions[action_index]
     # embb_list = []
@@ -317,8 +320,8 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
     granted_req_list = []
 
     #Conversion of action in proportion eg: #action = (0.75,1,0.25) -> (3,4,1) represents 3:4:1
-    translated_action = []
-    for i in action:
+    translated_action = [] ## will contain the numbers 1,2,3,4 instead of 0.5,...
+    for i in action:  ## ATT translates only one action, the action passed to the function
         if i == 1:
             translated_action.append(4)
         elif i == 0.75:
@@ -337,16 +340,18 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
     #     else:
     #         miot_list.append(req)
 
-    #While there are requests in the lists, they are added to the prioritized list        
     embb_list = window_req_list[0]
     urllc_list = window_req_list[1]
     miot_list = window_req_list[2]
+    
+    #While there are requests in the lists, they are added to the prioritized list        
+
     while embb_list or urllc_list or miot_list:
         #for value in action:
         for i in range(0,translated_action[0]):
             if embb_list:
-                granted_req_list.append(embb_list[0])
-                embb_list.pop(0)
+                granted_req_list.append(embb_list[0]) ## att: fills the granted_list will the respective number of requests epecified in the translated action for ex: 3
+                embb_list.pop(0) ## remove the request taken from the list, leave only untreated events or requests
 
         for i in range(0,translated_action[1]):
             if urllc_list:
@@ -358,9 +363,9 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
                 granted_req_list.append(miot_list[0])
                 miot_list.pop(0)        
 
-    return granted_req_list
+    return granted_req_list 
 
-def takeFirst(elem):
+def takeFirst(elem):## i guess useless 
     return elem[0]
 
 def prioritizer(window_req_list,action_index): #v2
