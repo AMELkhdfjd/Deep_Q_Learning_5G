@@ -404,11 +404,11 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
     return granted_req_list, remaining_req_list #v6
     #return granted_req_list+remaining_req_list, remaining_req_list #v1
 
-def update_resources(substrate,nslr,kill):
+def update_resources(substrate,nslr,kill):  ## updates the ressources consumed for the cpu of physical nodes and the bw of the links
     
     nodes = substrate.graph["nodes"]
     links = substrate.graph["links"]   
-    for vnf in nslr.nsl_graph_reduced["vnodes"]:#se recorre los nodos del grafo reducido del nslr aceptado    
+    for vnf in nslr.nsl_graph_reduced["vnodes"]:#the nodes of the reduced graph of the accepted nslr are traversed   
         if "mapped_to" in vnf:
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )# 
             if vnf["type"] == 0:
@@ -421,10 +421,10 @@ def update_resources(substrate,nslr,kill):
                 substrate.graph[type] += vnf["cpu"]
             else:
                 
-                n["cpu"] = n["cpu"] - vnf["cpu"] 
+                n["cpu"] = n["cpu"] - vnf["cpu"] ## reduce the cpu of the nodes in the graph maybe
                 substrate.graph[type] -= vnf["cpu"]
     for vlink in nslr.nsl_graph_reduced["vlinks"]:
-        try:#cuando dos vnfs se instancian en un mismo nodo no hay link
+        try:#when two vnfs are instantiated in the same node there is no link
             path = vlink["mapped_to"]            
         except KeyError:
             path=[]
@@ -435,7 +435,7 @@ def update_resources(substrate,nslr,kill):
                     l["bw"] += vlink["bw"]
                     substrate.graph["bw"] += vlink["bw"]
                 else:
-                    l["bw"] -= vlink["bw"]
+                    l["bw"] -= vlink["bw"] ## reduce the bw consumed 
                     substrate.graph["bw"] -= vlink["bw"]
             except StopIteration:
                 pass
