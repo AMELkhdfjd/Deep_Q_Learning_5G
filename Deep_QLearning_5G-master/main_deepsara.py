@@ -372,30 +372,31 @@ def takeFirst(elem):## i guess useless
 
 ############################### Continue here ###################################
 
-def prioritizer(window_req_list,action_index): #v2  ## this version is not clear, need to revieW later
+def prioritizer(window_req_list,action_index): #v2  ## the two versions do the same thing but with different manners
     #print("****prioritizing...")
-    action = actions[action_index]## taken the action passed in argument
+    action = actions[action_index]## taken the action passed in argument action=(0.75,1,0.5)
     action2 = []
     granted_req_list = []
     remaining_req_list = []
     
     #action = (0.75,1,0.25) -> (cant1,cant2,cant3) 
-    #traducir action en porcentage a cantidades (entero más cercano)
+    #translate action in percentage to quantities (nearest integer)
     action2.append([action[0],round(action[0]*len(window_req_list[0])),0]) #[pctg,cant,type] ej:[0.75,75,0]
     action2.append([action[1],round(action[1]*len(window_req_list[1])),1]) ## wondering if the length here is 100 for all lists or what
     action2.append([action[2],round(action[2]*len(window_req_list[2])),2])
-
+   ## ex: action2=([0.75,75,0],[0.5,50,1],[0.25,25,2])
     #according to "action", sort "action2"
     action2.sort(key=takeFirst,reverse=True)## action2 will be sorted in descending order based on the first element of each element in the list.
+    ## it sorts according to the percentage of the services 0.75 descending order
 
     for j in action2:
         
-        if j[0]==1:
-            granted_req_list += window_req_list[j[2]]
+        if j[0]==1:## contains the percentage for each element of the list, ex: 0.5
+            granted_req_list += window_req_list[j[2]]## add all requests for the type to the granted list since the percentage is 100%
             
         else:    
             for i in range(len(window_req_list[j[2]])):            
-                if i < j[1]:
+                if i < j[1]:## in order to take for ex 75 requests from the windows list and leave in the remaining list the remaining requests
                     granted_req_list.append(window_req_list[j[2]][i])
                 else:
                     remaining_req_list.append(window_req_list[j[2]][i])      
