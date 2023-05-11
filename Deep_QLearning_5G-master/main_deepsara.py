@@ -594,13 +594,13 @@ def translateStateToIndex(state): ## still ambigus
     return int(index)
 
 
-def get_state(substrate,simulation):    
+def get_state(substrate,simulation): ## returns the state of 9 parmas   
     cod_avble_edge = get_code(substrate.graph["edge_cpu"]/edge_initial) ## att the substrate.graph["edge_cpu"] decreasing after each nslr treatement, but edge initial is const
     cod_avble_central = get_code(substrate.graph["centralized_cpu"]/centralized_initial)
     cod_avble_bw = get_code(substrate.graph["bw"]/bw_initial)
     
 
-    total = 0
+    total = 0   ## for all the requests from current instantiated req list for the step
     for i in simulation.current_instatiated_reqs:
         total += i
     if total == 0:
@@ -612,7 +612,8 @@ def get_state(substrate,simulation):
     cod_pct_miot = get_code(pct_miot)
 
     
-    counter = [0,0,0]
+    counter = [0,0,0] ## counts the number of reqs for each type of the granted req list
+                      ## here we are doing the same thing above except for the granted list req
     n = len(simulation.granted_req_list)
     
     if n == 0:
