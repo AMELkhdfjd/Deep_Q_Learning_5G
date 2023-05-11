@@ -159,7 +159,7 @@ class Sim:
         self.window_req_list = [[],[],[]] #for the three services
         #self.window_req_list = []
         self.granted_req_list = []
-        self.horario = 0 
+        self.horario = 0 ## means the start of an nslr treatement
         self.run_till = -1
         self.total_reqs = 0
         self.total_embb_reqs = 0
@@ -445,8 +445,8 @@ def resource_allocation(cn): #cn=controller
    #makes allocation for the set of nslrs captured in a time window
     # the metrics calculated here correspond to a step
      
-    sim = cn.simulation
-    substrate = cn.substrate
+    sim = cn.simulation ## define the object of class Sim which is part of the Controller class
+    substrate = cn.substrate ## substrate of the controller class
     step_embb_profit = 0 
     step_urllc_profit = 0
     step_miot_profit = 0
@@ -465,16 +465,16 @@ def resource_allocation(cn): #cn=controller
     max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
     max_profit = max_link_profit + max_node_profit
 
-    for req in sim.granted_req_list:
+    for req in sim.granted_req_list: 
         # print("**",req.service_type,req.nsl_graph)
         sim.attended_reqs += 1        
-        rejected = nsl_placement.nsl_placement(req,substrate)#mapping
-        if not rejected: 
-            #instantiation y adicion de evento de termination
-            req.set_end_time(sim.horario+req.operation_time)
-            graph = req.nsl_graph_reduced
+        rejected = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
+        if not rejected: ## successfully mapped
+            #instantiation and addition of termination event
+            req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
+            graph = req.nsl_graph_reduced 
             update_resources(substrate,req,False)#instantiation, occupy resources
-            evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate)
+            evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
             sim.add_event(evt) 
 
             #calculo de metricas (profit, acpt_rate, contadores)            

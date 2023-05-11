@@ -56,7 +56,7 @@ def calculate_profit_links(nslr,end_simulation_time):
     profit = (revenue-cost)*time
     return profit
 
-def calculate_request_utilization(nslr,end_simulation_time,substrate):## returns how much cpu*time consumed for contral nodes and links
+def calculate_request_utilization(nslr,end_simulation_time,substrate):## returns how much cpu*time consumed (the cpu and bw consumed) for contral nodes and links
     vnfs = nslr.nsl_graph_reduced["vnodes"]
     vlinks = nslr.nsl_graph_reduced["vlinks"]
     time = 0.0
