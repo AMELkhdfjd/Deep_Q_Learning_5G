@@ -688,7 +688,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 
 
 counter_windows = 0
-def func_twindow(c,evt):
+def func_twindow(c,evt):  ## recursive function need to understand it more
     #the time sale has expired. The nslrs collected so far will be analyzed for admission.
     global counter_windows
     sim = c.simulation 
@@ -739,21 +739,22 @@ def func_twindow(c,evt):
         end_state = True
     else:
         end_state = False
-    
-    evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)    
+    ### ATTT!!! recursive CALL here  |
+    evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)  
+
     sim.add_event(evt)
     sim.window_req_list = [[],[],[]] #
     #sim.window_req_list = []
     sim.granted_req_list = [] 
   
-def prepare_sim(s):
+def prepare_sim(s):## prepares the simulation object for all services and sets the params for them
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(embb_arrival_rate),extra={"service_type":"embb","arrival_rate":embb_arrival_rate},f=func_arrival)
     s.add_event(evt)
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_arrival_rate),extra={"service_type":"urllc","arrival_rate":urllc_arrival_rate},f=func_arrival)
     s.add_event(evt)
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)
     s.add_event(evt)
-
+    ## here maybe its the first state
     evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)
     s.add_event(evt)
 
