@@ -405,20 +405,21 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
     #return granted_req_list+remaining_req_list, remaining_req_list #v1
 
 def update_resources(substrate,nslr,kill):  ## updates the ressources consumed for the cpu of physical nodes and the bw of the links
-    
+    ### Problem !! why we dont update the ressources on the specific node rather than all the graph !?
     nodes = substrate.graph["nodes"]
     links = substrate.graph["links"]   
     for vnf in nslr.nsl_graph_reduced["vnodes"]:#the nodes of the reduced graph of the accepted nslr are traversed   
-        if "mapped_to" in vnf:
-            n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )# 
-            if vnf["type"] == 0:
+        if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
+            n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
+              ## need to figure out the effect of next above
+            if vnf["type"] == 0: #
                 type = "centralized_cpu"
             else:
                 type = "edge_cpu"
             if kill: #if it is kill process, resources are free again
                 
-                n["cpu"] = n["cpu"] + vnf["cpu"]
-                substrate.graph[type] += vnf["cpu"]
+                n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
+                substrate.graph[type] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
             else:
                 
                 n["cpu"] = n["cpu"] - vnf["cpu"] ## reduce the cpu of the nodes in the graph maybe
@@ -441,8 +442,8 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
                 pass
 
 def resource_allocation(cn): #cn=controller
-    #hace allocation para el conjunto de nslrs capturadas en una ventana de tiempo
-    #las metricas calculadas aqui corresponden a un step
+   #makes allocation for the set of nslrs captured in a time window
+    # the metrics calculated here correspond to a step
      
     sim = cn.simulation
     substrate = cn.substrate

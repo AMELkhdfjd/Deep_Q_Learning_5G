@@ -112,11 +112,11 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
 
                 v["mapped_to"] = n["id"]
                 print(v["id"] , "mapped to ", n["id"])
-                #print(v)
-                print("enter to same type of vnfs backup or not")
+                print(v)
+                #print("enter to same type of vnfs backup or not")
 
                 already.append(n["id"])
-                print("already", already)
+                #print("already", already)
                 break
             else: # insufficient resource, vnode rejected    
                         
