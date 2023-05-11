@@ -551,7 +551,7 @@ def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 
     
     #return value
 
-def translateStateToIndex(state):
+def translateStateToIndex(state): ## still ambigus
     '''
     returns state index from a given state code
     '''
@@ -595,7 +595,7 @@ def translateStateToIndex(state):
 
 
 def get_state(substrate,simulation):    
-    cod_avble_edge = get_code(substrate.graph["edge_cpu"]/edge_initial)
+    cod_avble_edge = get_code(substrate.graph["edge_cpu"]/edge_initial) ## att the substrate.graph["edge_cpu"] decreasing after each nslr treatement, but edge initial is const
     cod_avble_central = get_code(substrate.graph["centralized_cpu"]/centralized_initial)
     cod_avble_bw = get_code(substrate.graph["bw"]/bw_initial)
     
@@ -612,7 +612,7 @@ def get_state(substrate,simulation):
     cod_pct_miot = get_code(pct_miot)
 
     
-    contador = [0,0,0]
+    counter = [0,0,0]
     n = len(simulation.granted_req_list)
     
     if n == 0:
@@ -620,12 +620,12 @@ def get_state(substrate,simulation):
     else:
         for req in simulation.granted_req_list:
             if req.service_type == "embb":
-                contador[0] += 1
+                counter[0] += 1
             elif req.service_type == "urllc":
-                contador[1] += 1
+                counter[1] += 1
             else:
-                contador[2] += 1
-        pct_arriv_embb, pct_arriv_urllc, pct_arriv_miot = contador[0]*100/n, contador[1]*100/n, contador[2]*100/n
+                counter[2] += 1
+        pct_arriv_embb, pct_arriv_urllc, pct_arriv_miot = counter[0]*100/n, counter[1]*100/n, counter[2]*100/n
 
     cod_pct_arriv_embb = get_code(pct_arriv_embb)
     cod_pct_arriv_urllc = get_code(pct_arriv_urllc)
@@ -669,12 +669,12 @@ def func_arrival(c,evt): #NSL arrival
     s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
 
 
-contador_termination = 0
+counter_termination = 0
 
 def func_terminate(c,evt):
-    global contador_termination
+    global counter_termination
     sim = c.simulation
-    contador_termination +=1
+    counter_termination +=1
     print("terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
@@ -685,12 +685,12 @@ def func_terminate(c,evt):
     else:
         sim.current_instatiated_reqs[2] -= 1
 
-contador_windows = 0
+counter_windows = 0
 def func_twindow(c,evt):
     #la venta de tiempo ha expirado. Las nslrs recolectadas hasta ahora seran analizadas para su admision
-    global contador_windows
+    global counter_windows
     sim = c.simulation 
-    contador_windows += 1
+    counter_windows += 1
     
     if evt.extra["first_state"]:
         #first state index
@@ -733,7 +733,7 @@ def func_twindow(c,evt):
     
     a = a_
     s = s_
-    if contador_windows  == (sim.run_till/twindow_length) - 2:
+    if counter_windows  == (sim.run_till/twindow_length) - 2:
         end_state = True
     else:
         end_state = False
