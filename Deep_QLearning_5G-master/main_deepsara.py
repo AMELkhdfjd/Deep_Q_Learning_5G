@@ -661,7 +661,7 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
 
     return state
 
-def func_arrival(c,evt): #NSL arrival
+def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and inserts it in the list of events
     s = c.simulation
     # print("**/",evt.extra["arrival_rate"])
     arrival_rate = evt.extra["arrival_rate"]
@@ -672,7 +672,7 @@ def func_arrival(c,evt): #NSL arrival
 
 counter_termination = 0
 
-def func_terminate(c,evt):
+def func_terminate(c,evt):   ## terminates a request, updates the ressources and reduced the number of instantiated reqs list
     global counter_termination
     sim = c.simulation
     counter_termination +=1
@@ -680,7 +680,7 @@ def func_terminate(c,evt):
     request = evt.extra
     update_resources(c.substrate,request,True)
     if request.service_type == "embb":
-        sim.current_instatiated_reqs[0] -= 1
+        sim.current_instatiated_reqs[0] -= 1  ## att current_instatiated reqs means the req in this moment occuping ressources in the graph and not yet terminated
     elif request.service_type == "urllc":
         sim.current_instatiated_reqs[1] -= 1
     else:
