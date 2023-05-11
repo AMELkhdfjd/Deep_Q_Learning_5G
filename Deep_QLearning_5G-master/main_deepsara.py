@@ -686,31 +686,32 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     else:
         sim.current_instatiated_reqs[2] -= 1
 
+
 counter_windows = 0
 def func_twindow(c,evt):
-    #la venta de tiempo ha expirado. Las nslrs recolectadas hasta ahora seran analizadas para su admision
+    #the time sale has expired. The nslrs collected so far will be analyzed for admission.
     global counter_windows
     sim = c.simulation 
     counter_windows += 1
     
-    if evt.extra["first_state"]:
+    if evt.extra["first_state"]: ## if its the first state
         #first state index
-        #todos los recursos al 100% (con granularidad de 5)
+        #all resources at 100% (with granularity of 5)
         state = get_state(c.substrate,c.simulation)
         
         #s = translateStateToIndex(state)
         #a = agente.take_action(s,True)
         
-        a = agente.step(state,0)
-    else:
-        s = evt.extra["current_state"]
-        a = evt.extra["action"]
+        a = agente.step(state,0) ## this returns the action taken, here we call the function step from the dql file, give state, reward, training=true, 
+    else:## its not the first state, still ambigus why we dont call the step function
+        s = evt.extra["current_state"] ## the state
+        a = evt.extra["action"]  ## the action of the event
         #print("##agent",agente.last_state," ",agente.last_action)        
       
-    sim.granted_req_list, remaining_req_list = prioritizer(sim.window_req_list, a) #se filtra la lista de reqs dependiendo de la accion
-    #la lista se envia al modulo de Resource Allocation
+    sim.granted_req_list, remaining_req_list = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
+    #the list is sent to the Resource Allocation module
     step_profit,step_node_profit,step_link_profit,step_embb_profit,step_urllc_profit,step_miot_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl = resource_allocation(c)
-    c.total_profit += step_profit
+    c.total_profit += step_profit ## here we have the global profits for all steps not only one
     c.node_profit += step_node_profit
     c.link_profit += step_link_profit
     c.embb_profit += step_embb_profit
@@ -730,11 +731,11 @@ def func_twindow(c,evt):
     #agente.updateQ(step_profit,s,a,s_,a_,evt.extra["end_state"]) #(reward,s,a,s_,a_end_sate)
     
     s_ = next_state
-    a_ = agente.step(s_,r)
+    a_ = agente.step(s_,r) ## we give the new reward and the current state in order to get the action to take
     
-    a = a_
-    s = s_
-    if counter_windows  == (sim.run_till/twindow_length) - 2:
+    a = a_ ## set the next action to the current action
+    s = s_  ## set the next state to the current state
+    if counter_windows  == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
         end_state = True
     else:
         end_state = False
