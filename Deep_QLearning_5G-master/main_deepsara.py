@@ -442,7 +442,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
                 pass
 
 def resource_allocation(cn): #cn=controller
-   #makes allocation for the set of nslrs captured in a time window
+   #makes allocation for the set of nslrs captured in a time window ##and returns the profits calculated for the global allocations
     # the metrics calculated here correspond to a step
      
     sim = cn.simulation ## define the object of class Sim which is part of the Controller class
@@ -477,9 +477,9 @@ def resource_allocation(cn): #cn=controller
             evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
             sim.add_event(evt) 
 
-            #calculo de metricas (profit, acpt_rate, contadores)            
+            #calculation of metrics (profit, acpt_rate, counters)           
             sim.accepted_reqs += 1
-            profit_nodes = calculate_metrics.calculate_profit_nodes(req,end_simulation_time)
+            profit_nodes = calculate_metrics.calculate_profit_nodes(req,end_simulation_time)  ## from the functions of the calculate_metrics file to have the profit gained for node and links
             profit_links = calculate_metrics.calculate_profit_links(req,end_simulation_time)*10    
             step_profit += (profit_nodes + profit_links)/max_profit #the total profit in this step is the reward
             step_link_profit += profit_links/max_link_profit
@@ -488,8 +488,8 @@ def resource_allocation(cn): #cn=controller
             step_central_profit = 0#ajustar
 
             if req.service_type == "embb":
-                sim.current_instatiated_reqs[0] += 1
-                sim.embb_accepted_reqs += 1
+                sim.current_instatiated_reqs[0] += 1 ## the total of requests accepted for the specific service for each step
+                sim.embb_accepted_reqs += 1 ## the accepted for the specific service in general not in the step i think
                 step_embb_profit += profit_nodes/max_node_profit
             elif req.service_type == "urllc":
                 sim.current_instatiated_reqs[1] += 1
@@ -500,17 +500,17 @@ def resource_allocation(cn): #cn=controller
                 sim.miot_accepted_reqs += 1
                 step_miot_profit += profit_nodes/max_node_profit                       
             
-            a,b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)
-            step_edge_cpu_utl += a/(edge_initial*end_simulation_time)
+            a,b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)## returns edge_utl, central_utl, links_utl for the request treated
+            step_edge_cpu_utl += a/(edge_initial*end_simulation_time)## edge initial here is the initial value of cpu edge of the graph
             step_central_cpu_utl += b/(centralized_initial*end_simulation_time)
-            step_links_bw_utl += c*10/(bw_initial*end_simulation_time)
+            step_links_bw_utl += c*10/(bw_initial*end_simulation_time)## links profit and utilistion are always *10
             step_node_utl += (a+b)/((edge_initial+centralized_initial)*end_simulation_time)
             #step_total_utl += (a+b+(c*10))/((edge_initial+centralized_initial+bw_initial)*end_simulation_time)
             step_total_utl += (step_node_utl + step_links_bw_utl)/2
              
     return step_profit,step_node_profit,step_link_profit,step_embb_profit,step_urllc_profit,step_miot_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl
 
-def get_code(value):   
+def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 5, 6, 7, 8, or 9) based on the range of values that value falls within.
     cod = 0
     value = value*100
     # #para granularidad de 5 (100/5) -> (20,40,60,80,100)
@@ -526,7 +526,7 @@ def get_code(value):
     #     cod = 4
     # return cod
 
-    #para granularidad de 10 (100/10) -> (10,20,30,...100)
+    #for granularity of 10 (100/10) -> (10,20,30,...100)
     if value <= 10:
         cod = 0
     elif value <= 20:
