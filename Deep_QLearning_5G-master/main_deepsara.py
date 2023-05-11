@@ -23,7 +23,7 @@ twindow_length = 1
 embb_arrival_rate = 0
 urllc_arrival_rate = 0
 miot_arrival_rate = 0 
-arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20
+arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
 
 mean_operation_time = 15
 
@@ -779,8 +779,8 @@ def main():
     global urllc_arrival_rate
     global miot_arrival_rate
     
-    for m in arrival_rates:
-        embb_arrival_rate = m/3
+    for m in arrival_rates:  ### the most global loop, arrival_rates = [100,80,60,40,30,25,20,15,10,7,5,3,1]
+        embb_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
         urllc_arrival_rate = m/3
         miot_arrival_rate = m/3        
         
