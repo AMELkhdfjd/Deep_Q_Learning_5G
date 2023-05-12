@@ -281,9 +281,9 @@ def randoms(seed):  ## which means random just to not confuse
     rand_number = (((a*seed)+b)%m)/m
     return rand_number
 
-def get_interarrival_time(arrival_rate):   ## generates an interarrival time randomly
-    seed = random.randint(10000000,8000000000)#change only for each repeat
 
+def get_interarrival_time(arrival_rate):
+    seed = random.randint(10000000,8000000000)#cambiar solo para cada repetición
     p = randoms(seed) 
     # print(p)     
     inter_arrival_time = -math.log(1.0 - p)/arrival_rate #the inverse of the CDF of Exponential(_lamnbda)
@@ -755,7 +755,7 @@ def prepare_sim(s):## prepares the simulation object for all services and sets t
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)
     s.add_event(evt)
     ## here maybe its the first state
-    evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)
+    evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)## att here the function is different
     s.add_event(evt)
 
 
@@ -839,10 +839,12 @@ def main():
             for j in range(episodes): ## remark: we have two loops for episodes
                 agente.handle_episode_start() ## sets last_state and last_action to none
 
+
                 print("\n","episode:",j,"\n")
                 controller = None
                 controller = Controlador()                   
                 controller.substrate = copy.deepcopy(substrate_graphs.get_graph("16node_BA")) #get substrate  with 16 nodes
+                
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
