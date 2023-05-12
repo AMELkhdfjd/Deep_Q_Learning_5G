@@ -339,7 +339,7 @@ def get_graph(n): ## returns a substrate of graph depending on the number of nod
     elif n == 14:
         #substrate.set_graph(substrate14["graph"])
         pass#amel
-    elif n == 16:        
+    elif n == "16node_BA":        
         substrate.set_graph(substrate16["graph"])
     elif n == "abilene":
         substrate.set_graph(abilene["graph"])

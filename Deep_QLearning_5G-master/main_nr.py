@@ -593,3 +593,13 @@ if __name__ == '__main__':
 # print("edge_node_utl: ", controller.edge_node_utl)
 # print("central_node_utl: ", controller.central_node_utl)
 # print("contador_termination:", contador_termination)
+
+
+
+
+
+
+
+
+
+

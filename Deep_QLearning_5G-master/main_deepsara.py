@@ -807,7 +807,8 @@ def main():
         urllc_utl_rep = []
         miot_utl_rep = []    
         
-        for i in range(episodes):
+        for i in range(episodes): ## we loop the set of episodes which is 350 global var 
+                                  ## here creation of empty lists
             total_profit_rep.append([])
             link_profit_rep.append([])
             node_profit_rep.append([])
@@ -831,26 +832,26 @@ def main():
             urllc_utl_rep.append([])
             miot_utl_rep.append([])
         
-        for i in range(repetitions):
+        for i in range(repetitions): ## repetitions=33 global 
             #agente = ql.Qagent(0.9, 0.9, 0.9, episodes, n_states, n_actions) #(alpha, gamma, epsilon, episodes, n_states, n_actions)
-            agente = dql.Agent(9,n_actions)
-
-            for j in range(episodes):
-                agente.handle_episode_start()
+            agente = dql.Agent(9,n_actions) ## here we pass the state size and the action size
+                                            ## state is with size 9
+            for j in range(episodes): ## remark: we have two loops for episodes
+                agente.handle_episode_start() ## sets last_state and last_action to none
 
                 print("\n","episode:",j,"\n")
                 controller = None
                 controller = Controlador()                   
-                controller.substrate = copy.deepcopy(substrate_graphs.get_graph("16node_BA")) #get substrate  
+                controller.substrate = copy.deepcopy(substrate_graphs.get_graph("16node_BA")) #get substrate  with 16 nodes
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
-                edge_initial = controller.substrate.graph["edge_cpu"]
+                edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)  
-                prepare_sim(controller.simulation)            
-                controller.run()        
+                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
+                controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
 
-                total_profit_rep[j].append(controller.total_profit)
+                total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
                 node_profit_rep[j].append(controller.node_profit)        
                 link_profit_rep[j].append(controller.link_profit)
                 edge_profit_rep[j].append(controller.edge_profit)
