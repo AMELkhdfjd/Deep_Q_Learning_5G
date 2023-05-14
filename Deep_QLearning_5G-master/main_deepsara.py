@@ -863,8 +863,8 @@ def main():
                 bw_initial = controller.substrate.graph["bw"]
                 controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
-                controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
-                """
+                """controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
+                
                 total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
                 node_profit_rep[j].append(controller.node_profit)        
                 link_profit_rep[j].append(controller.link_profit)

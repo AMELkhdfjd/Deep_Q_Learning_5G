@@ -58,3 +58,8 @@ git checkout master
 
 
 ATT, whatever do the git operations on the deep folder not the parent
+
+
+
+############ alternative of the commit problem ################
+create a new folder and clone the git repo and then cd to the directory and update the files regenerate other ones and commit the changes 
