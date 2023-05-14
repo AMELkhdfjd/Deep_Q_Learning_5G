@@ -1,6 +1,8 @@
 import numpy
 import random
 import copy
+import networkx as nx
+import matplotlib.pyplot as plt
 
 cpu_embb = (5,5) #cpu units range for eMBB
 cpu_urllc = (5,5) ## the first value represents the maximum processing power, while the second value represents the minimum processing power.
@@ -62,11 +64,11 @@ nsl_graph_URLLC =  {
 }
 nsl_graph_MIoT =  {
             "vnfs": [
-                        {"id":0,"function":"AMF","type":0,"backup":0},
-                        {"id":1,"function":"AMF","type":0,"backup":0},
-                        {"id":2,"function":"AMF","type":0,"backup":0},
-                        {"id":3,"function":"SMF","type":0,"backup":0},
-                        {"id":4,"function":"UPF","type":0,"backup":0}
+                        {"id":0,"function":"AMF","type":1,"backup":0},
+                        {"id":1,"function":"AMF","type":1,"backup":0},
+                        {"id":2,"function":"AMF","type":1,"backup":0},
+                        {"id":3,"function":"SMF","type":1,"backup":0},
+                        {"id":4,"function":"UPF","type":1,"backup":0}
             ],
             "vlinks":[
                         {"source":0,"target":3},
@@ -139,4 +141,29 @@ def get_nslr(id,service_type,mean_operation_time):## generates a NSLR request fr
  
     nsl_graph = add_resources(copy.deepcopy(nsl_graph),service_type)
     request = NSLR(id,service_type,get_operation_time(mean_operation_time),nsl_graph)
+
+
+
+    ### in order to draw the NSLR graph
+
+    # create an empty graph
+    G = nx.Graph()
+    print("printing the nslr graph  ")
+
+    # add nodes to the graph
+    for vnf in request.nsl_graph["vnfs"]:
+        G.add_node(vnf["id"], function=vnf["function"], type=vnf["type"], backup=vnf["backup"])
+
+    # add edges to the graph
+    for vlink in request.nsl_graph["vlinks"]:
+        G.add_edge(vlink["source"], vlink["target"])
+
+    # draw the graph
+    pos = nx.spring_layout(G)
+    nx.draw_networkx_nodes(G, pos)
+    nx.draw_networkx_edges(G, pos)
+    nx.draw_networkx_labels(G, pos)
+    plt.savefig("NSLR_test.png") # save as png 
+
+    
     return request

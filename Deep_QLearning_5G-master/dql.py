@@ -168,7 +168,7 @@ class Agent(object):
         self.min_explore = min_explore
         self.anneal_rate = anneal_rate
         self.steps = 0
-
+        print("######## AGENT INIT ###########")
         # replay memory
         self.memory = Memory(replay_memory_size)## define an object of the class Memory
         self.replay_start_size = replay_start_size

@@ -110,4 +110,4 @@ def ba_graph(name,n):
 
     # return substrate ##quitarrrr
 
-topo = ba_graph("10",10)
+##topo = ba_graph("10",10)

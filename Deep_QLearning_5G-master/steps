@@ -33,3 +33,28 @@ You can install TensorFlow using Anaconda by following these steps:
    If TensorFlow is installed correctly, you should see a random number printed to the console.
 
 That's it! You now have TensorFlow installed in your Anaconda environment. You can use this environment to develop and run TensorFlow applications without worrying about conflicting dependencies with other projects on your system.
+
+
+
+
+
+5. in order to run the main_deepsara, cd to the directory deep then activate myenv by running: conda activate myenv
+then execute the file with python3 not python, att we've reinstalled all the AI libraries with python3 
+
+ATTTT:  you sould be on the myenv in order to work, if not you need to reinstall the libraries for the base env like networkx
+
+
+
+############### GIT problem of Commit ################
+rm -rf .git
+
+git init
+
+git remote add origin ssh://git@github.com/YourUsername/repoName.git
+
+git fetch origin master
+
+git checkout master
+
+
+ATT, whatever do the git operations on the deep folder not the parent

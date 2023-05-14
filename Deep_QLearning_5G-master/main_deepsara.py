@@ -14,7 +14,7 @@ import time
 # import bisect
 #simulation parameters
 # seed = 0
-repetitions = 33 #33
+repetitions = 1 #33
 twindow_length = 1
 # embb_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_arrival_rate = 40 #5#2.5 #reqXsecond
@@ -33,7 +33,7 @@ bw_initial = 0
 agente = None
 
 #RL-specific parameters
-episodes = 350 #240
+episodes = 1 #240##350
 
 avble_edge_size = 10
 avble_central_size = 10
@@ -220,6 +220,7 @@ class Sim:
             self.total_reqs += 1  ## increase the number of requests
             service_type = evt.extra["service_type"]## maybe the extra means the additional parameters for the event here we are assigining the service_type
             request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)## here we are calling the fonction from the file imported ATT
+            
               ## self.total_reqs: to define the id of the new nslr, 
               ## mean_operation_time = 15 as a global variable
 
@@ -232,6 +233,9 @@ class Sim:
             else: #evt.extra["service_type"] == "miot":
                 self.total_miot_reqs += 1
                 self.window_req_list[2].append(copy.deepcopy(request))#
+            print("print events:  ")
+            self.print_eventos()
+            print()
 
             #service_type = evt.extra["service_type"]
             #request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)
@@ -245,7 +249,9 @@ class Sim:
     def print_eventos(self):## print the infos about an event
         print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
         for i in range(len(self.eventos)): ## loop the events
-            print(self.eventos[i].type,self.eventos[i].start, end=" > ")
+            print(str(self.eventos[i]), end=" > ")
+           
+           
         #print("++list: ",len(self.window_req_list[0])+len(self.window_req_list[1])+len(self.window_req_list[2]))
 
         print("\n")
@@ -282,7 +288,7 @@ def randoms(seed):  ## which means random just to not confuse
     return rand_number
 
 
-def get_interarrival_time(arrival_rate):
+def get_interarrival_time(arrival_rate):  ## the same for all services
     seed = random.randint(10000000,8000000000)#cambiar solo para cada repetición
     p = randoms(seed) 
     # print(p)     
@@ -748,11 +754,11 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     sim.granted_req_list = [] 
   
 def prepare_sim(s):## prepares the simulation object for all services and sets the params for them
-    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(embb_arrival_rate),extra={"service_type":"embb","arrival_rate":embb_arrival_rate},f=func_arrival)
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(embb_arrival_rate),extra={"service_type":"embb","arrival_rate":embb_arrival_rate},f=func_arrival) 
     s.add_event(evt)
-    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_arrival_rate),extra={"service_type":"urllc","arrival_rate":urllc_arrival_rate},f=func_arrival)
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_arrival_rate),extra={"service_type":"urllc","arrival_rate":urllc_arrival_rate},f=func_arrival)    
     s.add_event(evt)
-    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)    
     s.add_event(evt)
     ## here maybe its the first state
     evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)## att here the function is different
@@ -809,6 +815,7 @@ def main():
         
         for i in range(episodes): ## we loop the set of episodes which is 350 global var 
                                   ## here creation of empty lists
+                                  ## 3
             total_profit_rep.append([])
             link_profit_rep.append([])
             node_profit_rep.append([])
@@ -833,18 +840,23 @@ def main():
             miot_utl_rep.append([])
         
         for i in range(repetitions): ## repetitions=33 global 
+                                     ## 3
             #agente = ql.Qagent(0.9, 0.9, 0.9, episodes, n_states, n_actions) #(alpha, gamma, epsilon, episodes, n_states, n_actions)
             agente = dql.Agent(9,n_actions) ## here we pass the state size and the action size
                                             ## state is with size 9
             for j in range(episodes): ## remark: we have two loops for episodes
+                                      ## 3
                 agente.handle_episode_start() ## sets last_state and last_action to none
 
 
                 print("\n","episode:",j,"\n")
+                print("################ MAIN START #####################")
                 controller = None
                 controller = Controlador()                   
                 controller.substrate = copy.deepcopy(substrate_graphs.get_graph("16node_BA")) #get substrate  with 16 nodes
-                
+                                                                                              ## maybe we dont need to pass the agent to the controller
+
+
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
@@ -852,7 +864,7 @@ def main():
                 controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
-
+                """
                 total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
                 node_profit_rep[j].append(controller.node_profit)        
                 link_profit_rep[j].append(controller.link_profit)
@@ -924,11 +936,14 @@ def main():
             f.write("**miot_utl_rep:\n")
             f.write(str(miot_utl_rep)+"\n\n")        
             f.close()
+            """
 
 if __name__ == '__main__':
     #bot.sendMessage("Simulation starts!")
-    start = time.time()
+    start = time.time()## in order to receive the current time
+    print("start time: ",start)
     main()
     end = time.time()
+    print("end time: ",end)
     # bot.sendMessage("Simulation finishes!")
     # bot.sendMessage("total time: " + str(end-start))

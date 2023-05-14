@@ -338,7 +338,7 @@ def analyze_links(nsl_graph,substrate):
 
 ## Amel code
 
-substrate = substrate_graph.get_graph(10)
+"""substrate = substrate_graph.get_graph(10)
 
 NSLR = nslr.get_nslr(1,"urllc",50)
 
@@ -415,6 +415,6 @@ nx.draw_networkx_edges(G, pos)
 nx.draw_networkx_labels(G, pos)
 plt.savefig("NSLR_test.png") # save as png  
 
-
+"""
 
 
