@@ -651,6 +651,9 @@ def func_terminate(c,evt):
     else:
         sim.current_instatiated_reqs[2] -= 1
 
+
+
+#### start to copy changes
 contador_windows = 0
 def func_twindow(c,evt):
     #la venta de tiempo ha expirado. Las nslrs recolectadas hasta ahora seran analizadas para su admision
