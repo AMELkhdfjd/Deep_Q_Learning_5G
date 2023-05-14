@@ -148,7 +148,7 @@ def get_nslr(id,service_type,mean_operation_time):## generates a NSLR request fr
 
     # create an empty graph
     G = nx.Graph()
-    print("printing the nslr graph  ")
+    ##print("printing the nslr graph  ")
 
     # add nodes to the graph
     for vnf in request.nsl_graph["vnfs"]:

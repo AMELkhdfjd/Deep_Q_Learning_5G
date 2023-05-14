@@ -98,7 +98,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     ## here we have only two vnodes according if the vnfs are primary or backup, then aleardy will be used to put them in different nodes 
     rejected = False
     already = [] #list of nodes that already hold a vnode
-    print("ranked nodes",ranked_nodes_cpu)
+    ### print("ranked nodes",ranked_nodes_cpu)
     #print("vnodes list: ", nsl_graph_red["vnodes"])
     for v in vnodes:
         if rejected:
@@ -111,8 +111,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                 #mapping:
 
                 v["mapped_to"] = n["id"]
-                print(v["id"] , "mapped to ", n["id"])
-                print(v)
+                ### print(v["id"] , "mapped to ", n["id"])
+                ### print(v)
                 #print("enter to same type of vnfs backup or not")
 
                 already.append(n["id"])
@@ -238,7 +238,7 @@ def group_vnfs(vnfs_list,node_type):  ## here we are grouping the backup vnfs an
         elif vnfs_list[i]["backup"]==vnfs_list[i-1]["backup"]: ## we need to have the condition backup and primary vnfs are never put in the same node
             vnode["cpu"] += vnfs_list[i]["cpu"]  ## add the cpu ressources to the virtual node for the next vnf
             vnode["vnfs"].append(vnfs_list[i]["id"])  
-            print("same backup",vnode["vnfs"])
+            ### print("same backup",vnode["vnfs"])
             #print(vnfs_list[i], i)
             if i == len(vnfs_list)-1: ## we are on the last vnf, need to add it the vnodes list
                 vnode["id"]=cont

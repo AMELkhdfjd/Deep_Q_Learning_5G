@@ -160,7 +160,8 @@ class Sim:
         #self.window_req_list = []
         self.granted_req_list = []
         self.horario = 0 ## means the start of an nslr treatement
-        self.run_till = -1
+                         ## more likely its the start time of the current event that is being treated
+        self.run_till = 1 ## initially was -1
         self.total_reqs = 0
         self.total_embb_reqs = 0
         self.total_urllc_reqs = 0
@@ -233,10 +234,10 @@ class Sim:
             else: #evt.extra["service_type"] == "miot":
                 self.total_miot_reqs += 1
                 self.window_req_list[2].append(copy.deepcopy(request))#
-            print("print events:  ")
-            self.print_eventos()
-            print()
-
+            
+        print("print events:  ")
+        self.print_eventos()
+        print()
             #service_type = evt.extra["service_type"]
             #request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)
             #self.window_req_list.append(copy.deepcopy(request))
@@ -249,7 +250,7 @@ class Sim:
     def print_eventos(self):## print the infos about an event
         print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
         for i in range(len(self.eventos)): ## loop the events
-            print(str(self.eventos[i]), end=" > ")
+            print(str(self.eventos[i]), end=" > \n")
            
            
         #print("++list: ",len(self.window_req_list[0])+len(self.window_req_list[1])+len(self.window_req_list[2]))
@@ -263,15 +264,17 @@ class Sim:
             return None
         else:
             p = self.eventos.pop(0) ## remove the first element of the list which means the first event, since they are ordered
-            self.horario = p.start  ## 
+            self.horario = p.start  ## ATTT self.horario is the start of the event
+                                    ## ATTT here we are changing the horario
             return p
 
     def run(self,c):  ## run all events from the list of events, one by one till we reach the end time of the simulation and execute a function for each event
                       ## need to figure out what the c represents here !!
-
-        # self.print_eventos()
-        while self.horario<self.run_till: ## while the start time of the event is less than the time the simulation ends, its ok
+        
+        #self.print_eventos()
+        while self.horario<self.run_till: ## while the start time of the event that we are going to teate is less than the time the simulation ends, its ok
             #self.print_eventos()
+            print("we are inside the run while")
             p = self.get_next_evento()
             if p==None:
                 return    
@@ -709,7 +712,8 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
         #a = agente.take_action(s,True)
         
         a = agente.step(state,0) ## this returns the action taken, here we call the function step from the dql file, give state, reward, training=true, 
-    else:## its not the first state, still ambigus why we dont call the step function
+    else:## its not the first state, still ambigus why we dont call the step function 
+                                    ##edit: we dont need to calculate the next step bcz we have the action here, before we dont have since its the first state
         s = evt.extra["current_state"] ## the state
         a = evt.extra["action"]  ## the action of the event
         #print("##agent",agente.last_state," ",agente.last_action)        
@@ -738,7 +742,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     
     s_ = next_state
     a_ = agente.step(s_,r) ## we give the new reward and the current state in order to get the action to take
-    
+                           ## here we are getting the new action, no need to execute the step function above since its no longer the first state
     a = a_ ## set the next action to the current action
     s = s_  ## set the next state to the current state
     if counter_windows  == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
@@ -746,6 +750,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     else:
         end_state = False
     ### ATTT!!! recursive CALL here  |
+    print("about to create the new twindow_end event")
     evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)  
 
     sim.add_event(evt)
@@ -841,16 +846,18 @@ def main():
         
         for i in range(repetitions): ## repetitions=33 global 
                                      ## 3
+
+
+            print("################ REPITITION LOOP #####################", i)                       
             #agente = ql.Qagent(0.9, 0.9, 0.9, episodes, n_states, n_actions) #(alpha, gamma, epsilon, episodes, n_states, n_actions)
             agente = dql.Agent(9,n_actions) ## here we pass the state size and the action size
                                             ## state is with size 9
-            for j in range(episodes): ## remark: we have two loops for episodes
-                                      ## 3
+            for j in range(episodes): ## 1
                 agente.handle_episode_start() ## sets last_state and last_action to none
 
 
                 print("\n","episode:",j,"\n")
-                print("################ MAIN START #####################")
+                print("################ EPISODE LOOP #####################", j)
                 controller = None
                 controller = Controlador()                   
                 controller.substrate = copy.deepcopy(substrate_graphs.get_graph("16node_BA")) #get substrate  with 16 nodes
@@ -861,10 +868,11 @@ def main():
                 edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                                                        ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
-                """controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
-                
+                controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
+                """
                 total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
                 node_profit_rep[j].append(controller.node_profit)        
                 link_profit_rep[j].append(controller.link_profit)
