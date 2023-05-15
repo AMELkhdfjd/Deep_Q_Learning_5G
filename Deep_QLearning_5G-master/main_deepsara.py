@@ -25,7 +25,7 @@ urllc_arrival_rate = 0
 miot_arrival_rate = 0 
 arrival_rates = [10] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
 
-mean_operation_time = 4 ## initially set to 15, the temination events are never executed
+mean_operation_time = 3 ## initially set to 15, the temination events are never executed
                           
 
 edge_initial = 0
@@ -228,6 +228,7 @@ class Sim:
             
               ## self.total_reqs: to define the id of the new nslr, 
               ## mean_operation_time = 15 as a global variable
+
 
             if evt.extra["service_type"] == "embb":
                 self.total_embb_reqs += 1
