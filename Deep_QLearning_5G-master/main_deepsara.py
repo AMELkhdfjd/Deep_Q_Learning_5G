@@ -33,6 +33,7 @@ centralized_initial = 0
 bw_initial = 0
 agente = None
 
+
 #RL-specific parameters 
 episodes = 1 #240##350
 
@@ -115,6 +116,7 @@ class Evento:
     def __str__(self):
         return "("+self.type+","+str(self.start)+","+str(self.extra)+")"
 
+##
 
 ## class for the controller
 class Controlador:
