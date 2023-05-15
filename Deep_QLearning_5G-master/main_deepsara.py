@@ -249,8 +249,9 @@ class Sim:
 
     def print_eventos(self):## print the infos about an event
         print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
-        for i in range(len(self.eventos)): ## loop the events
-            print(str(self.eventos[i]), end=" > \n")
+    
+        #for i in range(len(self.eventos)): ## loop the events
+            #print(str(self.eventos[i]), end=" > \n")
            
            
         #print("++list: ",len(self.window_req_list[0])+len(self.window_req_list[1])+len(self.window_req_list[2]))
@@ -473,7 +474,7 @@ def resource_allocation(cn): #cn=controller
     max_node_profit = substrate.graph["max_cpu_profit"]*sim.run_till
     max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
     max_profit = max_link_profit + max_node_profit
-
+    print("granted req list contains: ",sim.granted_req_list)
     for req in sim.granted_req_list: 
         # print("**",req.service_type,req.nsl_graph)
         sim.attended_reqs += 1        
@@ -485,6 +486,7 @@ def resource_allocation(cn): #cn=controller
             update_resources(substrate,req,False)#instantiation, occupy resources
             evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
             sim.add_event(evt) 
+            print("added a termination event")
 
             #calculation of metrics (profit, acpt_rate, counters)           
             sim.accepted_reqs += 1
@@ -677,6 +679,7 @@ def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and i
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
     s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
+    print("teated arrival event ---> creration of another arrival event")
 
 
 counter_termination = 0
@@ -706,6 +709,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     if evt.extra["first_state"]: ## if its the first state
         #first state index
         #all resources at 100% (with granularity of 5)
+        print("entered in the first state section of func_twindow")
         state = get_state(c.substrate,c.simulation)
         
         #s = translateStateToIndex(state)
@@ -716,7 +720,8 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
                                     ##edit: we dont need to calculate the next step bcz we have the action here, before we dont have since its the first state
         s = evt.extra["current_state"] ## the state
         a = evt.extra["action"]  ## the action of the event
-        #print("##agent",agente.last_state," ",agente.last_action)        
+        #print("##agent",agente.last_state," ",agente.last_action)    
+        print("entered in the else of first state of func_twindow")    
       
     sim.granted_req_list, remaining_req_list = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
     #the list is sent to the Resource Allocation module
@@ -747,12 +752,14 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     s = s_  ## set the next state to the current state
     if counter_windows  == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
         end_state = True
+        print("impossible end_state")
     else:
         end_state = False
+        
     ### ATTT!!! recursive CALL here  |
-    print("about to create the new twindow_end event")
+    
     evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)  
-
+    print("added a twindow_end event")
     sim.add_event(evt)
     sim.window_req_list = [[],[],[]] #
     #sim.window_req_list = []
@@ -868,7 +875,7 @@ def main():
                 edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(4)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
