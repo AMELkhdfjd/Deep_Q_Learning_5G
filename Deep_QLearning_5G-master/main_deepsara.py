@@ -14,7 +14,7 @@ import time
 # import bisect
 #simulation parameters
 # seed = 0
-repetitions = 1 #33
+repetitions = 33 #33
 twindow_length = 1
 # embb_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_arrival_rate = 40 #5#2.5 #reqXsecond
@@ -23,9 +23,9 @@ twindow_length = 1
 embb_arrival_rate = 0
 urllc_arrival_rate = 0
 miot_arrival_rate = 0 
-arrival_rates = [10] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
+arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
 
-mean_operation_time = 3 ## initially set to 15, the temination events are never executed
+mean_operation_time = 15 ## initially set to 15, the temination events are never executed
                           
 
 edge_initial = 0
@@ -35,7 +35,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 350 #240##350
 
 avble_edge_size = 10
 avble_central_size = 10
@@ -890,7 +890,7 @@ def main():
                 edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
