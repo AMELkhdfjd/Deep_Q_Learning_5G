@@ -23,16 +23,17 @@ twindow_length = 1
 embb_arrival_rate = 0
 urllc_arrival_rate = 0
 miot_arrival_rate = 0 
-arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
+arrival_rates = [10] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
 
-mean_operation_time = 15
+mean_operation_time = 4 ## initially set to 15, the temination events are never executed
+                          
 
 edge_initial = 0
 centralized_initial = 0
 bw_initial = 0
 agente = None
 
-#RL-specific parameters
+#RL-specific parameters 
 episodes = 1 #240##350
 
 avble_edge_size = 10
@@ -184,7 +185,8 @@ class Sim:
         if start<self.horario:
             print("***false")
             return False
-        # else:     
+        # else:  
+         
         e = Evento(type, start, extra, f)
         return e
 
@@ -235,8 +237,9 @@ class Sim:
                 self.total_miot_reqs += 1
                 self.window_req_list[2].append(copy.deepcopy(request))#
             
-        print("print events:  ")
+        print("print details events:  ")
         self.print_eventos()
+
         print()
             #service_type = evt.extra["service_type"]
             #request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)
@@ -248,10 +251,10 @@ class Sim:
 
 
     def print_eventos(self):## print the infos about an event
-        print("HORARIO: ",self.horario,"\nTotal Eventos:",len(self.eventos))
+        print("HORARIO: ",self.horario,"\nTotal Events:",len(self.eventos))
     
-        #for i in range(len(self.eventos)): ## loop the events
-            #print(str(self.eventos[i]), end=" > \n")
+        for i in range(len(self.eventos)): ## loop the events
+            print(str(self.eventos[i]), end=" > \n")
            
            
         #print("++list: ",len(self.window_req_list[0])+len(self.window_req_list[1])+len(self.window_req_list[2]))
@@ -275,7 +278,8 @@ class Sim:
         #self.print_eventos()
         while self.horario<self.run_till: ## while the start time of the event that we are going to teate is less than the time the simulation ends, its ok
             #self.print_eventos()
-            print("we are inside the run while")
+
+            print("we are inside the run while", self.horario,"<",self.run_till)
             p = self.get_next_evento()
             if p==None:
                 return    
@@ -384,7 +388,7 @@ def takeFirst(elem):## i guess useless
 
 def prioritizer(window_req_list,action_index): #v2  ## the two versions do the same thing but with different manners
     #print("****prioritizing...")
-    action = actions[action_index]## taken the action passed in argument action=(0.75,1,0.5)
+    action = actions[action_index]## taken the action passed in argument action=(0.75,1,0.25)
     action2 = []
     granted_req_list = []
     remaining_req_list = []
@@ -392,13 +396,13 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
     #action = (0.75,1,0.25) -> (cant1,cant2,cant3) 
     #translate action in percentage to quantities (nearest integer)
     action2.append([action[0],round(action[0]*len(window_req_list[0])),0]) #[pctg,cant,type] ej:[0.75,75,0]
-    action2.append([action[1],round(action[1]*len(window_req_list[1])),1]) ## wondering if the length here is 100 for all lists or what
+    action2.append([action[1],round(action[1]*len(window_req_list[1])),1]) ## the length depends on each execution, we need to have more reqs to take some
     action2.append([action[2],round(action[2]*len(window_req_list[2])),2])
    ## ex: action2=([0.75,75,0],[0.5,50,1],[0.25,25,2])
     #according to "action", sort "action2"
     action2.sort(key=takeFirst,reverse=True)## action2 will be sorted in descending order based on the first element of each element in the list.
     ## it sorts according to the percentage of the services 0.75 descending order
-
+    print("action2 containts", action2)
     for j in action2:
         
         if j[0]==1:## contains the percentage for each element of the list, ex: 0.5
@@ -410,7 +414,9 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
                     granted_req_list.append(window_req_list[j[2]][i])
                 else:
                     remaining_req_list.append(window_req_list[j[2]][i])      
-
+    print("granted_req_list contains from the prioritizer function", granted_req_list)
+    print("remaining_req_list contains from the prioritizer function", remaining_req_list)
+    
     return granted_req_list, remaining_req_list #v6
     #return granted_req_list+remaining_req_list, remaining_req_list #v1
 
@@ -475,7 +481,9 @@ def resource_allocation(cn): #cn=controller
     max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
     max_profit = max_link_profit + max_node_profit
     print("granted req list contains: ",sim.granted_req_list)
+
     for req in sim.granted_req_list: 
+        
         # print("**",req.service_type,req.nsl_graph)
         sim.attended_reqs += 1        
         rejected = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
@@ -485,8 +493,9 @@ def resource_allocation(cn): #cn=controller
             graph = req.nsl_graph_reduced 
             update_resources(substrate,req,False)#instantiation, occupy resources
             evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
-            sim.add_event(evt) 
             print("added a termination event")
+            sim.add_event(evt) 
+           
 
             #calculation of metrics (profit, acpt_rate, counters)           
             sim.accepted_reqs += 1
@@ -678,8 +687,9 @@ def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and i
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
     print("teated arrival event ---> creration of another arrival event")
+    s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
+    
 
 
 counter_termination = 0
@@ -716,10 +726,12 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
         #a = agente.take_action(s,True)
         
         a = agente.step(state,0) ## this returns the action taken, here we call the function step from the dql file, give state, reward, training=true, 
+        print("the action taken",actions[a])
     else:## its not the first state, still ambigus why we dont call the step function 
                                     ##edit: we dont need to calculate the next step bcz we have the action here, before we dont have since its the first state
         s = evt.extra["current_state"] ## the state
         a = evt.extra["action"]  ## the action of the event
+        print("the action taken",a)
         #print("##agent",agente.last_state," ",agente.last_action)    
         print("entered in the else of first state of func_twindow")    
       
@@ -752,7 +764,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     s = s_  ## set the next state to the current state
     if counter_windows  == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
         end_state = True
-        print("impossible end_state")
+        print("the end state is set to True for the twindow event")
     else:
         end_state = False
         
@@ -875,7 +887,7 @@ def main():
                 edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(4)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
