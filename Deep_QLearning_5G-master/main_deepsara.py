@@ -8,7 +8,7 @@ import copy
 import calculate_metrics 
 import ql
 import dql
-#import telegram_bot as bot
+import telegram_bot as bot
 import time
 
 # import bisect
@@ -893,7 +893,7 @@ def main():
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
-                """
+                
                 total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
                 node_profit_rep[j].append(controller.node_profit)        
                 link_profit_rep[j].append(controller.link_profit)
@@ -965,14 +965,14 @@ def main():
             f.write("**miot_utl_rep:\n")
             f.write(str(miot_utl_rep)+"\n\n")        
             f.close()
-            """
+            
 
 if __name__ == '__main__':
-    #bot.sendMessage("Simulation starts!")
+    bot.sendMessage("Simulation starts!")
     start = time.time()## in order to receive the current time
     print("start time: ",start)
     main()
     end = time.time()
     print("end time: ",end)
-    # bot.sendMessage("Simulation finishes!")
-    # bot.sendMessage("total time: " + str(end-start))
+    bot.sendMessage("Simulation finishes!")
+    bot.sendMessage("total time: " + str(end-start))

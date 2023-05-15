@@ -7,7 +7,7 @@ def sendMessage(message):
     #'chat_id': '787248960' Dani
     
     data = {
-        'chat_id': '835968219',  
+        'chat_id': '2013516156',  
         'text': message
     }
 
