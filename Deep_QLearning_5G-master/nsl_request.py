@@ -4,19 +4,19 @@ import copy
 import networkx as nx
 import matplotlib.pyplot as plt
 
-cpu_embb = (5,5) #cpu units range for eMBB
-cpu_urllc = (5,5) ## the first value represents the maximum processing power, while the second value represents the minimum processing power.
-cpu_miot = (5,5) 
-# bw_embb = (1,1) #Mbps
+cpu_urllc_1 = (5,5) #cpu units range for urllc_1
+cpu_urllc_2 = (5,5) ## the first value represents the maximum processing power, while the second value represents the minimum processing power.
+cpu_urllc_3 = (5,5) 
+# bw_urllc_1 = (1,1) #Mbps
 # bw_urllc = (.50,.50) #Mbps
 # bw_miot = (.1,.3)
 
-bw_embb = (.5,.5) #Mbps
-bw_urllc = (.5,.5) #Mbps
-bw_miot = (.01,.01)
+bw_urllc_1 = (.5,.5) #Mbps
+bw_urllc_2 = (.5,.5) #Mbps
+bw_urllc_3 = (.01,.01)
 
 #0:centralized, 1:edge
-nsl_graph_eMBB =  {
+nsl_graph_urllc_1 =  {
             "vnfs": [
                         {"id":0,"function":"AMF","type":1,"backup":0},
                         {"id":1,"function":"AMF","type":1,"backup":1},
@@ -37,7 +37,7 @@ nsl_graph_eMBB =  {
 
             ] 
 }
-nsl_graph_URLLC =  {
+nsl_graph_urllc_2 =  {
             "vnfs": [
                         {"id":0,"function":"AMF","type":1,"backup":0},
                         {"id":1,"function":"AMF","type":1,"backup":1},
@@ -62,7 +62,7 @@ nsl_graph_URLLC =  {
                         {"source":1,"target":9}
             ] 
 }
-nsl_graph_MIoT =  {
+nsl_graph_urllc_3 =  {
             "vnfs": [
                         {"id":0,"function":"AMF","type":1,"backup":0},
                         {"id":1,"function":"AMF","type":1,"backup":0},
@@ -105,20 +105,20 @@ def get_operation_time(mean_operation_time):
 def add_resources(nsl_graph,service_type):## give cpu and bw ressources to each of the vnf of the graph
     cpu = 0
     # print("**",service_type)
-    if service_type == "embb":
+    if service_type == "urllc_1":
         # print("entro")
-        cpu = cpu_embb
-        # strg = str_embb
-        bw = bw_embb
-    elif service_type == "urllc": 
+        cpu = cpu_urllc_1
+        # strg = str_urllc_1
+        bw = bw_urllc_1
+    elif service_type == "urllc_2": 
         #print("entro urllc")
-        cpu = cpu_urllc
+        cpu = cpu_urllc_2
         # strg = str_urllc
-        bw = bw_urllc
-    elif service_type == "miot":
-        cpu = cpu_miot
+        bw = bw_urllc_2
+    elif service_type == "urllc_3":
+        cpu = cpu_urllc_3
         # strg = str_miot
-        bw = bw_miot
+        bw = bw_urllc_3
 
     for v in nsl_graph["vnfs"]:
         v["cpu"] = random.randint(cpu[0],cpu[1])
@@ -132,12 +132,12 @@ def add_resources(nsl_graph,service_type):## give cpu and bw ressources to each 
 
 def get_nslr(id,service_type,mean_operation_time):## generates a NSLR request from the graphs above
     
-    if service_type == "embb":
-        nsl_graph = nsl_graph_eMBB    
-    elif service_type == "urllc":
-        nsl_graph = nsl_graph_URLLC 
-    elif service_type == "miot":
-        nsl_graph = nsl_graph_MIoT
+    if service_type == "urllc_1":
+        nsl_graph = nsl_graph_urllc_1    
+    elif service_type == "urllc_2":
+        nsl_graph = nsl_graph_urllc_2
+    elif service_type == "urllc_3":
+        nsl_graph = nsl_graph_urllc_3
  
     nsl_graph = add_resources(copy.deepcopy(nsl_graph),service_type)
     request = NSLR(id,service_type,get_operation_time(mean_operation_time),nsl_graph)
