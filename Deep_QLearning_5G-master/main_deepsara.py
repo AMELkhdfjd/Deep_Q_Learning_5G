@@ -430,6 +430,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
     for vnf in nslr.nsl_graph_reduced["vnodes"]:#the nodes of the reduced graph of the accepted nslr are traversed   
         if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
+            ### ATTT; here we are taking the id of the phisical node not any node in order to update its ressources
               ## need to figure out the effect of next above
             if vnf["type"] == 0: #
                 type = "centralized_cpu"
@@ -753,7 +754,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     c.central_utl += step_central_cpu_utl
     c.link_utl += step_links_bw_utl
     
-    r = step_profit
+    r = step_profit ### ATT this is the reward to pass to the agent
     next_state = get_state(c.substrate,c.simulation) #getting the next state    
     
     #s_ = translateStateToIndex(next_state) #getting index of the next state
