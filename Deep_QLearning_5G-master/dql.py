@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import collections as cns
 
-
+### compatible to the new solution
 
 # https://stackoverflow.com/questions/11706215/how-can-i-fix-the-git-error-object-file-is-empty
 
