@@ -2,6 +2,7 @@
 
 
 def calculate_profit_nodes(nslr,end_simulation_time):
+
     #Calculates profit per time unit and then multiplies it by the nslr op. time
     #profit = revenue-cost 
     cost = 0
@@ -17,7 +18,7 @@ def calculate_profit_nodes(nslr,end_simulation_time):
             cf_cpu = 3 ## edge nodes are more valuable
         # else:
         #     cf_cpu = 4 
-        cost += vnf["cpu"]*cf_cpu
+        cost += vnf["cpu"]*cf_cpu  ## att: vnodes not the phisical nodes
         revenue += vnf["cpu"]*cf_cpu*2#revenue is twice the cost (so far)
 
     if nslr.end_time > end_simulation_time:
