@@ -17,11 +17,11 @@ import time
 repetitions = 33 #33
 twindow_length = 1
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
-# urllc_arrival_rate = 40 #5#2.5 #reqXsecond
+# urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
 # miot_arrival_rate = 10 #5#1#2 #reqXsecond
 
 urllc_1_arrival_rate = 0
-urllc_arrival_rate = 0
+urllc_2_arrival_rate = 0
 miot_arrival_rate = 0 
 arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
 
@@ -43,17 +43,17 @@ avble_bw_size = 10
 
 pct_inst_urllc_1_size = 10 #percentage of instantiated slices of type urllc_1
                         ## maybe we need this percentage for the action vector
-pct_inst_urllc_size = 10
+pct_inst_urllc_2_size = 10
 pct_inst_miot_size = 10
 
 pct_arriv_urllc_1_size = 10
-pct_arriv_urllc_size = 10
+pct_arriv_urllc_2_size = 10
 pct_arriv_miot_size = 10
 
 # n_states = avble_edge_size*avble_central_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_miot_size
-n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size
+n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size
 
 # #30 actions:
 # actions = [
@@ -126,14 +126,14 @@ class Controlador:
         self.node_profit=0
         self.link_profit=0
         self.urllc_1_profit = 0
-        self.urllc_profit = 0
+        self.urllc_2_profit = 0
         self.miot_profit = 0
         self.edge_profit = 0
         self.central_profit = 0
 
         self.acpt_rate = 0     ## we define acceptence rate
         self.urllc_1_acpt_rate = 0
-        self.urllc_acpt_rate = 0
+        self.urllc_2_acpt_rate = 0
         self.miot_acpt_rate = 0
         
         self.total_utl = 0   ## here the utl means utilisation
@@ -142,7 +142,7 @@ class Controlador:
         self.edge_utl = 0
         self.central_utl = 0
         self.urllc_1_utl = 0
-        self.urllc_utl = 0
+        self.urllc_2_utl = 0
         self.miot_utl = 0
 
         self.simulation = Sim()
@@ -167,14 +167,14 @@ class Sim:
         self.run_till = 1 ## initially was -1
         self.total_reqs = 0
         self.total_urllc_1_reqs = 0
-        self.total_urllc_reqs = 0
+        self.total_urllc_2_reqs = 0
         self.total_miot_reqs = 0
         self.attended_reqs = 0
         self.accepted_reqs = 0
         self.urllc_1_accepted_reqs = 0
-        self.urllc_accepted_reqs = 0
+        self.urllc_2_accepted_reqs = 0
         self.miot_accepted_reqs = 0
-        self.current_instatiated_reqs = [0,0,0] #[urllc_1,urllc,miot]
+        self.current_instatiated_reqs = [0,0,0] #[urllc_1,urllc_2,miot]
                    
 
     def set_run_till(self, t):
@@ -233,8 +233,8 @@ class Sim:
             if evt.extra["service_type"] == "urllc_1":
                 self.total_urllc_1_reqs += 1
                 self.window_req_list[0].append(copy.deepcopy(request))## add the request to the window list according to the type of the service
-            elif evt.extra["service_type"] == "urllc":
-                self.total_urllc_reqs += 1
+            elif evt.extra["service_type"] == "urllc_2":
+                self.total_urllc_2_reqs += 1
                 self.window_req_list[1].append(copy.deepcopy(request))#
             else: #evt.extra["service_type"] == "miot":
                 self.total_miot_reqs += 1
@@ -315,7 +315,7 @@ def filtro(window_req_list,action): ## still ambigus
     auxiliar_list = []
     for req in window_req_list:
         ## ATT here bandera means flag, maybe here we are taking the requests with action flags <=(100,100,100)
-        if (req.service_type == "urllc_1" and req.bandera <= actions[action][0]*100) or (req.service_type == "urllc" and req.bandera <= actions[action][1]*100) or (req.service_type == "miot" and req.bandera <= actions[action][2]*100):
+        if (req.service_type == "urllc_1" and req.bandera <= actions[action][0]*100) or (req.service_type == "urllc_2" and req.bandera <= actions[action][1]*100) or (req.service_type == "miot" and req.bandera <= actions[action][2]*100):
             # print("**agregando request...")
             granted_req_list.append(req)
     #     else:
@@ -333,7 +333,7 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
     #print("****prioritizing...")
     action = actions[action_index]
     # urllc_1_list = []
-    # urllc_list = []
+    # urllc_2_list = []
     # miot_list = []
     granted_req_list = []
 
@@ -353,18 +353,18 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
     # for req in window_req_list: 
     #     if req.service_type == "urllc_1":
     #         urllc_1_list.append(req)
-    #     elif req.service_type == "urllc":
-    #         urllc_list.append(req)
+    #     elif req.service_type == "urllc_2":
+    #         urllc_2_list.append(req)
     #     else:
     #         miot_list.append(req)
 
     urllc_1_list = window_req_list[0]
-    urllc_list = window_req_list[1]
+    urllc_2_list = window_req_list[1]
     miot_list = window_req_list[2]
     
     #While there are requests in the lists, they are added to the prioritized list        
 
-    while urllc_1_list or urllc_list or miot_list:
+    while urllc_1_list or urllc_2_list or miot_list:
         #for value in action:
         for i in range(0,translated_action[0]):
             if urllc_1_list:
@@ -372,9 +372,9 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
                 urllc_1_list.pop(0) ## remove the request taken from the list, leave only untreated events or requests
 
         for i in range(0,translated_action[1]):
-            if urllc_list:
-                granted_req_list.append(urllc_list[0])
-                urllc_list.pop(0)
+            if urllc_2_list:
+                granted_req_list.append(urllc_2_list[0])
+                urllc_2_list.pop(0)
    
         for i in range(0,translated_action[2]):
             if miot_list: 
@@ -468,7 +468,7 @@ def resource_allocation(cn): #cn=controller
     sim = cn.simulation ## define the object of class Sim which is part of the Controller class
     substrate = cn.substrate ## substrate of the controller class
     step_urllc_1_profit = 0 
-    step_urllc_profit = 0
+    step_urllc_2_profit = 0
     step_miot_profit = 0
     step_link_profit=0
     step_node_profit=0
@@ -515,10 +515,10 @@ def resource_allocation(cn): #cn=controller
                 sim.current_instatiated_reqs[0] += 1 ## the total of requests accepted for the specific service for each step
                 sim.urllc_1_accepted_reqs += 1 ## the accepted for the specific service in general not in the step i think
                 step_urllc_1_profit += profit_nodes/max_node_profit
-            elif req.service_type == "urllc":
+            elif req.service_type == "urllc_2":
                 sim.current_instatiated_reqs[1] += 1
-                sim.urllc_accepted_reqs += 1
-                step_urllc_profit += profit_nodes/max_node_profit
+                sim.urllc_2_accepted_reqs += 1
+                step_urllc_2_profit += profit_nodes/max_node_profit
             else:
                 sim.current_instatiated_reqs[2] += 1
                 sim.miot_accepted_reqs += 1
@@ -532,7 +532,7 @@ def resource_allocation(cn): #cn=controller
             #step_total_utl += (a+b+(c*10))/((edge_initial+centralized_initial+bw_initial)*end_simulation_time)
             step_total_utl += (step_node_utl + step_links_bw_utl)/2
              
-    return step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_profit,step_miot_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl
+    return step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_miot_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl
 
 def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 5, 6, 7, 8, or 9) based on the range of values that value falls within.
     cod = 0
@@ -584,11 +584,11 @@ def translateStateToIndex(state): ## still ambigus
     cod_avble_bw = state[2]
     
     cod_pct_urllc_1 = state[3]
-    cod_pct_urllc = state[4]
+    cod_pct_urllc_2= state[4]
     cod_pct_miot = state[5]
     
     cod_pct_arriv_urllc_1 = state[6]
-    cod_pct_arriv_urllc = state[7]
+    cod_pct_arriv_urllc_2= state[7]
     cod_pct_arriv_miot = state[8]
 
     #index = cod_avble_edge*avble_central_size + cod_avble_central
@@ -605,14 +605,14 @@ def translateStateToIndex(state): ## still ambigus
     # + cod_pct_miot
 
     #index for a 9-parameter state
-    index = cod_avble_edge*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size 
-    + cod_avble_central*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size
-    + cod_avble_bw*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size
-    + cod_pct_urllc_1*pct_inst_urllc_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size
-    + cod_pct_urllc*pct_inst_miot_size *pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size
-    + cod_pct_miot*pct_arriv_urllc_1_size*pct_arriv_urllc_size*pct_arriv_miot_size
-    + cod_pct_arriv_urllc_1*pct_arriv_urllc_size*pct_arriv_miot_size
-    + cod_pct_arriv_urllc*pct_arriv_miot_size
+    index = cod_avble_edge*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size 
+    + cod_avble_central*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size
+    + cod_avble_bw*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size
+    + cod_pct_urllc_1*pct_inst_urllc_2_size*pct_inst_miot_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size
+    + cod_pct_urllc_2*pct_inst_miot_size *pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size
+    + cod_pct_miot*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_miot_size
+    + cod_pct_arriv_urllc_1*pct_arriv_urllc_2_size*pct_arriv_miot_size
+    + cod_pct_arriv_urllc_2*pct_arriv_miot_size
     + cod_pct_arriv_miot
 
     return int(index)
@@ -628,11 +628,11 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
     for i in simulation.current_instatiated_reqs:
         total += i
     if total == 0:
-        pct_urllc_1, pct_urllc, pct_miot = 0,0,0
+        pct_urllc_1, pct_urllc_2, pct_miot = 0,0,0
     else:
-        pct_urllc_1, pct_urllc, pct_miot = simulation.current_instatiated_reqs[0]*100/total,simulation.current_instatiated_reqs[1]*100/total,simulation.current_instatiated_reqs[2]*100/total 
+        pct_urllc_1, pct_urllc_2, pct_miot = simulation.current_instatiated_reqs[0]*100/total,simulation.current_instatiated_reqs[1]*100/total,simulation.current_instatiated_reqs[2]*100/total 
     cod_pct_urllc_1 = get_code(pct_urllc_1)
-    cod_pct_urllc = get_code(pct_urllc)
+    cod_pct_urllc_2= get_code(pct_urllc_2)
     cod_pct_miot = get_code(pct_miot)
 
     
@@ -641,19 +641,19 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
     n = len(simulation.granted_req_list)
     
     if n == 0:
-        pct_arriv_urllc_1, pct_arriv_urllc, pct_arriv_miot = 0,0,0
+        pct_arriv_urllc_1, pct_arriv_urllc_2, pct_arriv_miot = 0,0,0
     else:
         for req in simulation.granted_req_list:
             if req.service_type == "urllc_1":
                 counter[0] += 1
-            elif req.service_type == "urllc":
+            elif req.service_type == "urllc_2":
                 counter[1] += 1
             else:
                 counter[2] += 1
-        pct_arriv_urllc_1, pct_arriv_urllc, pct_arriv_miot = counter[0]*100/n, counter[1]*100/n, counter[2]*100/n
+        pct_arriv_urllc_1, pct_arriv_urllc_2, pct_arriv_miot = counter[0]*100/n, counter[1]*100/n, counter[2]*100/n
 
     cod_pct_arriv_urllc_1 = get_code(pct_arriv_urllc_1)
-    cod_pct_arriv_urllc = get_code(pct_arriv_urllc)
+    cod_pct_arriv_urllc_2= get_code(pct_arriv_urllc_2)
     cod_pct_arriv_miot = get_code(pct_arriv_miot)
 
 
@@ -666,7 +666,7 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
     #             np.float32(cod_avble_central),
     #             np.float32(cod_avble_bw),
     #             np.float32(cod_pct_urllc_1),
-    #             np.float32(cod_pct_urllc),
+    #             np.float32(cod_pct_urllc_2),
     #             np.float32(cod_pct_miot)
     #         ]
 
@@ -676,10 +676,10 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
                 np.float32(cod_avble_central),
                 np.float32(cod_avble_bw),
                 np.float32(cod_pct_urllc_1),
-                np.float32(cod_pct_urllc),
+                np.float32(cod_pct_urllc_2),
                 np.float32(cod_pct_miot),
                 np.float32(cod_pct_arriv_urllc_1),
-                np.float32(cod_pct_arriv_urllc),
+                np.float32(cod_pct_arriv_urllc_2),
                 np.float32(cod_pct_arriv_miot)
             ]
 
@@ -707,7 +707,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     update_resources(c.substrate,request,True)
     if request.service_type == "urllc_1":
         sim.current_instatiated_reqs[0] -= 1  ## att current_instatiated reqs means the req in this moment occuping ressources in the graph and not yet terminated
-    elif request.service_type == "urllc":
+    elif request.service_type == "urllc_2":
         sim.current_instatiated_reqs[1] -= 1
     else:
         sim.current_instatiated_reqs[2] -= 1
@@ -741,12 +741,12 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
       
     sim.granted_req_list, remaining_req_list = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
     #the list is sent to the Resource Allocation module
-    step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_profit,step_miot_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl = resource_allocation(c)
+    step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_miot_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl = resource_allocation(c)
     c.total_profit += step_profit ## here we have the global profits for all steps not only one
     c.node_profit += step_node_profit
     c.link_profit += step_link_profit
     c.urllc_1_profit += step_urllc_1_profit
-    c.urllc_profit += step_urllc_profit
+    c.urllc_2_profit += step_urllc_2_profit
     c.miot_profit += step_miot_profit
     c.total_utl += step_total_utl
     c.node_utl += step_node_utl 
@@ -784,7 +784,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
 def prepare_sim(s):## prepares the simulation object for all services and sets the params for them
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_1","arrival_rate":urllc_1_arrival_rate},f=func_arrival) 
     s.add_event(evt)
-    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_arrival_rate),extra={"service_type":"urllc","arrival_rate":urllc_arrival_rate},f=func_arrival)    
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_2_arrival_rate),extra={"service_type":"urllc_2","arrival_rate":urllc_2_arrival_rate},f=func_arrival)    
     s.add_event(evt)
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(miot_arrival_rate),extra={"service_type":"miot","arrival_rate":miot_arrival_rate},f=func_arrival)    
     s.add_event(evt)
@@ -810,12 +810,12 @@ def main():
     global bw_initial
     global agente
     global urllc_1_arrival_rate
-    global urllc_arrival_rate
+    global urllc_2_arrival_rate
     global miot_arrival_rate
     
     for m in arrival_rates:  ### the most global loop, arrival_rates = [100,80,60,40,30,25,20,15,10,7,5,3,1]
         urllc_1_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
-        urllc_arrival_rate = m/3
+        urllc_2_arrival_rate = m/3
         miot_arrival_rate = m/3        
         
         total_profit_rep = []
@@ -824,12 +824,12 @@ def main():
         edge_profit_rep = []
         central_profit_rep = []
         profit_urllc_1_rep = []
-        profit_urllc_rep = []
+        profit_urllc_2_rep = []
         profit_miot_rep = []
         
         acpt_rate_rep = []
         acpt_rate_urllc_1_rep = []
-        acpt_rate_urllc_rep = []
+        acpt_rate_urllc_2_rep = []
         acpt_rate_miot_rep = []
 
         total_utl_rep = []
@@ -838,7 +838,7 @@ def main():
         edge_ult_rep = []
         central_utl_rep = []
         urllc_1_utl_rep = []
-        urllc_utl_rep = []
+        urllc_2_utl_rep = []
         miot_utl_rep = []    
         
         for i in range(episodes): ## we loop the set of episodes which is 350 global var 
@@ -850,12 +850,12 @@ def main():
             edge_profit_rep.append([])
             central_profit_rep.append([])
             profit_urllc_1_rep.append([])
-            profit_urllc_rep.append([])
+            profit_urllc_2_rep.append([])
             profit_miot_rep.append([])
             
             acpt_rate_rep.append([])
             acpt_rate_urllc_1_rep.append([])
-            acpt_rate_urllc_rep.append([])
+            acpt_rate_urllc_2_rep.append([])
             acpt_rate_miot_rep.append([])
 
             total_utl_rep.append([])
@@ -864,7 +864,7 @@ def main():
             edge_ult_rep.append([])
             central_utl_rep.append([])
             urllc_1_utl_rep.append([])
-            urllc_utl_rep.append([])
+            urllc_2_utl_rep.append([])
             miot_utl_rep.append([])
         
         for i in range(repetitions): ## repetitions=33 global 
@@ -902,12 +902,12 @@ def main():
                 edge_profit_rep[j].append(controller.edge_profit)
                 central_profit_rep[j].append(controller.central_profit)
                 profit_urllc_1_rep[j].append(controller.urllc_1_profit)
-                profit_urllc_rep[j].append(controller.urllc_profit)
+                profit_urllc_2_rep[j].append(controller.urllc_2_profit)
                 profit_miot_rep[j].append(controller.miot_profit)
                         
                 acpt_rate_rep[j].append(controller.simulation.accepted_reqs/controller.simulation.total_reqs)
                 acpt_rate_urllc_1_rep[j].append(controller.simulation.urllc_1_accepted_reqs/controller.simulation.total_urllc_1_reqs)
-                acpt_rate_urllc_rep[j].append(controller.simulation.urllc_accepted_reqs/controller.simulation.total_urllc_reqs)
+                acpt_rate_urllc_2_rep[j].append(controller.simulation.urllc_2_accepted_reqs/controller.simulation.total_urllc_2_reqs)
                 acpt_rate_miot_rep[j].append(controller.simulation.miot_accepted_reqs/controller.simulation.total_miot_reqs)
                 
                 total_utl_rep[j].append(controller.total_utl)
@@ -916,7 +916,7 @@ def main():
                 edge_ult_rep[j].append(controller.edge_utl)
                 central_utl_rep[j].append(controller.central_utl) 
                 urllc_1_utl_rep[j].append(controller.urllc_1_utl)
-                urllc_utl_rep[j].append(controller.urllc_utl)
+                urllc_2_utl_rep[j].append(controller.urllc_2_utl)
                 miot_utl_rep[j].append(controller.miot_utl)
 
             #bot.sendMessage("Repetition " + str(i) + " finishes!")
@@ -936,8 +936,8 @@ def main():
             f.write(str(central_profit_rep)+"\n\n")
             f.write("**profit_urllc_1_rep:\n")
             f.write(str(profit_urllc_1_rep)+"\n\n")
-            f.write("**profit_urllc_rep:\n")
-            f.write(str(profit_urllc_rep)+"\n\n")
+            f.write("**profit_urllc_2_rep:\n")
+            f.write(str(profit_urllc_2_rep)+"\n\n")
             f.write("**profit_miot_rep:\n")
             f.write(str(profit_miot_rep)+"\n\n")
 
@@ -945,8 +945,8 @@ def main():
             f.write(str(acpt_rate_rep)+"\n\n")
             f.write("**acpt_rate_urllc_1_rep:\n")
             f.write(str(acpt_rate_urllc_1_rep)+"\n\n")
-            f.write("**acpt_rate_urllc_rep:\n")
-            f.write(str(acpt_rate_urllc_rep)+"\n\n")
+            f.write("**acpt_rate_urllc_2_rep:\n")
+            f.write(str(acpt_rate_urllc_2_rep)+"\n\n")
             f.write("**acpt_rate_miot_rep:\n")
             f.write(str(acpt_rate_miot_rep)+"\n\n")
 
@@ -962,8 +962,8 @@ def main():
             f.write(str(central_utl_rep)+"\n\n")
             f.write("**urllc_1_utl_rep:\n")
             f.write(str(urllc_1_utl_rep)+"\n\n")
-            f.write("**urllc_utl_rep:\n")
-            f.write(str(urllc_utl_rep)+"\n\n")
+            f.write("**urllc_2_utl_rep:\n")
+            f.write(str(urllc_2_utl_rep)+"\n\n")
             f.write("**miot_utl_rep:\n")
             f.write(str(miot_utl_rep)+"\n\n")        
             f.close()
