@@ -38,7 +38,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     profit_links = 0
     centralized_vnfs = []
     # local_vnfs = []
-    edge_vnfs = []      
+    #edge_vnfs = []      
 
     vnfs = nslr.nsl_graph["vnfs"] #considerar rankear vnfs tambien
     reduce_nslr_graph(nslr) #builds a reduced version of the nsl_graph to reduce the size of it based on if we have seccessor backups we put them in one virtual node
@@ -176,28 +176,29 @@ def reduce_nslr_graph(nslr):
     centralized_vnfs = []
     
     # local_vnfs = []
-    edge_vnfs = []
+    ###edge_vnfs = []
 
     #1. Group vnfs by node type: (fill the two above lists)
-    for vnf in nslr.nsl_graph["vnfs"]: #loop vnfs      
+    """for vnf in nslr.nsl_graph["vnfs"]: #loop vnfs      
         if vnf["type"] == 0:
             centralized_vnfs.append(vnf)
         # elif vnf["type"] == 1:
         #     local_vnfs.append(vnf)
         else: 
             edge_vnfs.append(vnf) 
+            """
 
     #2. Sort the vnfs by backup:
     centralized_vnfs = sorted(centralized_vnfs, key=itemgetter("backup"))## order the vnfs according to backup from 0 to above to start first with the primary vnfs
     # local_vnfs = sorted(local_vnfs, key=itemgetter("backup"))
-    edge_vnfs = sorted(edge_vnfs, key=itemgetter("backup"))
+    ###edge_vnfs = sorted(edge_vnfs, key=itemgetter("backup"))
 
     #3. Group vnfs that will be instantiated in the same physical node:
     nsl_graph_red["vnodes"] = []
    
     group_vnfs(centralized_vnfs,0)
     # group_vnfs(local_vnfs,1)
-    group_vnfs(edge_vnfs,1)
+    ###group_vnfs(edge_vnfs,1)
 
     #4. Create new vlinks considering the virtual nodes created
     nsl_graph_red["vlinks"] = []
