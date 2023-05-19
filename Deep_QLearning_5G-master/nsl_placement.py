@@ -12,7 +12,7 @@
     In this way, accepting nslrs from a use case will have a greater influence on
     nslrs acceptance of another use cas
 """
-
+### type here is only centralised
 ## orderring the vnfs starting from the backup ones
 ## vnfs on the same node are groups and called virtual node to reduce the nslr graph
 
