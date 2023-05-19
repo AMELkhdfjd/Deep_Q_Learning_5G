@@ -500,6 +500,13 @@ def resource_allocation(cn): #cn=controller
             profit_nodes = calculate_metrics.calculate_profit_nodes(req,end_simulation_time)  ## from the functions of the calculate_metrics file to have the profit gained for node and links
             profit_links = calculate_metrics.calculate_profit_links(req,end_simulation_time)*10    
             step_profit += (profit_nodes + profit_links)/max_profit #the total profit in this step is the reward
+
+            #### new reward solution
+            #latency_reward = calculate_metrics.calculate_latency_reward(...)
+            #reability_reward = calculate_metrics.calculate_reability_reward(...)
+            #step_profit = latency_reward + reability_reward
+            ### 
+            
             step_link_profit += profit_links/max_link_profit
             step_node_profit += profit_nodes/max_node_profit
             step_central_profit = 0#ajustar
