@@ -28,7 +28,7 @@ arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the num
 mean_operation_time = 15 ## initially set to 15, the temination events are never executed
                           
 
-edge_initial = 0
+
 centralized_initial = 0
 bw_initial = 0
 agente = None
@@ -37,7 +37,7 @@ agente = None
 #RL-specific parameters 
 episodes = 350 #240##350
 
-avble_edge_size = 10
+
 avble_central_size = 10
 avble_bw_size = 10
 
@@ -53,7 +53,7 @@ pct_arriv_urllc_3_size = 10
 # n_states = avble_edge_size*avble_central_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_urllc_3_size
-n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
+n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
 
 # #30 actions:
 # actions = [
@@ -128,7 +128,6 @@ class Controlador:
         self.urllc_1_profit = 0
         self.urllc_2_profit = 0
         self.urllc_3_profit = 0
-        self.edge_profit = 0
         self.central_profit = 0
 
         self.acpt_rate = 0     ## we define acceptence rate
@@ -139,7 +138,6 @@ class Controlador:
         self.total_utl = 0   ## here the utl means utilisation
         self.node_utl = 0    
         self.link_utl = 0
-        self.edge_utl = 0
         self.central_utl = 0
         self.urllc_1_utl = 0
         self.urllc_2_utl = 0
@@ -434,8 +432,6 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
               ## need to figure out the effect of next above
             if vnf["type"] == 0: #
                 type = "centralized_cpu"
-            else:
-                type = "edge_cpu"
             if kill: #if it is kill process, resources are free again
                 
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
@@ -472,10 +468,8 @@ def resource_allocation(cn): #cn=controller
     step_urllc_3_profit = 0
     step_link_profit=0
     step_node_profit=0
-    step_edge_profit = 0
     step_central_profit = 0
     step_profit=0
-    step_edge_cpu_utl = 0
     step_central_cpu_utl = 0
     step_links_bw_utl = 0
     step_node_utl = 0
@@ -508,7 +502,6 @@ def resource_allocation(cn): #cn=controller
             step_profit += (profit_nodes + profit_links)/max_profit #the total profit in this step is the reward
             step_link_profit += profit_links/max_link_profit
             step_node_profit += profit_nodes/max_node_profit
-            step_edge_profit = 0 #ajustar
             step_central_profit = 0#ajustar
 
             if req.service_type == "urllc_1":
@@ -524,12 +517,10 @@ def resource_allocation(cn): #cn=controller
                 sim.urllc_3_accepted_reqs += 1
                 step_urllc_3_profit += profit_nodes/max_node_profit                       
             
-            a,b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)## returns edge_utl, central_utl, links_utl for the request treated
-            step_edge_cpu_utl += a/(edge_initial*end_simulation_time)## edge initial here is the initial value of cpu edge of the graph
+            b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)## returns edge_utl, central_utl, links_utl for the request treated
             step_central_cpu_utl += b/(centralized_initial*end_simulation_time)
             step_links_bw_utl += c*10/(bw_initial*end_simulation_time)## links profit and utilistion are always *10
-            step_node_utl += (a+b)/((edge_initial+centralized_initial)*end_simulation_time)
-            #step_total_utl += (a+b+(c*10))/((edge_initial+centralized_initial+bw_initial)*end_simulation_time)
+            step_node_utl += (b)/((centralized_initial)*end_simulation_time)
             step_total_utl += (step_node_utl + step_links_bw_utl)/2
              
     return step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl
@@ -579,7 +570,6 @@ def translateStateToIndex(state): ## still ambigus
     '''
     returns state index from a given state code
     '''
-    cod_avble_edge = state[0]
     cod_avble_central = state[1]
     cod_avble_bw = state[2]
     
@@ -605,7 +595,7 @@ def translateStateToIndex(state): ## still ambigus
     # + cod_pct_urllc_3
 
     #index for a 9-parameter state
-    index = cod_avble_edge*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size 
+    index = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size 
     + cod_avble_central*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
     + cod_avble_bw*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
     + cod_pct_urllc_1*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
@@ -619,7 +609,6 @@ def translateStateToIndex(state): ## still ambigus
 
 
 def get_state(substrate,simulation): ## returns the state of 9 parmas   
-    cod_avble_edge = get_code(substrate.graph["edge_cpu"]/edge_initial) ## att the substrate.graph["edge_cpu"] decreasing after each nslr treatement, but edge initial is const
     cod_avble_central = get_code(substrate.graph["centralized_cpu"]/centralized_initial)
     cod_avble_bw = get_code(substrate.graph["bw"]/bw_initial)
     
@@ -672,7 +661,6 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
 
     #9-parameter state:
     state = [
-                np.float32(cod_avble_edge),
                 np.float32(cod_avble_central),
                 np.float32(cod_avble_bw),
                 np.float32(cod_pct_urllc_1),
@@ -741,7 +729,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
       
     sim.granted_req_list, remaining_req_list = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
     #the list is sent to the Resource Allocation module
-    step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl = resource_allocation(c)
+    step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_central_cpu_utl = resource_allocation(c)
     c.total_profit += step_profit ## here we have the global profits for all steps not only one
     c.node_profit += step_node_profit
     c.link_profit += step_link_profit
@@ -750,7 +738,6 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     c.urllc_3_profit += step_urllc_3_profit
     c.total_utl += step_total_utl
     c.node_utl += step_node_utl 
-    c.edge_utl += step_edge_cpu_utl 
     c.central_utl += step_central_cpu_utl
     c.link_utl += step_links_bw_utl
     
@@ -805,7 +792,6 @@ def main():
 # ▄███▄ ▀▀  ▄████▄███▄   ▄████▄████▄███▄    ██ 
                                                   
                                                       
-    global edge_initial
     global centralized_initial
     global bw_initial
     global agente
@@ -821,7 +807,6 @@ def main():
         total_profit_rep = []
         link_profit_rep = []
         node_profit_rep = []
-        edge_profit_rep = []
         central_profit_rep = []
         profit_urllc_1_rep = []
         profit_urllc_2_rep = []
@@ -835,7 +820,6 @@ def main():
         total_utl_rep = []
         link_utl_rep = []
         node_utl_rep = []
-        edge_ult_rep = []
         central_utl_rep = []
         urllc_1_utl_rep = []
         urllc_2_utl_rep = []
@@ -847,7 +831,6 @@ def main():
             total_profit_rep.append([])
             link_profit_rep.append([])
             node_profit_rep.append([])
-            edge_profit_rep.append([])
             central_profit_rep.append([])
             profit_urllc_1_rep.append([])
             profit_urllc_2_rep.append([])
@@ -861,7 +844,6 @@ def main():
             total_utl_rep.append([])
             link_utl_rep.append([])
             node_utl_rep.append([])
-            edge_ult_rep.append([])
             central_utl_rep.append([])
             urllc_1_utl_rep.append([])
             urllc_2_utl_rep.append([])
@@ -888,7 +870,6 @@ def main():
 
 
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
-                edge_initial = controller.substrate.graph["edge_cpu"] ## get the initial values for the ressources
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
                 controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
@@ -899,7 +880,6 @@ def main():
                 total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
                 node_profit_rep[j].append(controller.node_profit)        
                 link_profit_rep[j].append(controller.link_profit)
-                edge_profit_rep[j].append(controller.edge_profit)
                 central_profit_rep[j].append(controller.central_profit)
                 profit_urllc_1_rep[j].append(controller.urllc_1_profit)
                 profit_urllc_2_rep[j].append(controller.urllc_2_profit)
@@ -913,7 +893,6 @@ def main():
                 total_utl_rep[j].append(controller.total_utl)
                 link_utl_rep[j].append(controller.link_utl)
                 node_utl_rep[j].append(controller.node_utl)
-                edge_ult_rep[j].append(controller.edge_utl)
                 central_utl_rep[j].append(controller.central_utl) 
                 urllc_1_utl_rep[j].append(controller.urllc_1_utl)
                 urllc_2_utl_rep[j].append(controller.urllc_2_utl)
@@ -930,8 +909,6 @@ def main():
             f.write(str(node_profit_rep)+"\n\n")
             f.write("**link_profit_rep:\n")
             f.write(str(link_profit_rep)+"\n\n")
-            f.write("**edge_profit_rep:\n")
-            f.write(str(edge_profit_rep)+"\n\n")
             f.write("**central_profit_rep:\n")
             f.write(str(central_profit_rep)+"\n\n")
             f.write("**profit_urllc_1_rep:\n")
@@ -956,8 +933,6 @@ def main():
             f.write(str(node_utl_rep)+"\n\n")
             f.write("**link_utl_rep:\n")
             f.write(str(link_utl_rep)+"\n\n")
-            f.write("**edge_ult_rep:\n")
-            f.write(str(edge_ult_rep)+"\n\n")
             f.write("**central_utl_rep:\n")
             f.write(str(central_utl_rep)+"\n\n")
             f.write("**urllc_1_utl_rep:\n")
