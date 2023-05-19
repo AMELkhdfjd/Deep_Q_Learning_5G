@@ -62,14 +62,12 @@ def calculate_request_utilization(nslr,end_simulation_time,substrate):## returns
     vlinks = nslr.nsl_graph_reduced["vlinks"]
     time = 0.0
     central_sum = 0
-    edge_sum = 0
     bw_sum = 0 
     
     for vnf in vnfs:
         if vnf["type"] == 0:#central
             central_sum += vnf["cpu"]
-        elif vnf["type"] == 1:#edge
-            edge_sum += vnf["cpu"]
+      
 
     for vlink in vlinks:
         bw_sum += vlink["bw"]      
@@ -81,11 +79,10 @@ def calculate_request_utilization(nslr,end_simulation_time,substrate):## returns
     else:
         time = nslr.operation_time## same as above
 
-    edge_utl = edge_sum*time
     central_utl = central_sum*time
     links_utl = bw_sum*time  
 
-    return edge_utl, central_utl, links_utl
+    return  central_utl, links_utl
 
 # def calculate_request_utilization(nslr,end_simulation_time,substrate):
 #     '''
