@@ -278,7 +278,9 @@ def new_vlinks(nsl_graph_red, nsl_graph): ## create the virtual links between th
             nsl_graph_red["vlinks"].append(new_vlink)
 
 
-def analyze_links(nsl_graph,substrate):
+def analyze_links(nsl_graph,substrate): ## returns the length of the path in addition in order to calculate the latency
+
+    ## ATT: the virtual link vlink, can be more than one link in the physical representation
     '''
    Makes the accept or reject decision based on the shortest path
     Find the shortest path and with enough bw in each link to instantiate
@@ -330,7 +332,7 @@ def analyze_links(nsl_graph,substrate):
         if reject:
             break
 
-    return reject
+    return reject, len(path)
 
 
 #substrate = ggen.ba_graph("amel_test",15) 
