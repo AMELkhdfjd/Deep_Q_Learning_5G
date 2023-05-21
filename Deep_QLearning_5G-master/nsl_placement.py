@@ -38,7 +38,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     profit_links = 0
     centralized_vnfs = []
     # local_vnfs = []
-    #edge_vnfs = []      
+    #edge_vnfs = []   
+    n_hops = 0   
 
     vnfs = nslr.nsl_graph["vnfs"] #considerar rankear vnfs tambien
     ##reduce_nslr_graph(nslr) #builds a reduced version of the nsl_graph to reduce the size of it based on if we have seccessor backups we put them in one virtual node
@@ -106,14 +107,18 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
         if i > 0:
             pre_vnf = vnodes[i - 1]
             pre_backup = pre_vnf["backup"]
-            print("pre_backup",pre_backup)
+            print("backup type of previous node",pre_backup)
             if(pre_backup != vnodes[i]["backup"]):  ## we have diff types of backup, need to find another physical node to map it
             
                 for n in ranked_nodes_cpu:
                     if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[vnodes[i-1]["backup"]]:
+                        
                         already_backup[vnodes[i]["backup"]].append(n["id"])
+                        
                         vnodes[i]["mapped_to"] = n["id"]
                         print("not_same_backup",vnodes[i] , "mapped to ", n["id"])
+                        print("already backup 0",already_backup[0])
+                        print("already backup 1",already_backup[1])
                         break
                 
                     else: # insufficient resource, vnode rejected    
@@ -124,13 +129,17 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             print("enter to insufficient ressources")
                             #print("insufficient ressources")
                             break 
-            else:
+            else:   ### we have the same backup
                 for n in ranked_nodes_cpu:
-                    if(vnodes[i]["backup"] == "0"):
+                    if(vnodes[i]["backup"] == 0):
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
+                            
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
+                            
                             print("same backup 0", vnodes[i] , "mapped to ", n["id"])
+                            print("already backup 0",already_backup[0])
+                            print("already backup 1",already_backup[1])
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -142,9 +151,13 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                                 break
                     else:
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[0]:
+                            
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
+                            
                             print("same backup 1", vnodes[i] , "mapped to ", n["id"])
+                            print("already backup 0",already_backup[0])
+                            print("already backup 1",already_backup[1])
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -155,12 +168,34 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                                 #print("insufficient ressources")
                                 break
         else:### here we are treating the first vnode, we dont have a previous one
+            
             for n in ranked_nodes_cpu:
+                    
                     if(vnodes[i]["backup"] == "0"):
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
                             already_backup[vnodes[i]["backup"]].append(n["id"])
+                            
                             vnodes[i]["mapped_to"] = n["id"]
+                            
                             print("the first node", vnodes[i] , "mapped to ", n["id"])
+                            break
+                        else: # insufficient resource, vnode rejected    
+                        
+                            if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
+                                                                        ## we are in the last vnode
+                                rejected = True    
+                                print("enter to insufficient ressources")
+                                #print("insufficient ressources")
+                                break
+                    else:
+                        if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[0]:
+                            
+                            already_backup[vnodes[i]["backup"]].append(n["id"])
+                            
+                            vnodes[i]["mapped_to"] = n["id"]
+                            print("the first node ", vnodes[i] , "mapped to ", n["id"])
+                            print("already backup 0",already_backup[0])
+                            print("already backup 1",already_backup[1])
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -206,13 +241,13 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     ################### ------------- #################                
     
     ################## vlinks admission #################
-   # if not rejected:
-    #    rejected = analyze_links(nsl_graph_red,substrate)
-    # else:
-    #     print("\n\n","***rejected by scarce node rsc","\n\n")
+    if not rejected:
+        rejected, n_hops = analyze_links(nsl_graph_red,substrate)
+    else:
+         print("\n\n","***rejected by scarce node rsc","\n\n")
     ################### ------------- #################
-    # if rejected:
-    #     print("\n\n","***rejected by scarce link rsc","\n\n")
+    if rejected:
+         print("\n\n","***rejected by scarce link rsc","\n\n")
 
     return rejected 
 
