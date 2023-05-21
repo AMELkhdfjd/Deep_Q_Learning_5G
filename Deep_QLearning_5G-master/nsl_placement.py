@@ -97,13 +97,86 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     ################### vnfs admission #################  
     ## here we have only two vnodes according if the vnfs are primary or backup, then aleardy will be used to put them in different nodes 
     rejected = False
-    already = [] #list of nodes that already hold a vnode
+    already_backup = [[],[]] #list of nodes that already hold a vnode
     ### print("ranked nodes",ranked_nodes_cpu)
     #print("vnodes list: ", nsl_graph_red["vnodes"])
-    for v in vnodes:
+    for i in range(len(vnodes)):
         if rejected:
             break
-        for n in ranked_nodes_cpu:  ## loop the list of vnodes sorted according to their ressources
+        if i > 0:
+            pre_vnf = vnodes[i - 1]
+            pre_backup = pre_vnf["backup"]
+            print("pre_backup",pre_backup)
+            if(pre_backup != vnodes[i]["backup"]):  ## we have diff types of backup, need to find another physical node to map it
+            
+                for n in ranked_nodes_cpu:
+                    if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[vnodes[i-1]["backup"]]:
+                        already_backup[vnodes[i]["backup"]].append(n["id"])
+                        vnodes[i]["mapped_to"] = n["id"]
+                        print("not_same_backup",vnodes["id"] , "mapped to ", n["id"])
+                
+                    else: # insufficient resource, vnode rejected    
+
+                        if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
+                                                                        ## we are in the last vnode
+                            rejected = True    
+                            print("enter to insufficient ressources")
+                            #print("insufficient ressources")
+                            break 
+            else:
+                for n in ranked_nodes_cpu:
+                    if(vnodes[i]["backup"] == "0"):
+                        if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
+                            already_backup[vnodes[i]["backup"]].append(n["id"])
+                            vnodes[i]["mapped_to"] = n["id"]
+                            print("same backup 0", vnodes["id"] , "mapped to ", n["id"])
+                        else: # insufficient resource, vnode rejected    
+                        
+                            if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
+                                                                        ## we are in the last vnode
+                                rejected = True    
+                                print("enter to insufficient ressources")
+                                #print("insufficient ressources")
+                                break
+                    else:
+                        if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[0]:
+                            already_backup[vnodes[i]["backup"]].append(n["id"])
+                            vnodes[i]["mapped_to"] = n["id"]
+                            print("same backup 1", vnodes["id"] , "mapped to ", n["id"])
+                        else: # insufficient resource, vnode rejected    
+                        
+                            if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
+                                                                        ## we are in the last vnode
+                                rejected = True    
+                                print("enter to insufficient ressources")
+                                #print("insufficient ressources")
+                                break
+        else:### here we are treating the first vnode, we dont have a previous one
+            for n in ranked_nodes_cpu:
+                    if(vnodes[i]["backup"] == "0"):
+                        if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
+                            already_backup[vnodes[i]["backup"]].append(n["id"])
+                            vnodes[i]["mapped_to"] = n["id"]
+                            print("the first node", vnodes["id"] , "mapped to ", n["id"])
+                        else: # insufficient resource, vnode rejected    
+                        
+                            if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
+                                                                        ## we are in the last vnode
+                                rejected = True    
+                                print("enter to insufficient ressources")
+                                #print("insufficient ressources")
+                                break
+
+
+        
+   
+        
+
+
+
+
+
+        """for n in ranked_nodes_cpu:  ## loop the list of vnodes sorted according to their ressources
             #if resource enough and node of the same type and node not used, vnode accepted  
              
             
@@ -125,7 +198,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                     rejected = True    
                     print("enter to insufficient ressources")
                     #print("insufficient ressources")
-                    break   
+                    break   """
     ################### ------------- #################                
     
     ################## vlinks admission #################
