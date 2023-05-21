@@ -18,13 +18,13 @@ bw_urllc_3 = (.01,.01)
 #0:centralized, 1:edge
 nsl_graph_urllc_1 =  {
             "vnfs": [
-                        {"id":0,"function":"AMF","type":1,"backup":0},
-                        {"id":1,"function":"AMF","type":1,"backup":1},
+                        {"id":0,"function":"AMF","type":1,"backup":1},
+                        {"id":1,"function":"AMF","type":1,"backup":0},
                         {"id":2,"function":"SMF","type":1,"backup":0},
                         {"id":3,"function":"UPF","type":1,"backup":0},
                         {"id":4,"function":"UPF","type":1,"backup":1},
                         {"id":5,"function":"UPF","type":1,"backup":1},
-                        {"id":6,"function":"UPF","type":1,"backup":0}
+                        {"id":6,"function":"UPF","type":1,"backup":1}
             ],
             "vlinks":[
                         {"source":0,"target":1},

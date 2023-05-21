@@ -41,15 +41,15 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     #edge_vnfs = []      
 
     vnfs = nslr.nsl_graph["vnfs"] #considerar rankear vnfs tambien
-    reduce_nslr_graph(nslr) #builds a reduced version of the nsl_graph to reduce the size of it based on if we have seccessor backups we put them in one virtual node
+    ##reduce_nslr_graph(nslr) #builds a reduced version of the nsl_graph to reduce the size of it based on if we have seccessor backups we put them in one virtual node
     
-    vnodes = nslr.nsl_graph_reduced["vnodes"]    ## !! if its not working check here for the return of the above function
+    ##vnodes = nslr.nsl_graph_reduced["vnodes"]    ## !! if its not working check here for the return of the above function
 
 
     #Amel code to avoid reducing the nslr graph
-    #vnodes=vnfs
-    #nslr.set_nsl_graph_reduced(vnfs) 
-    #nsl_graph_red=vnfs
+    vnodes=vnfs
+    nslr.set_nsl_graph_reduced(vnfs) 
+    nsl_graph_red=vnfs
 
     ## end code
 
@@ -67,7 +67,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
       ###### Draw the reduced graph to see how we are grouping vnfs of different types, backup & primary
     
       
-    G = nx.Graph()
+    """G = nx.Graph()
 
     # add nodes to the graph
     for vnf in nsl_graph_red["vnodes"]:
@@ -82,7 +82,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     nx.draw_networkx_nodes(G, pos)
     nx.draw_networkx_edges(G, pos)
     nx.draw_networkx_labels(G, pos)
-    plt.savefig("red_graph_test.png") # save as png 
+    plt.savefig("red_graph_test.png") # save as png """
 
 
 
@@ -168,7 +168,7 @@ def calculate_resource_potential(substrate,resource_type):
         #print("+++",nodes[i]["degree_centrality"])
 
 
-def reduce_nslr_graph(nslr):
+"""def reduce_nslr_graph(nslr):
     '''
         Pre-processing of the nslr graph to reduce its size
         the vnfs that can be instantiated in the same physical node are grouped as a single virtual node
@@ -179,14 +179,7 @@ def reduce_nslr_graph(nslr):
     ###edge_vnfs = []
 
     #1. Group vnfs by node type: (fill the two above lists)
-    """for vnf in nslr.nsl_graph["vnfs"]: #loop vnfs      
-        if vnf["type"] == 0:
-            centralized_vnfs.append(vnf)
-        # elif vnf["type"] == 1:
-        #     local_vnfs.append(vnf)
-        else: 
-            edge_vnfs.append(vnf) 
-            """
+  
 
     #2. Sort the vnfs by backup:
     centralized_vnfs = sorted(centralized_vnfs, key=itemgetter("backup"))## order the vnfs according to backup from 0 to above to start first with the primary vnfs
@@ -275,7 +268,7 @@ def new_vlinks(nsl_graph_red, nsl_graph): ## create the virtual links between th
             new_src = next(vnode for vnode in vnodes if source["id"] in vnode["vnfs"])
             new_tgt = next(vnode for vnode in vnodes if target["id"] in vnode["vnfs"]) 
             new_vlink = {"source":new_src["id"],"target":new_tgt["id"],"bw":vlink["bw"]}
-            nsl_graph_red["vlinks"].append(new_vlink)
+            nsl_graph_red["vlinks"].append(new_vlink)"""
 
 
 def analyze_links(nsl_graph,substrate): ## returns the length of the path in addition in order to calculate the latency
@@ -341,9 +334,9 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
 
 ## Amel code
 
-"""substrate = substrate_graph.get_graph(10)
+substrate = substrate_graph.get_graph(10)
 
-NSLR = nslr.get_nslr(1,"urllc",50)
+NSLR = nslr.get_nslr(1,"urllc_1",50)
 
 decision = nsl_placement(NSLR, substrate)
 print(decision)
@@ -393,7 +386,7 @@ nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black
 
 # show plot
 plt.axis('off')
-plt.savefig("graph_test.png") # save as png   
+plt.savefig("substrate_graph.png") # save as png   
 
 
 
@@ -416,8 +409,8 @@ pos = nx.spring_layout(G)
 nx.draw_networkx_nodes(G, pos)
 nx.draw_networkx_edges(G, pos)
 nx.draw_networkx_labels(G, pos)
-plt.savefig("NSLR_test.png") # save as png  
+plt.savefig("NSLR_graph.png") # save as png  
 
-"""
+
 
 
