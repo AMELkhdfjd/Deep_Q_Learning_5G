@@ -113,7 +113,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                     if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[vnodes[i-1]["backup"]]:
                         already_backup[vnodes[i]["backup"]].append(n["id"])
                         vnodes[i]["mapped_to"] = n["id"]
-                        print("not_same_backup",vnodes["id"] , "mapped to ", n["id"])
+                        print("not_same_backup",vnodes[i] , "mapped to ", n["id"])
+                        break
                 
                     else: # insufficient resource, vnode rejected    
 
@@ -129,7 +130,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
-                            print("same backup 0", vnodes["id"] , "mapped to ", n["id"])
+                            print("same backup 0", vnodes[i] , "mapped to ", n["id"])
+                            break
                         else: # insufficient resource, vnode rejected    
                         
                             if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
@@ -142,7 +144,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[0]:
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
-                            print("same backup 1", vnodes["id"] , "mapped to ", n["id"])
+                            print("same backup 1", vnodes[i] , "mapped to ", n["id"])
+                            break
                         else: # insufficient resource, vnode rejected    
                         
                             if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
@@ -157,7 +160,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
-                            print("the first node", vnodes["id"] , "mapped to ", n["id"])
+                            print("the first node", vnodes[i] , "mapped to ", n["id"])
+                            break
                         else: # insufficient resource, vnode rejected    
                         
                             if ranked_nodes_cpu.index(n) == len(ranked_nodes_cpu)-1: #slice rejection only when no node has enough resources
