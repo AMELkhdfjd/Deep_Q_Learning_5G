@@ -426,8 +426,9 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
                     # print("*",path[l],path[l+1])
                     # print("link:",link["bw"])
                     if vlink["bw"] <= link["bw"]: #hay suficiente bw                        
-                        link["bw"] -= vlink["bw"] #resource is updated
-                        # enough bw                       
+                        #link["bw"] -= vlink["bw"] #resource is updated
+                        # enough bw    
+                        enough = True                   
                     else:# not enough bw
                         enough = False
 
