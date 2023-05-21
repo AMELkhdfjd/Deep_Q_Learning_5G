@@ -49,8 +49,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
 
     #Amel code to avoid reducing the nslr graph
     vnodes=vnfs
-    nslr.set_nsl_graph_reduced(vnfs) 
-    nsl_graph_red=vnfs
+    nslr.set_nsl_graph_reduced(nslr.nsl_graph) 
+    nsl_graph_red=nslr.nsl_graph
 
     ## end code
 
@@ -242,7 +242,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     
     ################## vlinks admission #################
     if not rejected:
-        rejected, n_hops = analyze_links(nsl_graph_red,substrate)
+        rejected, n_hops = analyze_links(nslr.nsl_graph,substrate)
+        print("decision after analyse links", rejected, "number of hops", n_hops)
     else:
          print("\n\n","***rejected by scarce node rsc","\n\n")
     ################### ------------- #################
@@ -397,16 +398,19 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
     links = copy.deepcopy(substrate.graph["links"])#copy to temporarily work with it
     reject = False
     max_hops = 5
+    
     vlinks = nsl_graph["vlinks"]
-    vnfs = nsl_graph["vnodes"] ## att: we work only with vnodes 
+    vnfs = nsl_graph["vnfs"] ## att: we work only with vnodes 
     for vlink in vlinks:
         substrate_src = next(vnf["mapped_to"] for vnf in vnfs if vnf["id"] == vlink["source"]) 
         substrate_dst = next(vnf["mapped_to"] for vnf in vnfs if vnf["id"] == vlink["target"])
+        print("source", substrate_src, "destination", substrate_dst)
         # print("\n***vlink:",vlink)
         # que hacer con las vnfs que se instancian en el mismo nodo? cobrar por vlink? cuanto?
         paths = nx.all_simple_paths(G,source=substrate_src,target=substrate_dst)
         path_list = [p for p in paths]
         path_list.sort(key=len)
+        print("the path list ", path_list)
         for path in path_list:
             #check if all the links in the path have sufficient resource
             enough = True
@@ -429,7 +433,8 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
 
                 if enough:
                     # print("MAPEAR")
-                    vlink["mapped_to"] = path#si hubo bw suficiente en cada link del path, se mapea
+                    vlink["mapped_to"] = path#if there was enough bw on each link of the path, it is mapp
+                    print("the path choosen", path)
                     break
                 elif enough == False and path_list.index(path) == len(path_list)-1:
                         reject = True              
