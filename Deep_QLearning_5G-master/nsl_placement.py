@@ -250,7 +250,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
     if rejected:
          print("\n\n","***rejected by scarce link rsc","\n\n")
 
-    return rejected 
+    return rejected, n_hops 
 
 def sort_nodes(node_list,sortby):       
     sorted_list = sorted(node_list, key=itemgetter(sortby), reverse=True)#sorted list    

@@ -38,6 +38,7 @@ agente = None
 episodes = 350 #240##350
 
 
+
 avble_central_size = 10
 avble_bw_size = 10
 
@@ -483,8 +484,9 @@ def resource_allocation(cn): #cn=controller
     for req in sim.granted_req_list: 
         
         # print("**",req.service_type,req.nsl_graph)
-        sim.attended_reqs += 1        
-        rejected = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
+        sim.attended_reqs += 1   
+        n_hops = 0 ## this variable will contain the nmber of hops for each request     
+        rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
         if not rejected: ## successfully mapped
             #instantiation and addition of termination event
             req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
