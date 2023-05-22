@@ -446,7 +446,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
             ### ATTT; here we are taking the id of the phisical node not any node in order to update its ressources
               ## need to figure out the effect of next above
-            if vnf["type"] == 0: #
+            if vnf["type"] == 1: #
                 type = "centralized_cpu"
             if kill: #if it is kill process, resources are free again
                 
