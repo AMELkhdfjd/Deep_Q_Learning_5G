@@ -441,7 +441,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
     ### Problem !! why we dont update the ressources on the specific node rather than all the graph !?
     nodes = substrate.graph["nodes"]
     links = substrate.graph["links"]   
-    for vnf in nslr.nsl_graph_reduced["vnodes"]:#the nodes of the reduced graph of the accepted nslr are traversed   
+    for vnf in nslr.nsl_graph_reduced["vnfs"]:#the nodes of the reduced graph of the accepted nslr are traversed   
         if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
             ### ATTT; here we are taking the id of the phisical node not any node in order to update its ressources
@@ -982,11 +982,11 @@ def main():
             
 
 if __name__ == '__main__':
-    bot.sendMessage("Simulation starts!")
+    #bot.sendMessage("Simulation starts!")
     start = time.time()## in order to receive the current time
     print("start time: ",start)
     main()
     end = time.time()
     print("end time: ",end)
-    bot.sendMessage("Simulation finishes!")
-    bot.sendMessage("total time: " + str(end-start))
+    #bot.sendMessage("Simulation finishes!")
+    #bot.sendMessage("total time: " + str(end-start))
