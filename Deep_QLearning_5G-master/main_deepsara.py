@@ -14,7 +14,7 @@ import time
 # import bisect
 #simulation parameters
 # seed = 0
-repetitions = 33 #33
+repetitions = 1 #33
 twindow_length = 1
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
@@ -35,7 +35,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 350 #240##350
+episodes = 1 #240##350
 
 
 
@@ -483,13 +483,6 @@ def resource_allocation(cn): #cn=controller
     step_urllc_2_profit_latency = 0
     step_urllc_3_profit_latency = 0
     step_latency_profit=0
-    step_reability_profit=0
-    step_central_profit = 0
-    step_profit=0
-    step_central_cpu_utl = 0
-    step_links_bw_utl = 0
-    step_node_utl = 0
-    step_total_utl = 0
     end_simulation_time = sim.run_till
     """max_node_profit = substrate.graph["max_cpu_profit"]*sim.run_till
     max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
@@ -527,10 +520,7 @@ def resource_allocation(cn): #cn=controller
 
             step_latency_profit += profit_latency 
            
-            ### 
-            
-            #step_reability_profit += profit_reability
-            step_central_profit = 0#ajustar
+         
 
             if req.service_type == "urllc_1":
                 sim.current_instatiated_reqs[0] += 1 ## the total of requests accepted for the specific service for each step
@@ -937,13 +927,13 @@ def main():
                 acpt_rate_urllc_2_rep[j].append(controller.simulation.urllc_2_accepted_reqs/controller.simulation.total_urllc_2_reqs)
                 acpt_rate_urllc_3_rep[j].append(controller.simulation.urllc_3_accepted_reqs/controller.simulation.total_urllc_3_reqs)
                 
-                total_utl_rep[j].append(controller.total_utl)
+                """total_utl_rep[j].append(controller.total_utl)
                 link_utl_rep[j].append(controller.link_utl)
                 node_utl_rep[j].append(controller.node_utl)
                 central_utl_rep[j].append(controller.central_utl) 
                 urllc_1_utl_rep[j].append(controller.urllc_1_utl)
                 urllc_2_utl_rep[j].append(controller.urllc_2_utl)
-                urllc_3_utl_rep[j].append(controller.urllc_3_utl)
+                urllc_3_utl_rep[j].append(controller.urllc_3_utl)"""
 
             #bot.sendMessage("Repetition " + str(i) + " finishes!")
             
@@ -974,7 +964,7 @@ def main():
             f.write("**acpt_rate_urllc_3_rep:\n")
             f.write(str(acpt_rate_urllc_3_rep)+"\n\n")
 
-            f.write("**total_utl_rep:\n")
+            """f.write("**total_utl_rep:\n")
             f.write(str(total_utl_rep)+"\n\n")
             f.write("**node_utl_rep:\n")
             f.write(str(node_utl_rep)+"\n\n")
@@ -988,7 +978,7 @@ def main():
             f.write(str(urllc_2_utl_rep)+"\n\n")
             f.write("**urllc_3_utl_rep:\n")
             f.write(str(urllc_3_utl_rep)+"\n\n")        
-            f.close()
+            f.close()"""
             
 
 if __name__ == '__main__':
