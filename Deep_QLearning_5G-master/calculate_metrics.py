@@ -19,8 +19,26 @@ def calculate_profit_latency(nslr, n_hops):
     
 
 
-def calculate_profit_reability(nslr,end_simulation_time):
-    
+def calculate_profit_reability(num_urllc_1,num_urllc_2,num_urllc_3, urllc_1_accepted_reqs,urllc_2_accepted_reqs,urllc_3_accepted_reqs):
+
+    perc_urllc_1_accepted =0
+    perc_urllc_2_accepted =0
+    perc_urllc_3_accepted =0
+    r1=0
+    r2=0
+    r3=0
+
+
+    perc_urllc_1_accepted = num_urllc_1*100/urllc_1_accepted_reqs
+    perc_urllc_2_accepted = num_urllc_2*100/urllc_2_accepted_reqs
+    perc_urllc_3_accepted = num_urllc_3*100/urllc_3_accepted_reqs
+    r1 = perc_urllc_1_accepted*a -(100 - perc_urllc_1_accepted)*b
+    r2 = perc_urllc_2_accepted*a_ -(100 - perc_urllc_2_accepted)*b_
+    r3 = perc_urllc_3_accepted*a__ -(100 - perc_urllc_3_accepted)*b__
+    step_reability_profit = r1+r2 +r3
+    return step_reability_profit, r1, r2, r3
+
+
 
 
 
