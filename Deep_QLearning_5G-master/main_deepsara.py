@@ -124,8 +124,8 @@ class Controlador:
     def __init__(self):
         #metricas
         self.total_profit = 0   ## profit for different types: node, links, services, type of nodes
-        self.node_profit=0
-        self.link_profit=0
+        self.reability_profit=0
+        self.latency_profit=0
         self.urllc_1_profit = 0
         self.urllc_2_profit = 0
         self.urllc_3_profit = 0
@@ -394,6 +394,9 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
     action2 = []
     granted_req_list = []
     remaining_req_list = []
+    num_urllc_1 =0
+    num_urllc_2 =0
+    num_urllc_3 =0
     
     #action = (0.75,1,0.25) -> (cant1,cant2,cant3) 
     #translate action in percentage to quantities (nearest integer)
@@ -409,17 +412,29 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
         
         if j[0]==1:## contains the percentage for each element of the list, ex: 0.5
             granted_req_list += window_req_list[j[2]]## add all requests for the type to the granted list since the percentage is 100%
+            if(j[2]== 0): ## urllc_1 type
+                        num_urllc_1 = len(window_req_list[j[2]])
+            elif(j[2]== 1):
+                        num_urllc_2 = len(window_req_list[j[2]])
+            elif(j[2]== 2):
+                        num_urllc_3 = len(window_req_list[j[2]])
             
         else:    
             for i in range(len(window_req_list[j[2]])):            
                 if i < j[1]:## in order to take for ex 75 requests from the windows list and leave in the remaining list the remaining requests
                     granted_req_list.append(window_req_list[j[2]][i])
+                    if(j[2]== 0): ## urllc_1 type
+                        num_urllc_1+=1
+                    elif(j[2]== 1):
+                        num_urllc_2+=1
+                    elif(j[2]== 2):
+                        num_urllc_3+=1
                 else:
                     remaining_req_list.append(window_req_list[j[2]][i])      
     print("granted_req_list contains from the prioritizer function", granted_req_list)
     print("remaining_req_list contains from the prioritizer function", remaining_req_list)
     
-    return granted_req_list, remaining_req_list #v6
+    return granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 #v6
     #return granted_req_list+remaining_req_list, remaining_req_list #v1
 
 def update_resources(substrate,nslr,kill):  ## updates the ressources consumed for the cpu of physical nodes and the bw of the links
@@ -464,11 +479,11 @@ def resource_allocation(cn): #cn=controller
      
     sim = cn.simulation ## define the object of class Sim which is part of the Controller class
     substrate = cn.substrate ## substrate of the controller class
-    step_urllc_1_profit = 0 
-    step_urllc_2_profit = 0
-    step_urllc_3_profit = 0
-    step_link_profit=0
-    step_node_profit=0
+    step_urllc_1_profit_latency = 0 
+    step_urllc_2_profit_latency = 0
+    step_urllc_3_profit_latency = 0
+    step_latency_profit=0
+    step_reability_profit=0
     step_central_profit = 0
     step_profit=0
     step_central_cpu_utl = 0
@@ -476,14 +491,18 @@ def resource_allocation(cn): #cn=controller
     step_node_utl = 0
     step_total_utl = 0
     end_simulation_time = sim.run_till
-    max_node_profit = substrate.graph["max_cpu_profit"]*sim.run_till
+    """max_node_profit = substrate.graph["max_cpu_profit"]*sim.run_till
     max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
-    max_profit = max_link_profit + max_node_profit
+    max_profit = max_link_profit + max_node_profit"""
     print("granted req list contains: ",sim.granted_req_list)
+
+
+
 
     for req in sim.granted_req_list: 
         
         # print("**",req.service_type,req.nsl_graph)
+
         sim.attended_reqs += 1   
         n_hops = 0 ## this variable will contain the nmber of hops for each request     
         rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
@@ -499,40 +518,40 @@ def resource_allocation(cn): #cn=controller
 
             #calculation of metrics (profit, acpt_rate, counters)           
             sim.accepted_reqs += 1
-            profit_nodes = calculate_metrics.calculate_profit_nodes(req,end_simulation_time)  ## from the functions of the calculate_metrics file to have the profit gained for node and links
-            profit_links = calculate_metrics.calculate_profit_links(req,end_simulation_time)*10    
-            step_profit += (profit_nodes + profit_links)/max_profit #the total profit in this step is the reward
+            ## implementation of the new rewared function call for reability and latency
+            profit_latency = calculate_metrics.calculate_profit_latency(req, n_hops)
 
-            #### new reward solution
-            #latency_reward = calculate_metrics.calculate_latency_reward(...)
-            #reability_reward = calculate_metrics.calculate_reability_reward(...)
-            #step_profit = latency_reward + reability_reward
+            #profit_nodes = calculate_metrics.calculate_profit_nodes(req,end_simulation_time)  ## from the functions of the calculate_metrics file to have the profit gained for node and links
+            #profit_links = calculate_metrics.calculate_profit_links(req,end_simulation_time)*10    
+            #step_profit += (profit_nodes + profit_links)/max_profit #the total profit in this step is the reward
+
+            step_latency_profit += profit_latency 
+           
             ### 
             
-            step_link_profit += profit_links/max_link_profit
-            step_node_profit += profit_nodes/max_node_profit
+            #step_reability_profit += profit_reability
             step_central_profit = 0#ajustar
 
             if req.service_type == "urllc_1":
                 sim.current_instatiated_reqs[0] += 1 ## the total of requests accepted for the specific service for each step
                 sim.urllc_1_accepted_reqs += 1 ## the accepted for the specific service in general not in the step i think
-                step_urllc_1_profit += profit_nodes/max_node_profit
+                step_urllc_1_profit_latency += profit_latency 
             elif req.service_type == "urllc_2":
                 sim.current_instatiated_reqs[1] += 1
                 sim.urllc_2_accepted_reqs += 1
-                step_urllc_2_profit += profit_nodes/max_node_profit
+                step_urllc_2_profit_latency += profit_latency 
             else:
                 sim.current_instatiated_reqs[2] += 1
                 sim.urllc_3_accepted_reqs += 1
-                step_urllc_3_profit += profit_nodes/max_node_profit                       
+                step_urllc_3_profit_latency += profit_latency                       
             
-            b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)## returns edge_utl, central_utl, links_utl for the request treated
+            """b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)## returns edge_utl, central_utl, links_utl for the request treated
             step_central_cpu_utl += b/(centralized_initial*end_simulation_time)
             step_links_bw_utl += c*10/(bw_initial*end_simulation_time)## links profit and utilistion are always *10
             step_node_utl += (b)/((centralized_initial)*end_simulation_time)
-            step_total_utl += (step_node_utl + step_links_bw_utl)/2
+            step_total_utl += (step_node_utl + step_links_bw_utl)/2"""
              
-    return step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_edge_cpu_utl,step_central_cpu_utl
+    return step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, sim.urllc_1_accepted_reqs, sim.urllc_2_accepted_reqs, sim.urllc_3_accepted_reqs 
 
 def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 5, 6, 7, 8, or 9) based on the range of values that value falls within.
     cod = 0
@@ -716,6 +735,9 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     global counter_windows
     sim = c.simulation 
     counter_windows += 1
+    num_urllc_1 = 0
+    num_urllc_2 = 0
+    num_urllc_3 = 0
     
     if evt.extra["first_state"]: ## if its the first state
         #first state index
@@ -736,19 +758,28 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
         #print("##agent",agente.last_state," ",agente.last_action)    
         print("entered in the else of first state of func_twindow")    
       
-    sim.granted_req_list, remaining_req_list = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
+    sim.granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
     #the list is sent to the Resource Allocation module
-    step_profit,step_node_profit,step_link_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit,step_total_utl,step_node_utl,step_links_bw_utl,step_central_cpu_utl = resource_allocation(c)
+    #step_profit_latency,step_latency_profit,step_reability_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit = resource_allocation(c)
+    step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, urllc_1_accepted_reqs, urllc_2_accepted_reqs, urllc_3_accepted_reqs = resource_allocation(c)
+
+    
+
+
+    perc_urllc_accepted = 
+
+
+
     c.total_profit += step_profit ## here we have the global profits for all steps not only one
-    c.node_profit += step_node_profit
-    c.link_profit += step_link_profit
+    c.latency_profit += step_latency_profit
+    c.reability_profit += step_reability_profit
     c.urllc_1_profit += step_urllc_1_profit
     c.urllc_2_profit += step_urllc_2_profit
     c.urllc_3_profit += step_urllc_3_profit
-    c.total_utl += step_total_utl
+    """c.total_utl += step_total_utl
     c.node_utl += step_node_utl 
     c.central_utl += step_central_cpu_utl
-    c.link_utl += step_links_bw_utl
+    c.link_utl += step_links_bw_utl"""
     
     r = step_profit ### ATT this is the reward to pass to the agent
     next_state = get_state(c.substrate,c.simulation) #getting the next state    
@@ -814,8 +845,8 @@ def main():
         urllc_3_arrival_rate = m/3        
         
         total_profit_rep = []
-        link_profit_rep = []
-        node_profit_rep = []
+        reability_profit_rep = []
+        latency_profit_rep = []
         central_profit_rep = []
         profit_urllc_1_rep = []
         profit_urllc_2_rep = []
@@ -838,8 +869,8 @@ def main():
                                   ## here creation of empty lists
                                   ## 3
             total_profit_rep.append([])
-            link_profit_rep.append([])
-            node_profit_rep.append([])
+            reability_profit_rep.append([])
+            latency_profit_rep.append([])
             central_profit_rep.append([])
             profit_urllc_1_rep.append([])
             profit_urllc_2_rep.append([])
@@ -887,8 +918,8 @@ def main():
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
                 
                 total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
-                node_profit_rep[j].append(controller.node_profit)        
-                link_profit_rep[j].append(controller.link_profit)
+                latency_profit_rep[j].append(controller.latency_profit)        
+                reability_profit_rep[j].append(controller.reability_profit)
                 central_profit_rep[j].append(controller.central_profit)
                 profit_urllc_1_rep[j].append(controller.urllc_1_profit)
                 profit_urllc_2_rep[j].append(controller.urllc_2_profit)
@@ -914,10 +945,10 @@ def main():
             f.write("Repetition: "+str(i)+"\n")
             f.write("**Reward:\n")
             f.write(str(total_profit_rep)+"\n\n")
-            f.write("**node_profit_rep:\n")
-            f.write(str(node_profit_rep)+"\n\n")
-            f.write("**link_profit_rep:\n")
-            f.write(str(link_profit_rep)+"\n\n")
+            f.write("**latency_profit_rep:\n")
+            f.write(str(latency_profit_rep)+"\n\n")
+            f.write("**reability_profit_rep:\n")
+            f.write(str(reability_profit_rep)+"\n\n")
             f.write("**central_profit_rep:\n")
             f.write(str(central_profit_rep)+"\n\n")
             f.write("**profit_urllc_1_rep:\n")

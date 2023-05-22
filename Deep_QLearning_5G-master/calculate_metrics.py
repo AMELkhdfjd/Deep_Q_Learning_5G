@@ -1,4 +1,31 @@
 ### definition of functions to calculate the profit for nodes and links used in the deep main file ###
+def calculate_profit_latency(nslr, n_hops):
+    L_max = 4
+    if(nslr.service_type == "urllc_1"):
+        if(n_hops < L_max):
+            return 5
+        else:
+            return -5
+    elif(nslr.service_type == "urllc_2"):
+        if(n_hops < L_max):
+            return 4
+        else:
+            return -4
+    elif(nslr.service_type == "urllc_3"):
+        if(n_hops < L_max):
+            return 3
+        else:
+            return -3
+    
+
+
+def calculate_profit_reability(nslr,end_simulation_time):
+    
+
+
+
+
+
 
 
 def calculate_profit_nodes(nslr,end_simulation_time):
