@@ -1,0 +1,34 @@
+Repetition: 0
+**Reward:
+[[86.80900970374654]]
+
+**latency_profit_rep:
+[[99]]
+
+**reability_profit_rep:
+[[-12.19099029625346]]
+
+**central_profit_rep:
+[[0]]
+
+**profit_urllc_1_rep:
+[[127.85714285714285]]
+
+**profit_urllc_2_rep:
+[[15.174089068825936]]
+
+**profit_urllc_3_rep:
+[[-56.222222222222214]]
+
+**Acceptance Rate:
+[[0.391304347826087]]
+
+**acpt_rate_urllc_1_rep:
+[[0.21875]]
+
+**acpt_rate_urllc_2_rep:
+[[0.7037037037037037]]
+
+**acpt_rate_urllc_3_rep:
+[[0.30303030303030304]]
+

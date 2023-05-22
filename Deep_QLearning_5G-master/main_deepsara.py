@@ -11,6 +11,8 @@ import dql
 import telegram_bot as bot
 import time
 
+
+
 # import bisect
 #simulation parameters
 # seed = 0
