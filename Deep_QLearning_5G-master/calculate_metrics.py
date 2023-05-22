@@ -27,14 +27,17 @@ def calculate_profit_reability(num_urllc_1,num_urllc_2,num_urllc_3, urllc_1_acce
     r1=0
     r2=0
     r3=0
+    a = 1.0  # Weighting factor for the first URLLC service
+    a_ = 0.8  # Weighting factor for the second URLLC service
+    a__ = 0.6  # Weighting factor for the third URLLC service
 
 
     perc_urllc_1_accepted = num_urllc_1*100/urllc_1_accepted_reqs
     perc_urllc_2_accepted = num_urllc_2*100/urllc_2_accepted_reqs
     perc_urllc_3_accepted = num_urllc_3*100/urllc_3_accepted_reqs
-    r1 = perc_urllc_1_accepted*a -(100 - perc_urllc_1_accepted)*b
-    r2 = perc_urllc_2_accepted*a_ -(100 - perc_urllc_2_accepted)*b_
-    r3 = perc_urllc_3_accepted*a__ -(100 - perc_urllc_3_accepted)*b__
+    r1 = perc_urllc_1_accepted*a -(100 - perc_urllc_1_accepted)
+    r2 = perc_urllc_2_accepted*a_ -(100 - perc_urllc_2_accepted)
+    r3 = perc_urllc_3_accepted*a__ -(100 - perc_urllc_3_accepted)
     step_reability_profit = r1+r2 +r3
     return step_reability_profit, r1, r2, r3
 
