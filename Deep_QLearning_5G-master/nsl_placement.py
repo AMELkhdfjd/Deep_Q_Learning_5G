@@ -398,6 +398,7 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
     links = copy.deepcopy(substrate.graph["links"])#copy to temporarily work with it
     reject = False
     max_hops = 5
+    chosen_path =[]
     
     vlinks = nsl_graph["vlinks"]
     vnfs = nsl_graph["vnfs"] ## att: we work only with vnodes 
@@ -436,6 +437,7 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
                     # print("MAPEAR")
                     vlink["mapped_to"] = path#if there was enough bw on each link of the path, it is mapp
                     print("the path choosen", path)
+                    chosen_path = path
                     break
                 elif enough == False and path_list.index(path) == len(path_list)-1:
                         reject = True              
@@ -443,7 +445,7 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
         if reject:
             break
 
-    return reject, len(path)
+    return reject, len(chosen_path)
 
 
 #substrate = ggen.ba_graph("amel_test",15) 
