@@ -45,10 +45,10 @@ nsl_graph_urllc_2 =  {
                         {"id":3,"function":"SMF","type":1,"backup":1},
                         {"id":4,"function":"UPF","type":1,"backup":0},
                         {"id":5,"function":"UPF","type":1,"backup":1},
-                        {"id":6,"function":"UPF","type":1,"backup":2},
-                        {"id":7,"function":"UPF","type":1,"backup":3},
-                        {"id":8,"function":"UPF","type":1,"backup":3},
-                        {"id":9,"function":"UPF","type":1,"backup":3}
+                        {"id":6,"function":"UPF","type":1,"backup":0},
+                        {"id":7,"function":"UPF","type":1,"backup":1},
+                        {"id":8,"function":"UPF","type":1,"backup":1},
+                        {"id":9,"function":"UPF","type":1,"backup":1}
                         #{"id":10,"function":"UPF","type":2,"backup":3}"""
             ],
             "vlinks":[
