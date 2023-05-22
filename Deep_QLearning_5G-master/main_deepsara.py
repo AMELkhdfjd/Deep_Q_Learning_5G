@@ -738,6 +738,9 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     num_urllc_1 = 0
     num_urllc_2 = 0
     num_urllc_3 = 0
+    step_urllc_1_profit_reability =0
+    step_urllc_2_profit_reability =0
+    step_urllc_3_profit_reability =0
     
     if evt.extra["first_state"]: ## if its the first state
         #first state index
@@ -766,8 +769,12 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     
 
 
-    perc_urllc_accepted = 
+    step_reability_profit, step_urllc_1_profit_reability, step_urllc_2_profit_reability, step_urllc_3_profit_reability = calculate_metrics.calculate_profit_reability(num_urllc_1,num_urllc_2,num_urllc_3, urllc_1_accepted_reqs,urllc_2_accepted_reqs,urllc_3_accepted_reqs)
+    step_profit = step_latency_profit + step_reability_profit
 
+    step_urllc_1_profit = step_urllc_1_profit_reability + step_urllc_1_profit_latency
+    step_urllc_2_profit = step_urllc_2_profit_reability + step_urllc_2_profit_latency
+    step_urllc_3_profit = step_urllc_3_profit_reability + step_urllc_3_profit_latency
 
 
     c.total_profit += step_profit ## here we have the global profits for all steps not only one
