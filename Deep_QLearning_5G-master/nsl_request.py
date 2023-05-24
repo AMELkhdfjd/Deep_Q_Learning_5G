@@ -23,8 +23,8 @@ nsl_graph_urllc_1 =  {
                         {"id":2,"function":"SMF","type":1,"backup":0},
                         {"id":3,"function":"UPF","type":1,"backup":0},
                         {"id":4,"function":"UPF","type":1,"backup":1},
-                        {"id":5,"function":"UPF","type":1,"backup":1},
-                        {"id":6,"function":"UPF","type":1,"backup":1}
+                        #{"id":5,"function":"UPF","type":1,"backup":1},
+                        #{"id":6,"function":"UPF","type":1,"backup":1}
             ],
             "vlinks":[
                         {"source":0,"target":1},
@@ -32,8 +32,8 @@ nsl_graph_urllc_1 =  {
                         {"source":1,"target":2},
                         {"source":2,"target":3},
                         {"source":2,"target":4},
-                        {"source":3,"target":5},
-                        {"source":4,"target":6}
+                        #{"source":3,"target":5},
+                        #{"source":4,"target":6}
 
             ] 
 }
@@ -45,21 +45,23 @@ nsl_graph_urllc_2 =  {
                         {"id":3,"function":"SMF","type":1,"backup":1},
                         {"id":4,"function":"UPF","type":1,"backup":0},
                         {"id":5,"function":"UPF","type":1,"backup":1},
-                        {"id":6,"function":"UPF","type":1,"backup":0},
-                        {"id":7,"function":"UPF","type":1,"backup":1},
-                        {"id":8,"function":"UPF","type":1,"backup":1},
-                        {"id":9,"function":"UPF","type":1,"backup":1}
+                        #{"id":6,"function":"UPF","type":1,"backup":0},
+                        #{"id":7,"function":"UPF","type":1,"backup":1},
+                        #{"id":8,"function":"UPF","type":1,"backup":1},
+                        #{"id":9,"function":"UPF","type":1,"backup":1}
                         #{"id":10,"function":"UPF","type":2,"backup":3}"""
             ],
             "vlinks":[
                         {"source":0,"target":2},
                         {"source":1,"target":3},
                         {"source":0,"target":4},
+                        #{"source":1,"target":5},
+                        #{"source":0,"target":6},
+                        #{"source":1,"target":7},
+                        #{"source":0,"target":8},
+                        #{"source":1,"target":9}
                         {"source":1,"target":5},
-                        {"source":0,"target":6},
-                        {"source":1,"target":7},
-                        {"source":0,"target":8},
-                        {"source":1,"target":9}
+                        {"source":3,"target":4}
             ] 
 }
 nsl_graph_urllc_3 =  {
