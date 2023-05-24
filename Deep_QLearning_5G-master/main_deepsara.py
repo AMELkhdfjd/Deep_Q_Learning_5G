@@ -433,7 +433,7 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
                         num_urllc_3+=1
                 else:
                     remaining_req_list.append(window_req_list[j[2]][i])      
-    print("granted_req_list contains from the prioritizer function", granted_req_list)
+    print("granted_req_list length from the prioritizer", len(granted_req_list))
     print("remaining_req_list contains from the prioritizer function", remaining_req_list)
     
     return granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 #v6
@@ -489,7 +489,7 @@ def resource_allocation(cn): #cn=controller
     """max_node_profit = substrate.graph["max_cpu_profit"]*sim.run_till
     max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
     max_profit = max_link_profit + max_node_profit"""
-    print("granted req list contains: ",sim.granted_req_list)
+    print("granted req list length ",len(sim.granted_req_list))
 
 
 
@@ -912,7 +912,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     

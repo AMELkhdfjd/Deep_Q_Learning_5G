@@ -246,10 +246,10 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
         rejected, n_hops = analyze_links(nslr.nsl_graph,substrate)
         print("decision after analyse links", rejected, "number of hops", n_hops)
     else:
-         print("\n\n","***rejected by scarce node rsc","\n\n")
+         print("\n\n","***rejected by the lack of node rsc","\n\n")
     ################### ------------- #################
     if rejected:
-         print("\n\n","***rejected by scarce link rsc","\n\n")
+         print("\n\n","***rejected by the lack of link rsc","\n\n")
 
     return rejected, n_hops 
 
