@@ -505,6 +505,7 @@ def resource_allocation(cn): #cn=controller
         if not rejected: ## successfully mapped
             #instantiation and addition of termination event
             print("the nsl request n°: ", index, "rejected: ", rejected, "number of hops after nsl_placement: ", n_hops, "\n")
+            print("the service type of the nslr is: ", req.service_type)
             req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
             graph = req.nsl_graph_reduced 
             update_resources(substrate,req,False)#instantiation, occupy resources
