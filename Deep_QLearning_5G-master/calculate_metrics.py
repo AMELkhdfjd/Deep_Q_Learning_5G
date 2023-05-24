@@ -32,9 +32,24 @@ def calculate_profit_reability(num_urllc_1,num_urllc_2,num_urllc_3, urllc_1_acce
     a__ = 0.6  # Weighting factor for the third URLLC service
 
 
-    perc_urllc_1_accepted = num_urllc_1*100/urllc_1_accepted_reqs
-    perc_urllc_2_accepted = num_urllc_2*100/urllc_2_accepted_reqs
-    perc_urllc_3_accepted = num_urllc_3*100/urllc_3_accepted_reqs
+
+
+    if urllc_1_accepted_reqs != 0:
+        perc_urllc_1_accepted = num_urllc_1 * 100 / urllc_1_accepted_reqs
+    else:
+        perc_urllc_1_accepted = 0 
+
+    if urllc_2_accepted_reqs != 0:
+        perc_urllc_2_accepted = num_urllc_2 * 100 / urllc_2_accepted_reqs
+    else:
+        perc_urllc_2_accepted = 0 
+
+    if urllc_3_accepted_reqs != 0:
+        perc_urllc_3_accepted = num_urllc_3 * 100 / urllc_3_accepted_reqs
+    else:
+        perc_urllc_3_accepted = 0 
+
+
     r1 = perc_urllc_1_accepted*a -(100 - perc_urllc_1_accepted)
     r2 = perc_urllc_2_accepted*a_ -(100 - perc_urllc_2_accepted)
     r3 = perc_urllc_3_accepted*a__ -(100 - perc_urllc_3_accepted)
@@ -176,5 +191,6 @@ def calculate_request_utilization(nslr,end_simulation_time,substrate):## returns
 #     links_utl = bw_sum*time 
 #     # print("**++",edge_utl)
 #     return edge_utl, central_utl, links_utl
+
 
 
