@@ -13,6 +13,9 @@ import time
 
 
 
+
+
+
 # import bisect
 #simulation parameters
 # seed = 0
