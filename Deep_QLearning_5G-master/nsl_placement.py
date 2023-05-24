@@ -454,7 +454,7 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
 
 ## Amel code
 
-substrate = substrate_graph.get_graph(10)
+"""substrate = substrate_graph.get_graph(10)
 
 NSLR = nslr.get_nslr(1,"urllc_1",50)
 
@@ -529,7 +529,7 @@ pos = nx.spring_layout(G)
 nx.draw_networkx_nodes(G, pos)
 nx.draw_networkx_edges(G, pos)
 nx.draw_networkx_labels(G, pos)
-plt.savefig("NSLR_graph.png") # save as png  
+plt.savefig("NSLR_graph.png") # save as png  """
 
 
 

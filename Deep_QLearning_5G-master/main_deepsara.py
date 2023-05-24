@@ -13,9 +13,6 @@ import time
 
 
 
-
-
-
 # import bisect
 #simulation parameters
 # seed = 0
@@ -770,6 +767,8 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     step_urllc_1_profit = step_urllc_1_profit_reability + step_urllc_1_profit_latency
     step_urllc_2_profit = step_urllc_2_profit_reability + step_urllc_2_profit_latency
     step_urllc_3_profit = step_urllc_3_profit_reability + step_urllc_3_profit_latency
+
+
 
 
     c.total_profit += step_profit ## here we have the global profits for all steps not only one
