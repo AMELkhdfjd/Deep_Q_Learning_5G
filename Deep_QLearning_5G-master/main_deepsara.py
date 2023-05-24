@@ -501,9 +501,10 @@ def resource_allocation(cn): #cn=controller
         sim.attended_reqs += 1   
         n_hops = 0 ## this variable will contain the nmber of hops for each request     
         rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
-        print("the nsl request n°: ", index, "\n")
+        
         if not rejected: ## successfully mapped
             #instantiation and addition of termination event
+            print("the nsl request n°: ", index, "rejected: ", rejected, "number of hops after nsl_placement: ", n_hops, "\n")
             req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
             graph = req.nsl_graph_reduced 
             update_resources(substrate,req,False)#instantiation, occupy resources

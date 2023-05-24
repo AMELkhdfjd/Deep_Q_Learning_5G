@@ -240,7 +240,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                     break   """
     ################### ------------- #################                
     
-    ################## vlinks admission #################
+    ################## vlinks admission #################ù
+    print("placement done ! entering now to the analyse links function :")
     if not rejected:
         rejected, n_hops = analyze_links(nslr.nsl_graph,substrate)
         print("decision after analyse links", rejected, "number of hops", n_hops)
