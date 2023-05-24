@@ -494,13 +494,14 @@ def resource_allocation(cn): #cn=controller
 
 
 
-    for req in sim.granted_req_list: 
+    for index, req in enumerate(sim.granted_req_list):
         
         # print("**",req.service_type,req.nsl_graph)
 
         sim.attended_reqs += 1   
         n_hops = 0 ## this variable will contain the nmber of hops for each request     
         rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
+        print("the nsl request n°: ", index, "\n")
         if not rejected: ## successfully mapped
             #instantiation and addition of termination event
             req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
@@ -737,7 +738,6 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     if evt.extra["first_state"]: ## if its the first state
         #first state index
         #all resources at 100% (with granularity of 5)
-        print("entered in the first state section of func_twindow")
         state = get_state(c.substrate,c.simulation)
         
         #s = translateStateToIndex(state)
@@ -750,12 +750,10 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
         s = evt.extra["current_state"] ## the state
         a = evt.extra["action"]  ## the action of the event
         print("the action taken",a)
-        #print("##agent",agente.last_state," ",agente.last_action)    
-        print("entered in the else of first state of func_twindow")    
       
     sim.granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
+    print("results of prioritizer: num_urllc1, num_urllc2, num_urllc3:  ", num_urllc_1, num_urllc_2, num_urllc_3)
     #the list is sent to the Resource Allocation module
-    #step_profit_latency,step_latency_profit,step_reability_profit,step_urllc_1_profit,step_urllc_2_profit,step_urllc_3_profit = resource_allocation(c)
     step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, urllc_1_accepted_reqs, urllc_2_accepted_reqs, urllc_3_accepted_reqs = resource_allocation(c)
 
     
@@ -906,7 +904,7 @@ def main():
                 print("################ EPISODE LOOP #####################", j)
                 controller = None
                 controller = Controlador()                   
-                controller.substrate = copy.deepcopy(substrate_graphs.get_graph("16node_BA")) #get substrate  with 16 nodes
+                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(10)) #get substrate  with 16 nodes
                                                                                               ## maybe we dont need to pass the agent to the controller
 
 
