@@ -1,12 +1,12 @@
 Repetition: 0
 **Reward:
-[[-44.0]]
+[[28.0]]
 
 **latency_profit_rep:
 [[4]]
 
 **reability_profit_rep:
-[[-48.0]]
+[[24.0]]
 
 **central_profit_rep:
 [[0]]
@@ -15,19 +15,19 @@ Repetition: 0
 [[-100.0]]
 
 **profit_urllc_2_rep:
-[[156.0]]
+[[228.0]]
 
 **profit_urllc_3_rep:
 [[-100.0]]
 
 **Acceptance Rate:
-[[0.23809523809523808]]
+[[0.2631578947368421]]
 
 **acpt_rate_urllc_1_rep:
 [[0.0]]
 
 **acpt_rate_urllc_2_rep:
-[[0.7142857142857143]]
+[[0.5555555555555556]]
 
 **acpt_rate_urllc_3_rep:
 [[0.0]]
