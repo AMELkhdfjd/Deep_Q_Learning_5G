@@ -9,3 +9,5 @@ sum_x = tf.reduce_sum(x)
 # Print the result
 print(sum_x.numpy())
 
+## thsi
+
