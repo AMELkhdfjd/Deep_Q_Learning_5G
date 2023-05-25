@@ -101,8 +101,8 @@ def get_operation_time(mean_operation_time):
     value = numpy.random.exponential(mean_operation_time,1) 
     if round(value[0])== 0: #and round(value[0]) <= 180: #60: #para evitar duraciones de 0 y mayores a un valor
         value[0] = 1 ## to times under 1    
-    #return round(value[0])
-    return 0
+    return round(value[0])
+    
    
 
 def add_resources(nsl_graph,service_type):## give cpu and bw ressources to each of the vnf of the graph
