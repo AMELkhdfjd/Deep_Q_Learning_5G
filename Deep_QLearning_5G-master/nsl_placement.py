@@ -107,7 +107,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
         if i > 0:
             pre_vnf = vnodes[i - 1]
             pre_backup = pre_vnf["backup"]
-            print("backup type of previous node",pre_backup)
+            #print("backup type of previous node",pre_backup)
             if(pre_backup != vnodes[i]["backup"]):  ## we have diff types of backup, need to find another physical node to map it
             
                 for n in ranked_nodes_cpu:
@@ -117,8 +117,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                         
                         vnodes[i]["mapped_to"] = n["id"]
                         print("not_same_backup",vnodes[i] , "mapped to ", n["id"])
-                        print("already backup 0",already_backup[0])
-                        print("already backup 1",already_backup[1])
+                        n["cpu"]  = n["cpu"] - vnodes["cpu"] ## to update the ressource of the node, new
+                        substrate.graph[type] -= vnodes["cpu"]
                         break
                 
                     else: # insufficient resource, vnode rejected    
@@ -136,10 +136,9 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
-                            
                             print("same backup 0", vnodes[i] , "mapped to ", n["id"])
-                            print("already backup 0",already_backup[0])
-                            print("already backup 1",already_backup[1])
+                            n["cpu"]  = n["cpu"] - vnodes["cpu"] ## to update the ressource of the node, new
+                            substrate.graph[type] -= vnodes["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -153,11 +152,11 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[0]:
                             
                             already_backup[vnodes[i]["backup"]].append(n["id"])
-                            vnodes[i]["mapped_to"] = n["id"]
-                            
+                            vnodes[i]["mapped_to"] = n["id"] 
                             print("same backup 1", vnodes[i] , "mapped to ", n["id"])
-                            print("already backup 0",already_backup[0])
-                            print("already backup 1",already_backup[1])
+                            n["cpu"]  = n["cpu"] - vnodes["cpu"] ## to update the ressource of the node, new
+                            substrate.graph[type] -= vnodes["cpu"]
+
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -176,8 +175,9 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             
                             vnodes[i]["mapped_to"] = n["id"]
-                            
                             print("the first node", vnodes[i] , "mapped to ", n["id"])
+                            n["cpu"]  = n["cpu"] - vnodes["cpu"] ## to update the ressource of the node, new
+                            substrate.graph[type] -= vnodes["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -194,8 +194,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             
                             vnodes[i]["mapped_to"] = n["id"]
                             print("the first node ", vnodes[i] , "mapped to ", n["id"])
-                            print("already backup 0",already_backup[0])
-                            print("already backup 1",already_backup[1])
+                            n["cpu"]  = n["cpu"] - vnodes["cpu"] ## to update the ressource of the node, new
+                            substrate.graph[type] -= vnodes["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -205,8 +205,13 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                                 print("enter to insufficient ressources")
                                 #print("insufficient ressources")
                                 break
-
-
+    if rejected: ## free the ressources taken in the allocation process
+        for vnf in vnodes:#the nodes of the reduced graph of the accepted nslr are traversed   
+            if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
+                n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode                
+                n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
+                substrate.graph[type] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
+               
         
    
         
@@ -428,9 +433,10 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
                     # print("*",path[l],path[l+1])
                     # print("link:",link["bw"])
                     if vlink["bw"] <= link["bw"]: #hay suficiente bw                        
-                        #link["bw"] -= vlink["bw"] #resource is updated
-                        # enough bw    
-                        enough = True                   
+                        link["bw"] -= vlink["bw"] #resource is updated
+                        substrate.graph["bw"] -= vlink["bw"]
+                        #enough bw    
+                        ##enough = True                   
                     else:# not enough bw
                         enough = False
 
@@ -445,6 +451,23 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
                 
         if reject:
             break
+
+    if reject: ## free the resources taken during the allocation process
+        for vlink in vlinks:
+            try:#when two vnfs are instantiated in the same node there is no link
+                path = vlink["mapped_to"]            
+            except KeyError:
+                path=[]
+            for i in range(len(path)-1):
+                try:
+                    l = next(l for l in links if ( (l["source"]==path[i] and l["target"]==path[i+1]) or (l["source"]==path[i+1] and l["target"]==path[i]) ) )              
+                  
+                    l["bw"] += vlink["bw"]
+                    substrate.graph["bw"] += vlink["bw"]
+                   
+                except StopIteration:
+                    pass
+
 
     return reject, len(chosen_path)
 
