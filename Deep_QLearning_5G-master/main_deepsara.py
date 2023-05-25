@@ -443,6 +443,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
     ### Problem !! why we dont update the ressources on the specific node rather than all the graph !?
     nodes = substrate.graph["nodes"]
     links = substrate.graph["links"]   
+    print("uppppppppdate the node of the nslr type: ", nslr.service_type)
     for vnf in nslr.nsl_graph_reduced["vnfs"]:#the nodes of the reduced graph of the accepted nslr are traversed   
         if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
@@ -452,12 +453,14 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
                 type = "centralized_cpu"
             if kill: #if it is kill process, resources are free again
                 
+                print("before update the node: ", n["id"], n["cpu"])
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
+                print("after update the node: ", n["cpu"])
                 substrate.graph[type] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
-            else:
+            #else:
                 
-                n["cpu"] = n["cpu"] - vnf["cpu"] ## reduce the cpu of the nodes in the graph maybe
-                substrate.graph[type] -= vnf["cpu"]
+                #n["cpu"] = n["cpu"] - vnf["cpu"] ## reduce the cpu of the nodes in the graph maybe
+                #substrate.graph[type] -= vnf["cpu"]
     for vlink in nslr.nsl_graph_reduced["vlinks"]:
         try:#when two vnfs are instantiated in the same node there is no link
             path = vlink["mapped_to"]            
@@ -469,9 +472,9 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
                 if kill:
                     l["bw"] += vlink["bw"]
                     substrate.graph["bw"] += vlink["bw"]
-                else:
-                    l["bw"] -= vlink["bw"] ## reduce the bw consumed 
-                    substrate.graph["bw"] -= vlink["bw"]
+                #else:
+                    #l["bw"] -= vlink["bw"] ## reduce the bw consumed 
+                    #substrate.graph["bw"] -= vlink["bw"]
             except StopIteration:
                 pass
 
@@ -715,7 +718,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     global counter_termination
     sim = c.simulation
     counter_termination +=1
-    print("terminating")
+    print("*******************  terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
     if request.service_type == "urllc_1":
@@ -915,7 +918,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1.5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
