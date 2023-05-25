@@ -110,7 +110,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
             #print("backup type of previous node",pre_backup)
             if(pre_backup != vnodes[i]["backup"]):  ## we have diff types of backup, need to find another physical node to map it
             
-                for n, j in enumerate(ranked_nodes_cpu):
+                for j, n in enumerate(ranked_nodes_cpu):
                     if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[vnodes[i-1]["backup"]]:
                         
                         already_backup[vnodes[i]["backup"]].append(n["id"])
@@ -131,7 +131,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             #print("insufficient ressources")
                             break 
             else:   ### we have the same backup
-                for n in ranked_nodes_cpu:
+                for j, n in enumerate(ranked_nodes_cpu):
                     if(vnodes[i]["backup"] == 0):
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
                             
@@ -171,7 +171,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                                 break
         else:### here we are treating the first vnode, we dont have a previous one
             
-            for n in ranked_nodes_cpu:
+            for j, n in enumerate(ranked_nodes_cpu):
                     
                     if(vnodes[i]["backup"] == "0"):
                         if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[1]:
@@ -225,7 +225,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
 
 
 
-        """for n in ranked_nodes_cpu:  ## loop the list of vnodes sorted according to their ressources
+        """for j, n in enumerate(ranked_nodes_cpu):  ## loop the list of vnodes sorted according to their ressources
             #if resource enough and node of the same type and node not used, vnode accepted  
              
             
