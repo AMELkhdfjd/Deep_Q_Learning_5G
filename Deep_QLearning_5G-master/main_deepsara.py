@@ -446,6 +446,8 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
     print("uppppppppdate the node of the nslr type: ", nslr.service_type)
     for vnf in nslr.nsl_graph_reduced["vnfs"]:#the nodes of the reduced graph of the accepted nslr are traversed   
         if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
+            print("the issue: ", nslr.nsl_graph_reduced["vnfs"])
+            print("the nodes, ", nodes)
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
             ### ATTT; here we are taking the id of the phisical node not any node in order to update its ressources
               ## need to figure out the effect of next above
@@ -718,7 +720,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     global counter_termination
     sim = c.simulation
     counter_termination +=1
-    #print("*******************  terminating")
+    print("*******************  terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
     if request.service_type == "urllc_1":
@@ -918,7 +920,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1.5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
