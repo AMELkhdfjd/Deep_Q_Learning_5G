@@ -12,9 +12,10 @@ A graph of n nodes is grown by attaching new nodes each with m edges that are pr
 
 
 import json
-# import networkx as nx
+import networkx as nx
 import random
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
 
 
 
@@ -346,6 +347,40 @@ def get_graph(n): ## returns a substrate of graph depending on the number of nod
     else:   
         return "no substrate"
     calculate_degree_centrality(substrate)    
+
+    ## to draw the graph:
+# create an empty graph
+    G = nx.Graph()
+
+# add nodes
+    for node in substrate.graph["nodes"]:
+        G.add_node(node["id"], cpu=node["cpu"], type=node["type"])
+
+# add edges
+    for link in substrate.graph["links"]:
+        G.add_edge(link["source"], link["target"], bw=link["bw"])
+
+# set positions of nodes
+    pos = nx.spring_layout(G)
+
+# draw nodes
+    nx.draw_networkx_nodes(G, pos, node_size=500, node_color='lightblue')
+
+# draw edges
+    nx.draw_networkx_edges(G, pos, width=1, alpha=0.7, edge_color='gray')
+
+# add node labels
+    labels = {node["id"]: node["id"] for node in substrate.graph["nodes"]}
+    nx.draw_networkx_labels(G, pos, labels, font_size=10, font_color='black')
+
+# add edge labels
+    edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in substrate.graph["links"]}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+
+# show plot
+    plt.axis('off')
+    plt.savefig("substrate_graph.png") # save as png   
+
     return substrate 
 
 class Substrate:
