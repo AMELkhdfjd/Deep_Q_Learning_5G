@@ -409,7 +409,7 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
     #according to "action", sort "action2"
     action2.sort(key=takeFirst,reverse=True)## action2 will be sorted in descending order based on the first element of each element in the list.
     ## it sorts according to the percentage of the services 0.75 descending order
-    print("action2 containts", action2)
+    #print("action2 containts", action2)
     for j in action2:
         
         if j[0]==1:## contains the percentage for each element of the list, ex: 0.5
@@ -433,8 +433,8 @@ def prioritizer(window_req_list,action_index): #v2  ## the two versions do the s
                         num_urllc_3+=1
                 else:
                     remaining_req_list.append(window_req_list[j[2]][i])      
-    print("granted_req_list length from the prioritizer", len(granted_req_list))
-    print("remaining_req_list contains from the prioritizer function", remaining_req_list)
+    #print("granted_req_list length from the prioritizer", len(granted_req_list))
+    #print("remaining_req_list contains from the prioritizer function", remaining_req_list)
     
     return granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 #v6
     #return granted_req_list+remaining_req_list, remaining_req_list #v1
@@ -453,9 +453,9 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
                 type = "centralized_cpu"
             if kill: #if it is kill process, resources are free again
                 
-                print("before update the node: ", n["id"], n["cpu"])
+                #print("before update the node: ", n["id"], n["cpu"])
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
-                print("after update the node: ", n["cpu"])
+                #print("after update the node: ", n["cpu"])
                 substrate.graph[type] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
             #else:
                 
@@ -718,7 +718,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     global counter_termination
     sim = c.simulation
     counter_termination +=1
-    print("*******************  terminating")
+    #print("*******************  terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
     if request.service_type == "urllc_1":

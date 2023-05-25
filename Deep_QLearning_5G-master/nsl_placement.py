@@ -410,6 +410,7 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
     reject = False
     max_hops = 5
     chosen_path =[]
+    n_hops = 0
     
     vlinks = nsl_graph["vlinks"]
     vnfs = nsl_graph["vnfs"] ## att: we work only with vnodes 
@@ -473,8 +474,14 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
                 except StopIteration:
                     pass
 
+    for vlink in vlinks:
+        try:#when two vnfs are instantiated in the same node there is no link
+                path = vlink["mapped_to"]            
+        except KeyError:
+                path=[]
+        n_hops += len(path - 1)
 
-    return reject, len(chosen_path)
+    return reject, n_hops
 
 
 #substrate = ggen.ba_graph("amel_test",15) 
