@@ -991,11 +991,11 @@ def main():
             
 
 if __name__ == '__main__':
-    #bot.sendMessage("Simulation starts!")
+    bot.sendMessage("Simulation starts!")
     start = time.time()## in order to receive the current time
     print("start time: ",start)
     main()
     end = time.time()
     print("end time: ",end)
-    #bot.sendMessage("Simulation finishes!")
-    #bot.sendMessage("total time: " + str(end-start))
+    bot.sendMessage("Simulation finishes!")
+    bot.sendMessage("total time: " + str(end-start))
