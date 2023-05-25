@@ -118,7 +118,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                         vnodes[i]["mapped_to"] = n["id"]
                         print("not_same_backup",vnodes[i] , "mapped to ", n["id"])
                         n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
-                        substrate.graph[type] -= vnodes[i]["cpu"]
+                        substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                         break
                 
                     else: # insufficient resource, vnode rejected    
@@ -138,7 +138,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             vnodes[i]["mapped_to"] = n["id"]
                             print("same backup 0", vnodes[i] , "mapped to ", n["id"])
                             n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
-                            substrate.graph[type] -= vnodes[i]["cpu"]
+                            substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -155,7 +155,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             vnodes[i]["mapped_to"] = n["id"] 
                             print("same backup 1", vnodes[i] , "mapped to ", n["id"])
                             n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
-                            substrate.graph[type] -= vnodes["cpu"]
+                            substrate.graph["centralized_cpu"] -= vnodes["cpu"]
 
                             break
                         else: # insufficient resource, vnode rejected    
@@ -177,7 +177,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             vnodes[i]["mapped_to"] = n["id"]
                             print("the first node", vnodes[i] , "mapped to ", n["id"])
                             n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
-                            substrate.graph[type] -= vnodes[i]["cpu"]
+                            substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -195,7 +195,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             vnodes[i]["mapped_to"] = n["id"]
                             print("the first node ", vnodes[i] , "mapped to ", n["id"])
                             n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
-                            substrate.graph[type] -= vnodes[i]["cpu"]
+                            substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
                         
@@ -210,7 +210,7 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
             if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
                 n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode                
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
-                substrate.graph[type] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
+                substrate.graph["centralized_cpu"] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
                
         
    
