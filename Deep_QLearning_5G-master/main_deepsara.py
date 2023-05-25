@@ -16,7 +16,7 @@ import time
 # import bisect
 #simulation parameters
 # seed = 0
-repetitions = 1 #33
+repetitions = 33 #33
 twindow_length = 1
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
@@ -37,7 +37,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 350 #240##350
 
 
 
