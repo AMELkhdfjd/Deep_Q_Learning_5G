@@ -508,7 +508,8 @@ def resource_allocation(cn): #cn=controller
             print("the service type of the nslr is: ", req.service_type)
             req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
             graph = req.nsl_graph_reduced 
-            update_resources(substrate,req,False)#instantiation, occupy resources
+            ## no need to update the resources, its done in the nsl_placement
+            #update_resources(substrate,req,False)#instantiation, occupy resources
             evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
             print("added a termination event")
             sim.add_event(evt) 
