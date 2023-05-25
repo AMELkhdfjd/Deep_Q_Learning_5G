@@ -408,10 +408,10 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
     G = nx.node_link_graph(substrate.graph)#graph format
     links = copy.deepcopy(substrate.graph["links"])#copy to temporarily work with it
     reject = False
-    max_hops = 5
+    max_hops = 6
     chosen_path =[]
     n_hops = 0
-    
+
     vlinks = nsl_graph["vlinks"]
     vnfs = nsl_graph["vnfs"] ## att: we work only with vnodes 
     for vlink in vlinks:
@@ -476,10 +476,11 @@ def analyze_links(nsl_graph,substrate): ## returns the length of the path in add
 
     for vlink in vlinks:
         try:#when two vnfs are instantiated in the same node there is no link
-                path = vlink["mapped_to"]            
+                path = vlink["mapped_to"]  
+                print("the smaaaaaaal path:  ", path)          
         except KeyError:
                 path=[]
-        n_hops += len(path - 1)
+        n_hops += len(path) - 1
 
     return reject, n_hops
 

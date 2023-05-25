@@ -1,6 +1,6 @@
 ### definition of functions to calculate the profit for nodes and links used in the deep main file ###
 def calculate_profit_latency(nslr, n_hops):
-    L_max = 4
+    L_max = 5
     if(nslr.service_type == "urllc_1"):
         if(n_hops < L_max):
             return 5

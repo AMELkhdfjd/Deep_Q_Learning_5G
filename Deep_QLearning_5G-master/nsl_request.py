@@ -52,7 +52,7 @@ nsl_graph_urllc_2 =  {
                         #{"id":10,"function":"UPF","type":2,"backup":3}"""
             ],
             "vlinks":[
-                        {"source":0,"target":2, "mapped_to":[7,8,6,4]},
+                        {"source":0,"target":2,},
                         {"source":1,"target":3},
                         {"source":0,"target":4},
                         #{"source":1,"target":5},
