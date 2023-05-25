@@ -110,14 +110,15 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
             #print("backup type of previous node",pre_backup)
             if(pre_backup != vnodes[i]["backup"]):  ## we have diff types of backup, need to find another physical node to map it
             
-                for n in ranked_nodes_cpu:
+                for n, j in enumerate(ranked_nodes_cpu):
                     if vnodes[i]["cpu"] <= n["cpu"] and n["id"] not in already_backup[vnodes[i-1]["backup"]]:
                         
                         already_backup[vnodes[i]["backup"]].append(n["id"])
                         
                         vnodes[i]["mapped_to"] = n["id"]
                         print("not_same_backup",vnodes[i] , "mapped to ", n["id"])
-                        n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                        nodes[j]["cpu"]  = nodes[j]["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                        print("update resources here: ", n["cpu"])
                         substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                         break
                 
@@ -137,7 +138,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"]
                             print("same backup 0", vnodes[i] , "mapped to ", n["id"])
-                            n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            nodes[j]["cpu"]  = nodes[j]["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            print("update resources here: ", n["cpu"])
                             substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
@@ -154,7 +156,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             already_backup[vnodes[i]["backup"]].append(n["id"])
                             vnodes[i]["mapped_to"] = n["id"] 
                             print("same backup 1", vnodes[i] , "mapped to ", n["id"])
-                            n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            nodes[j]["cpu"]  = nodes[j]["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            print("update resources here: ", n["cpu"])
                             substrate.graph["centralized_cpu"] -= vnodes["cpu"]
 
                             break
@@ -176,7 +179,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             
                             vnodes[i]["mapped_to"] = n["id"]
                             print("the first node", vnodes[i] , "mapped to ", n["id"])
-                            n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            nodes[j]["cpu"]  = nodes[j]["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            print("update resources here: ", n["cpu"])
                             substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    
@@ -194,7 +198,8 @@ def nsl_placement(nslr, substrate):  ## need to know why we are passing the subs
                             
                             vnodes[i]["mapped_to"] = n["id"]
                             print("the first node ", vnodes[i] , "mapped to ", n["id"])
-                            n["cpu"]  = n["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            nodes[j]["cpu"]  = nodes[j]["cpu"] - vnodes[i]["cpu"] ## to update the ressource of the node, new
+                            print("update resources here: ", n["cpu"])
                             substrate.graph["centralized_cpu"] -= vnodes[i]["cpu"]
                             break
                         else: # insufficient resource, vnode rejected    

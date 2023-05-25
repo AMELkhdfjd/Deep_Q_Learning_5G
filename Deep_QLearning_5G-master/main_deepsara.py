@@ -501,6 +501,7 @@ def resource_allocation(cn): #cn=controller
         sim.attended_reqs += 1   
         n_hops = 0 ## this variable will contain the nmber of hops for each request     
         rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
+        print("after nsl_placement, what left in general as node cpu: ", substrate.graph["centralized_cpu"])
         
         if not rejected: ## successfully mapped
             #instantiation and addition of termination event
