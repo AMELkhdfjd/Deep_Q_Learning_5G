@@ -16,7 +16,7 @@ import time
 # import bisect
 #simulation parameters
 # seed = 0
-repetitions = 33 #33
+repetitions = 1 #33
 twindow_length = 1
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
@@ -37,7 +37,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 350 #240##350
+episodes = 35 #240##350
 
 
 
@@ -186,7 +186,7 @@ class Sim:
 
     def create_event(self, type, start, extra=None, f=None): ## creation of an event with parameters and its time must be greater than the schedule to take place
         if start<self.horario:
-            print("***false")
+            #print("***false")
             return False
         # else:  
          
@@ -241,10 +241,10 @@ class Sim:
                 self.total_urllc_3_reqs += 1
                 self.window_req_list[2].append(copy.deepcopy(request))#
             
-        print("print details events:  ")
-        self.print_eventos()
+        #print("print details events:  ")
+        #self.print_eventos()
 
-        print()
+        #print()
             #service_type = evt.extra["service_type"]
             #request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)
             #self.window_req_list.append(copy.deepcopy(request))
@@ -255,7 +255,7 @@ class Sim:
 
 
     def print_eventos(self):## print the infos about an event
-        print("HORARIO: ",self.horario,"\nTotal Events:",len(self.eventos))
+        #print("HORARIO: ",self.horario,"\nTotal Events:",len(self.eventos))
     
         for i in range(len(self.eventos)): ## loop the events
             print(str(self.eventos[i]), end=" > \n")
@@ -443,11 +443,10 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
     ### Problem !! why we dont update the ressources on the specific node rather than all the graph !?
     nodes = substrate.graph["nodes"]
     links = substrate.graph["links"]   
-    print("uppppppppdate the node of the nslr type: ", nslr.service_type)
+    #print("uppppppppdate the node of the nslr type: ", nslr.service_type)
     for vnf in nslr.nsl_graph_reduced["vnfs"]:#the nodes of the reduced graph of the accepted nslr are traversed   
         if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
-            print("the issue: ", nslr.nsl_graph_reduced["vnfs"])
-            print("the nodes, ", nodes)
+
             n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] and n["type"]==vnf["type"]) )## returns the phisical node mapped to the vnode
             ### ATTT; here we are taking the id of the phisical node not any node in order to update its ressources
               ## need to figure out the effect of next above
@@ -506,18 +505,18 @@ def resource_allocation(cn): #cn=controller
         sim.attended_reqs += 1   
         n_hops = 0 ## this variable will contain the nmber of hops for each request     
         rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
-        print("after nsl_placement, what left in general as node cpu: ", substrate.graph["centralized_cpu"])
+        #print("after nsl_placement, what left in general as node cpu: ", substrate.graph["centralized_cpu"])
         
         if not rejected: ## successfully mapped
             #instantiation and addition of termination event
-            print("the nsl request n°: ", index, "rejected: ", rejected, "number of hops after nsl_placement: ", n_hops, "\n")
-            print("the service type of the nslr is: ", req.service_type)
+            #print("the nsl request n°: ", index, "rejected: ", rejected, "number of hops after nsl_placement: ", n_hops, "\n")
+            #print("the service type of the nslr is: ", req.service_type)
             req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
             graph = req.nsl_graph_reduced 
             ## no need to update the resources, its done in the nsl_placement
             #update_resources(substrate,req,False)#instantiation, occupy resources
             evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
-            print("added a termination event")
+            #print("added a termination event")
             sim.add_event(evt) 
            
 
@@ -709,7 +708,7 @@ def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and i
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    print("teated arrival event ---> creration of another arrival event")
+    #print("teated arrival event ---> creration of another arrival event")
     s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
     
 
@@ -720,7 +719,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     global counter_termination
     sim = c.simulation
     counter_termination +=1
-    print("*******************  terminating")
+    #print("*******************  terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
     if request.service_type == "urllc_1":
@@ -761,7 +760,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
         print("the action taken",a)
       
     sim.granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
-    print("results of prioritizer: num_urllc1, num_urllc2, num_urllc3:  ", num_urllc_1, num_urllc_2, num_urllc_3)
+    #print("results of prioritizer: num_urllc1, num_urllc2, num_urllc3:  ", num_urllc_1, num_urllc_2, num_urllc_3)
     #the list is sent to the Resource Allocation module
     step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, urllc_1_accepted_reqs, urllc_2_accepted_reqs, urllc_3_accepted_reqs = resource_allocation(c)
 
@@ -803,14 +802,14 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     s = s_  ## set the next state to the current state
     if counter_windows  == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
         end_state = True
-        print("the end state is set to True for the twindow event")
+        #print("the end state is set to True for the twindow event")
     else:
         end_state = False
         
     ### ATTT!!! recursive CALL here  |
     
     evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)  
-    print("added a twindow_end event")
+    #print("added a twindow_end event")
     sim.add_event(evt)
     sim.window_req_list = [[],[],[]] #
     #sim.window_req_list = []
