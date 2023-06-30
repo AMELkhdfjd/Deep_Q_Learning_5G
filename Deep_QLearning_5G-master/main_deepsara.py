@@ -56,7 +56,7 @@ pct_arriv_urllc_1_size = 10
 # n_states = avble_edge_size*avble_central_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_urllc_3_size
-n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_arriv_urllc_1_size ## M
+#n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_arriv_urllc_1_size ## not being used even in the author's version
 
 # #30 actions:
 # actions = [
@@ -77,6 +77,7 @@ n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_arriv_urll
 (0.25,1,0.1), (0.1,1,0.25), (0.5,1,0.1), (0.1,1,0.5), (0.75,1,0.1), (0.1,1,0.75),
 (0.25,1,0.5), (0.5,1,0.25), (0.25,1,0.75), (0.75,1,0.25)  
 ]"""
+
 
 
 #20 actions:
@@ -104,6 +105,8 @@ n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_arriv_urll
 
 #7actions:
 #actions = [(1,1,1),(0.75,1,1),(1,1,0.75),(0.75,1,0.75),(0.75,1,0.5),(0.5,1,0.5),(0.5,1,0.25)] #list of tuples
+
+
 
 n_actions = len(actions)
 
@@ -595,46 +598,7 @@ def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 
     
     #return value
 
-def translateStateToIndex(state): ## still ambigus
-    '''
-    returns state index from a given state code
-    '''
-    cod_avble_central = state[1]
-    cod_avble_bw = state[2]
-    
-    cod_pct_urllc_1 = state[3]
-    cod_pct_urllc_2= state[4]
-    cod_pct_urllc_3 = state[5]
-    
-    cod_pct_arriv_urllc_1 = state[6]
-    cod_pct_arriv_urllc_2= state[7]
-    cod_pct_arriv_urllc_3 = state[8]
 
-    #index = cod_avble_edge*avble_central_size + cod_avble_central
-    
-    #index for a 3-parameter state
-    #index = cod_avble_edge*avble_central_size*avble_bw_size + cod_avble_central*avble_bw_size + cod_avble_bw
-    
-    #index for a 6-parameter state
-    # index = cod_avble_edge*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_urllc_3_size 
-    # + cod_avble_central*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_urllc_3_size
-    # + cod_avble_bw*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_urllc_3_size
-    # + cod_pct_urllc_1*pct_inst_urllc_size*pct_inst_urllc_3_size
-    # + cod_pct_urllc*pct_inst_urllc_3_size 
-    # + cod_pct_urllc_3
-
-    #index for a 9-parameter state
-    index = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size 
-    + cod_avble_central*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
-    + cod_avble_bw*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
-    + cod_pct_urllc_1*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
-    + cod_pct_urllc_2*pct_inst_urllc_3_size *pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
-    + cod_pct_urllc_3*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
-    + cod_pct_arriv_urllc_1*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
-    + cod_pct_arriv_urllc_2*pct_arriv_urllc_3_size
-    + cod_pct_arriv_urllc_3
-
-    return int(index)
 
 
 def get_state(substrate,simulation): ## returns the state of 9 parmas   
@@ -843,58 +807,61 @@ def main():
     global bw_initial
     global agente
     global urllc_1_arrival_rate
-    global urllc_2_arrival_rate
-    global urllc_3_arrival_rate
+    #global urllc_2_arrival_rate
+    #global urllc_3_arrival_rate
     
     for m in arrival_rates:  ### the most global loop, arrival_rates = [100,80,60,40,30,25,20,15,10,7,5,3,1]
-        urllc_1_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
-        urllc_2_arrival_rate = m/3
-        urllc_3_arrival_rate = m/3        
+        #urllc_1_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
+        urllc_1_arrival_rate = m   ## we have only one service type, logically take the arival rate as it is
+        #urllc_2_arrival_rate = m/3
+        #urllc_3_arrival_rate = m/3        
         
         total_profit_rep = []
-        reability_profit_rep = []
-        latency_profit_rep = []
-        central_profit_rep = []
+        #reability_profit_rep = []
+        #latency_profit_rep = []
+        #central_profit_rep = []
         profit_urllc_1_rep = []
-        profit_urllc_2_rep = []
-        profit_urllc_3_rep = []
+        #profit_urllc_2_rep = []
+        #profit_urllc_3_rep = []
         
         acpt_rate_rep = []
         acpt_rate_urllc_1_rep = []
-        acpt_rate_urllc_2_rep = []
-        acpt_rate_urllc_3_rep = []
+        #acpt_rate_urllc_2_rep = []
+        #acpt_rate_urllc_3_rep = []
 
         total_utl_rep = []
         link_utl_rep = []
         node_utl_rep = []
         central_utl_rep = []
         urllc_1_utl_rep = []
-        urllc_2_utl_rep = []
-        urllc_3_utl_rep = []    
+        #urllc_2_utl_rep = []
+        #urllc_3_utl_rep = []    
         
         for i in range(episodes): ## we loop the set of episodes which is 350 global var 
                                   ## here creation of empty lists
                                   ## 3
             total_profit_rep.append([])
-            reability_profit_rep.append([])
-            latency_profit_rep.append([])
-            central_profit_rep.append([])
+            #reability_profit_rep.append([])
+            #latency_profit_rep.append([])
+            #central_profit_rep.append([])
             profit_urllc_1_rep.append([])
-            profit_urllc_2_rep.append([])
-            profit_urllc_3_rep.append([])
+            #profit_urllc_2_rep.append([])
+            #profit_urllc_3_rep.append([])
             
             acpt_rate_rep.append([])
             acpt_rate_urllc_1_rep.append([])
-            acpt_rate_urllc_2_rep.append([])
-            acpt_rate_urllc_3_rep.append([])
+            #acpt_rate_urllc_2_rep.append([])
+            #acpt_rate_urllc_3_rep.append([])
 
             total_utl_rep.append([])
             link_utl_rep.append([])
             node_utl_rep.append([])
             central_utl_rep.append([])
             urllc_1_utl_rep.append([])
-            urllc_2_utl_rep.append([])
-            urllc_3_utl_rep.append([])
+            #urllc_2_utl_rep.append([])
+            #urllc_3_utl_rep.append([])
+
+            
         
         for i in range(repetitions): ## repetitions=33 global 
                                      ## 3
