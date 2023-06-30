@@ -23,11 +23,11 @@ twindow_length = 1
 # urllc_3_arrival_rate = 10 #5#1#2 #reqXsecond
 
 urllc_1_arrival_rate = 0
-urllc_2_arrival_rate = 0
-urllc_3_arrival_rate = 0 
+#urllc_2_arrival_rate = 0
+#urllc_3_arrival_rate = 0 
 arrival_rates = [20] #[100,80,60,40,30,25,20,15,10,7,5,3,1] #20 ## maybe the number of request to arrive in a time unit
 
-mean_operation_time = 15 ## initially set to 15, the temination events are never executed
+mean_operation_time = 5 ## initially set to 15, the temination events are never executed
                           
 
 
@@ -37,7 +37,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 35 #240##350
+episodes = 1 #240##350
 
 
 
@@ -46,17 +46,17 @@ avble_bw_size = 10
 
 pct_inst_urllc_1_size = 10 #percentage of instantiated slices of type urllc_1
                         ## maybe we need this percentage for the action vector
-pct_inst_urllc_2_size = 10
-pct_inst_urllc_3_size = 10
+#pct_inst_urllc_2_size = 10
+#pct_inst_urllc_3_size = 10
 
 pct_arriv_urllc_1_size = 10
-pct_arriv_urllc_2_size = 10
-pct_arriv_urllc_3_size = 10
+#pct_arriv_urllc_2_size = 10
+#pct_arriv_urllc_3_size = 10
 
 # n_states = avble_edge_size*avble_central_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size
 #n_states = avble_edge_size*avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_size*pct_inst_urllc_3_size
-n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc_2_size*pct_inst_urllc_3_size*pct_arriv_urllc_1_size*pct_arriv_urllc_2_size*pct_arriv_urllc_3_size
+n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_arriv_urllc_1_size ## M
 
 # #30 actions:
 # actions = [
@@ -68,7 +68,7 @@ n_states = avble_central_size*avble_bw_size*pct_inst_urllc_1_size*pct_inst_urllc
 # ]
 
 #30actsv2.2
-actions = [
+"""actions = [
 (1,1,1),
 (0.75,1,1),(1,0.75,1),(1,1,0.75),(1,0.75,0.75),(0.75,1,0.75),
 (0.75,1,0.5),(0.5,1,0.75),(1,0.75,0.5),
@@ -76,7 +76,7 @@ actions = [
 (0.25,1,1),(1,1,0.25),(0.25,1,0.25),(0.1,1,1),(1,1,0.1),(0.1,1,0.1),
 (0.25,1,0.1), (0.1,1,0.25), (0.5,1,0.1), (0.1,1,0.5), (0.75,1,0.1), (0.1,1,0.75),
 (0.25,1,0.5), (0.5,1,0.25), (0.25,1,0.75), (0.75,1,0.25)  
-]
+]"""
 
 
 #20 actions:
@@ -126,25 +126,25 @@ class Controlador:
     def __init__(self):
         #metricas
         self.total_profit = 0   ## profit for different types: node, links, services, type of nodes
-        self.reability_profit=0
+        #self.reability_profit=0
         self.latency_profit=0
         self.urllc_1_profit = 0
-        self.urllc_2_profit = 0
-        self.urllc_3_profit = 0
+        #self.urllc_2_profit = 0
+        #self.urllc_3_profit = 0
         self.central_profit = 0
 
         self.acpt_rate = 0     ## we define acceptence rate
         self.urllc_1_acpt_rate = 0
-        self.urllc_2_acpt_rate = 0
-        self.urllc_3_acpt_rate = 0
+        #self.urllc_2_acpt_rate = 0
+        #self.urllc_3_acpt_rate = 0
         
         self.total_utl = 0   ## here the utl means utilisation
         self.node_utl = 0    
         self.link_utl = 0
         self.central_utl = 0
         self.urllc_1_utl = 0
-        self.urllc_2_utl = 0
-        self.urllc_3_utl = 0
+        #self.urllc_2_utl = 0
+        #self.urllc_3_utl = 0
 
         self.simulation = Sim()
         self.substrate = {}
@@ -167,14 +167,14 @@ class Sim:
                          ## more likely its the start time of the current event that is being treated
         self.run_till = 1 ## initially was -1
         self.total_reqs = 0
-        self.total_urllc_1_reqs = 0
-        self.total_urllc_2_reqs = 0
-        self.total_urllc_3_reqs = 0
+        #self.total_urllc_1_reqs = 0
+        #self.total_urllc_2_reqs = 0
+        #self.total_urllc_3_reqs = 0
         self.attended_reqs = 0
         self.accepted_reqs = 0
-        self.urllc_1_accepted_reqs = 0
-        self.urllc_2_accepted_reqs = 0
-        self.urllc_3_accepted_reqs = 0
+        #self.urllc_1_accepted_reqs = 0
+        #self.urllc_2_accepted_reqs = 0
+        #self.urllc_3_accepted_reqs = 0
         self.current_instatiated_reqs = [0,0,0] #[urllc_1,urllc_2,urllc_3]
                    
 
@@ -385,7 +385,7 @@ def prioritizer_v1(window_req_list,action_index): ## in order to prioritize the 
     return granted_req_list 
 
 def takeFirst(elem):## i guess useless 
-    return elem[0]
+    return elem[0] 
 
 
 ############################### Continue here ###################################
@@ -708,7 +708,7 @@ def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and i
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    #print("teated arrival event ---> creration of another arrival event")
+    print("teated arrival event ---> creration of another arrival event")
     s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
     
 
@@ -719,7 +719,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     global counter_termination
     sim = c.simulation
     counter_termination +=1
-    #print("*******************  terminating")
+    print("*******************  terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
     if request.service_type == "urllc_1":
@@ -919,7 +919,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
