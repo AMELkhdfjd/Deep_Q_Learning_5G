@@ -672,7 +672,7 @@ def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and i
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    print("teated arrival event ---> creration of another arrival event")
+    print("treated arrival event ---> creration of another arrival event")
     s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
     
 
@@ -782,9 +782,9 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
 def prepare_sim(s):## prepares the simulation object for all services and sets the params for them
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_1","arrival_rate":urllc_1_arrival_rate},f=func_arrival) 
     s.add_event(evt)
-    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_2_arrival_rate),extra={"service_type":"urllc_2","arrival_rate":urllc_2_arrival_rate},f=func_arrival)    
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_2","arrival_rate":urllc_1_arrival_rate},f=func_arrival)    
     s.add_event(evt)
-    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_3_arrival_rate),extra={"service_type":"urllc_3","arrival_rate":urllc_3_arrival_rate},f=func_arrival)    
+    evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_3","arrival_rate":urllc_1_arrival_rate},f=func_arrival)    
     s.add_event(evt)
     ## here maybe its the first state
     evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)## att here the function is different
@@ -861,7 +861,7 @@ def main():
             #urllc_2_utl_rep.append([])
             #urllc_3_utl_rep.append([])
 
-            
+
         
         for i in range(repetitions): ## repetitions=33 global 
                                      ## 3
