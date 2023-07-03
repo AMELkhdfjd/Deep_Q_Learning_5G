@@ -108,7 +108,7 @@ pct_arriv_urllc_1_size = 10
 
 
 
-n_actions = len(actions)
+#n_actions = len(actions)
 
 
 ## class for the events
@@ -163,6 +163,7 @@ class Sim:
     def __init__(self):
         self.eventos = []## the list of events
         self.total_events = 0
+        self.request = {} ## NEW: added to hold the arriving urllc request
         self.window_req_list = [[],[],[]] #for the three services
         #self.window_req_list = []
         self.granted_req_list = []
@@ -228,13 +229,13 @@ class Sim:
             #add nslrs in window list
             self.total_reqs += 1  ## increase the number of requests
             service_type = evt.extra["service_type"]## maybe the extra means the additional parameters for the event here we are assigining the service_type
-            request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)## here we are calling the fonction from the file imported ATT
+            self.request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)## here we are calling the fonction from the file imported ATT
             
               ## self.total_reqs: to define the id of the new nslr, 
               ## mean_operation_time = 15 as a global variable
 
 
-            if evt.extra["service_type"] == "urllc_1":
+            """if evt.extra["service_type"] == "urllc_1":
                 self.total_urllc_1_reqs += 1
                 self.window_req_list[0].append(copy.deepcopy(request))## add the request to the window list according to the type of the service
             elif evt.extra["service_type"] == "urllc_2":
@@ -242,15 +243,11 @@ class Sim:
                 self.window_req_list[1].append(copy.deepcopy(request))#
             else: #evt.extra["service_type"] == "urllc_3":
                 self.total_urllc_3_reqs += 1
-                self.window_req_list[2].append(copy.deepcopy(request))#
+                self.window_req_list[2].append(copy.deepcopy(request))#"""
             
         #print("print details events:  ")
         #self.print_eventos()
 
-        #print()
-            #service_type = evt.extra["service_type"]
-            #request = nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time)
-            #self.window_req_list.append(copy.deepcopy(request))
 
 
 
@@ -482,7 +479,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
             except StopIteration:
                 pass
 
-def resource_allocation(cn): #cn=controller
+def resource_allocation_v1(cn): #cn=controller
    #makes allocation for the set of nslrs captured in a time window ##and returns the profits calculated for the global allocations
     # the metrics calculated here correspond to a step
      
@@ -556,6 +553,55 @@ def resource_allocation(cn): #cn=controller
             step_total_utl += (step_node_utl + step_links_bw_utl)/2"""
              
     return step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, sim.urllc_1_accepted_reqs, sim.urllc_2_accepted_reqs, sim.urllc_3_accepted_reqs 
+
+
+def resource_allocation(cn, index, already_backup): #cn=controller
+   #makes allocation for the set of nslrs captured in a time window ##and returns the profits calculated for the global allocations
+    # the metrics calculated here correspond to a step
+     
+    sim = cn.simulation ## define the object of class Sim which is part of the Controller class
+    substrate = cn.substrate ## substrate of the controller class
+    step_urllc_1_profit_latency = 0 
+    step_urllc_2_profit_latency = 0
+    step_urllc_3_profit_latency = 0
+    step_latency_profit=0
+    end_simulation_time = sim.run_till
+    
+    req = sim.request
+    vnfs = sim.request.nsl_graph["vnfs"]
+    vnf = vnfs[index]
+    n_hops = 0    
+
+    rejected, n_hops, already_backup = nsl_placement.nsl_placement(req, index, substrate, already_backup)#mapping  ## here try to allocate the nslr req in the substrate graph
+        
+    if not rejected: ## successfully mapped
+         
+        
+            profit_latency = 1/n_hops
+            #step_latency_profit += profit_latency 
+           
+
+            if(len(vnfs) == index-1 ): ## check here if its index-1, which means its not rejected and its the last vnf, create a termination event
+                sim.request.set_end_time(sim.horario+sim.request.operation_time)
+                sim.accepted_reqs += 1
+                evt = sim.create_event(type="termination",start=sim.request.end_time, extra=sim.request, f=func_terminate) ## add the event to the list of events
+
+                ## add here the final reward to get
+    else:
+        profit_latency = -1 ## the bad reward when we reject all the request due to non allocation of a vnf
+
+                      
+            
+        
+             
+    return profit_latency, already_backup
+
+
+
+
+
+
+
 
 def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 5, 6, 7, 8, or 9) based on the range of values that value falls within.
     cod = 0
@@ -666,15 +712,82 @@ def get_state(substrate,simulation): ## returns the state of 9 parmas
 
     return state
 
-def func_arrival(c,evt): #NSL arrival  ## creates an arrival event of NSLR and inserts it in the list of events
-    s = c.simulation
+def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arrived
+
+
+    global counter_windows
+    sim = c.simulation 
+    counter_windows += 1
+    num_urllc_1 = 0
+    num_urllc_2 = 0
+    num_urllc_3 = 0
+    step_urllc_1_profit_reability =0
+    step_urllc_2_profit_reability =0
+    step_urllc_3_profit_reability =0
+    already_backup =[[], []]
+    actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
+
+    vnfs = sim.request.nsl_graph["vnfs"]
+    vlinks = sim.request.nsl_graph["vlinks"]
+    for index, vnf in enumerate(vnfs):
+
+        if(index == 0):     ## need to check here if we should start with 0
+        #first state index
+        #all resources at 100% (with granularity of 5)
+            state = get_state(c.substrate,c.simulation)
+        
+        #s = translateStateToIndex(state)
+        #a = agente.take_action(s,True)
+        
+            a = agente.step(state,0) ## this returns the action taken, here we call the function step from the dql file, give state, reward, training=true, 
+            print("the action taken",actions[a])
+        else:## its not the first state, still ambigus why we dont call the step function 
+                                    ##edit: we dont need to calculate the next step bcz we have the action here, before we dont have since its the first state
+            s = evt.extra["current_state"] ## the state
+            a = evt.extra["action"]  ## the action of the event
+            print("the action taken",a)
+             
+        latency_profit, already_backup = resource_allocation(c, index, already_backup)
+
+
+        r = latency_profit ### ATT this is the reward to pass to the agent
+        next_state = get_state(c.substrate,c.simulation) #getting the next state    
+    
+  
+    
+        s_ = next_state
+        a_ = agente.step(s_,r) ## we give the new reward and the current state in order to get the action to take
+                           ## here we are getting the new action, no need to execute the step function above since its no longer the first state
+        a = a_ ## set the next action to the current action
+        s = s_  ## set the next state to the current state
+        #if counter_windows == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
+        #    end_state = True
+        #print("the end state is set to True for the twindow event")
+        #else:
+        #    end_state = False
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ## the original func_arrival
+   
     # print("**/",evt.extra["arrival_rate"])
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
     print("treated arrival event ---> creration of another arrival event")
-    s.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
-    
+    sim.add_event(s.create_event(type="arrival",start=s.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate}, f=func_arrival))
+    ## the request variable will be changed here, and storing the new urllc request for the arriving event
 
 
 counter_termination = 0
@@ -686,16 +799,16 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     print("*******************  terminating")
     request = evt.extra
     update_resources(c.substrate,request,True)
-    if request.service_type == "urllc_1":
+    """if request.service_type == "urllc_1":
         sim.current_instatiated_reqs[0] -= 1  ## att current_instatiated reqs means the req in this moment occuping ressources in the graph and not yet terminated
     elif request.service_type == "urllc_2":
         sim.current_instatiated_reqs[1] -= 1
     else:
-        sim.current_instatiated_reqs[2] -= 1
+        sim.current_instatiated_reqs[2] -= 1"""
 
 
 counter_windows = 0
-def func_twindow(c,evt):  ## recursive function need to understand it more
+"""def func_twindow(c,evt):  ## recursive function need to understand it more
     #the time sale has expired. The nslrs collected so far will be analyzed for admission.
     global counter_windows
     sim = c.simulation 
@@ -747,10 +860,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     c.urllc_1_profit += step_urllc_1_profit
     c.urllc_2_profit += step_urllc_2_profit
     c.urllc_3_profit += step_urllc_3_profit
-    """c.total_utl += step_total_utl
-    c.node_utl += step_node_utl 
-    c.central_utl += step_central_cpu_utl
-    c.link_utl += step_links_bw_utl"""
+   
     
     r = step_profit ### ATT this is the reward to pass to the agent
     next_state = get_state(c.substrate,c.simulation) #getting the next state    
@@ -777,7 +887,7 @@ def func_twindow(c,evt):  ## recursive function need to understand it more
     sim.add_event(evt)
     sim.window_req_list = [[],[],[]] #
     #sim.window_req_list = []
-    sim.granted_req_list = [] 
+    sim.granted_req_list = [] """
   
 def prepare_sim(s):## prepares the simulation object for all services and sets the params for them
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_1","arrival_rate":urllc_1_arrival_rate},f=func_arrival) 

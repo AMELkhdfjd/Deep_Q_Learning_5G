@@ -53,13 +53,13 @@ nsl_graph_urllc_2 =  {
             ],
             "vlinks":[
                         {"source":0,"target":2,},
-                        {"source":1,"target":3},
                         {"source":0,"target":4},
                         #{"source":1,"target":5},
                         #{"source":0,"target":6},
                         #{"source":1,"target":7},
                         #{"source":0,"target":8},
                         #{"source":1,"target":9}
+                        {"source":1,"target":3},
                         {"source":1,"target":5},
                         {"source":3,"target":4}
             ] 
