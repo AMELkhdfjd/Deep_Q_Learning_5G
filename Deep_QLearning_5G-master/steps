@@ -1,0 +1,85 @@
+You can install TensorFlow using Anaconda by following these steps:
+
+1. Create a new conda environment. Open Anaconda Prompt or Terminal and run the following command:
+
+   ```
+   conda create --name myenv
+   ```
+
+   Replace `myenv` with the name you want to give your environment.
+
+2. Activate the new environment by running:
+
+   ```
+   conda activate myenv
+   ```
+
+   Replace `myenv` with the name of your environment.
+
+3. Install TensorFlow using conda by running:
+
+   ```
+   conda install tensorflow
+   ```
+
+   This will install the latest stable version of TensorFlow along with its dependencies.
+
+4. Verify the installation by running a simple TensorFlow program:
+
+   ```
+   python -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
+   ```
+
+   If TensorFlow is installed correctly, you should see a random number printed to the console.
+
+That's it! You now have TensorFlow installed in your Anaconda environment. You can use this environment to develop and run TensorFlow applications without worrying about conflicting dependencies with other projects on your system.
+
+
+
+
+
+5. in order to run the main_deepsara, cd to the directory deep then activate myenv by running: conda activate myenv
+then execute the file with python3 not python, att we've reinstalled all the AI libraries with python3 
+
+ATTTT:  you sould be on the myenv in order to work, if not you need to reinstall the libraries for the base env like networkx
+
+6. install torch for the GCN modules, using pip3 install torch
+
+############### GIT problem of Commit ################
+rm -rf .git
+
+git init
+
+git remote add origin ssh://git@github.com/YourUsername/repoName.git
+
+git fetch origin master
+
+git checkout master
+
+
+ATT, whatever do the git operations on the deep folder not the parent
+
+
+
+############ alternative of the commit problem ################
+create a new folder and clone the git repo and then cd to the directory and update the files regenerate other ones and commit the changes 
+
+
+
+###### Steps to prepare the evnrirenemnt on the vm
+
+1. install the tensorflow with conda using this link:
+
+https://www.tensorflow.org/install/pip   (install conda & tensorflow)
+
+2. install networkx, numpy, matplotlib using : sudo apt update
+sudo apt install python3-dev python3-pip
+pip3 install networkx
+pip3 install numpy
+pip3 install matplotlib
+
+
+
+
+
+gcloud compute ssh --zone "europe-west2-c" "pfe" --project "atlantean-glyph-387919"
