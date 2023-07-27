@@ -312,80 +312,6 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
             except StopIteration:
                 pass
 
-def resource_allocation_v1(cn): #cn=controller
-   #makes allocation for the set of nslrs captured in a time window ##and returns the profits calculated for the global allocations
-    # the metrics calculated here correspond to a step
-     
-    sim = cn.simulation ## define the object of class Sim which is part of the Controller class
-    substrate = cn.substrate ## substrate of the controller class
-    step_urllc_1_profit_latency = 0 
-    step_urllc_2_profit_latency = 0
-    step_urllc_3_profit_latency = 0
-    step_latency_profit=0
-    end_simulation_time = sim.run_till
-    """max_node_profit = substrate.graph["max_cpu_profit"]*sim.run_till
-    max_link_profit = substrate.graph["max_bw_profit"]*sim.run_till
-    max_profit = max_link_profit + max_node_profit"""
-    print("granted req list length ",len(sim.granted_req_list))
-
-
-
-
-    for index, req in enumerate(sim.granted_req_list):
-        
-        # print("**",req.service_type,req.nsl_graph)
-
-        sim.attended_reqs += 1   
-        n_hops = 0 ## this variable will contain the nmber of hops for each request     
-        rejected, n_hops = nsl_placement.nsl_placement(req,substrate)#mapping  ## here try to allocate the nslr req in the substrate graph
-        #print("after nsl_placement, what left in general as node cpu: ", substrate.graph["centralized_cpu"])
-        
-        if not rejected: ## successfully mapped
-            #instantiation and addition of termination event
-            #print("the nsl request n°: ", index, "rejected: ", rejected, "number of hops after nsl_placement: ", n_hops, "\n")
-            #print("the service type of the nslr is: ", req.service_type)
-            req.set_end_time(sim.horario+req.operation_time)## the start time + the time of the operation
-            graph = req.nsl_graph_reduced 
-            ## no need to update the resources, its done in the nsl_placement
-            #update_resources(substrate,req,False)#instantiation, occupy resources
-            evt = sim.create_event(type="termination",start=req.end_time, extra=req, f=func_terminate) ## add the event to the list of events
-            #print("added a termination event")
-            sim.add_event(evt) 
-           
-
-            #calculation of metrics (profit, acpt_rate, counters)           
-            sim.accepted_reqs += 1
-            ## implementation of the new rewared function call for reability and latency
-            profit_latency = calculate_metrics.calculate_profit_latency(req, n_hops)
-
-            #profit_nodes = calculate_metrics.calculate_profit_nodes(req,end_simulation_time)  ## from the functions of the calculate_metrics file to have the profit gained for node and links
-            #profit_links = calculate_metrics.calculate_profit_links(req,end_simulation_time)*10    
-            #step_profit += (profit_nodes + profit_links)/max_profit #the total profit in this step is the reward
-
-            step_latency_profit += profit_latency 
-           
-         
-
-            if req.service_type == "urllc_1":
-                sim.current_instatiated_reqs[0] += 1 ## the total of requests accepted for the specific service for each step
-                sim.urllc_1_accepted_reqs += 1 ## the accepted for the specific service in general not in the step i think
-                step_urllc_1_profit_latency += profit_latency 
-            elif req.service_type == "urllc_2":
-                sim.current_instatiated_reqs[1] += 1
-                sim.urllc_2_accepted_reqs += 1
-                step_urllc_2_profit_latency += profit_latency 
-            else:
-                sim.current_instatiated_reqs[2] += 1
-                sim.urllc_3_accepted_reqs += 1
-                step_urllc_3_profit_latency += profit_latency                       
-            
-            """b,c = calculate_metrics.calculate_request_utilization(req,end_simulation_time,substrate)## returns edge_utl, central_utl, links_utl for the request treated
-            step_central_cpu_utl += b/(centralized_initial*end_simulation_time)
-            step_links_bw_utl += c*10/(bw_initial*end_simulation_time)## links profit and utilistion are always *10
-            step_node_utl += (b)/((centralized_initial)*end_simulation_time)
-            step_total_utl += (step_node_utl + step_links_bw_utl)/2"""
-             
-    return step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, sim.urllc_1_accepted_reqs, sim.urllc_2_accepted_reqs, sim.urllc_3_accepted_reqs 
 
 
 def resource_allocation(cn, index, already_backup, a): #cn=controller
@@ -414,9 +340,9 @@ def resource_allocation(cn, index, already_backup, a): #cn=controller
             #step_latency_profit += profit_latency 
            
 
-            if(len(vnfs)  == index ): ## check here if its index-1, which means its not rejected and its the last vnf, create a termination event
+            if(len(vnfs) -1   == index ): ## check here if its index-1, which means its not rejected and its the last vnf, create a termination event
                 sim.request.set_end_time(sim.horario+sim.request.operation_time)
-                sim.accepted_reqs += 1
+               
                 print("the accepted reqs: ", sim.accepted_reqs)
                 print("END TIME:  ", sim.request.end_time)
 
@@ -553,8 +479,8 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         
 
          #state = get_state(c.substrate,c.simulation, index)
-        state = [3703, 3540, 0000, 7822, 0000, 0000, 0000, 0000, 901,
-         5891, 6244, 0000, 1250, 1847, 2786, 0000]
+        state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
+         0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
 
         a =   agente.step(state,r)  
         print("THE ACTION : ", a)
@@ -607,9 +533,10 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     sim = c.simulation
     
     print("*******************  terminating")
-    print("BEFORE ", c.substrate.graph["nodes"], c.substrate.graph["links"])
+    print("BEFORE \n", c.substrate.graph["nodes"], c.substrate.graph["links"],"\n\n")
     
     request = evt.extra
+    print("the request terminated: \n ", request.nsl_graph)
 
     update_resources(c.substrate,request,True)
     print("AFTER ", c.substrate.graph["nodes"], c.substrate.graph["links"])

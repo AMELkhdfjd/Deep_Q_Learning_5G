@@ -42,9 +42,9 @@ def nsl_placement(req, index, substrate, already_backup, a):  ## need to know wh
     n_hops = 0   
 
 
-    calculate_resource_potential(substrate,"cpu") ## for each node, sum of its links bw * node's cpu ATTTT: to rank the nodes based on the ones with more conx links and cpu capacity
+    #calculate_resource_potential(substrate,"cpu") ## for each node, sum of its links bw * node's cpu ATTTT: to rank the nodes based on the ones with more conx links and cpu capacity
     nodes = copy.deepcopy(substrate.graph["nodes"]) #copy to temporarily work with it
-    ranked_nodes_cpu = sort_nodes(nodes,"node_potential") #ranked list of nodes by potential considering cpu and conections     
+    #ranked_nodes_cpu = sort_nodes(nodes,"node_potential") #ranked list of nodes by potential considering cpu and conections     
 
     rejected = False
     flag = False # to know if a vnode has not been mapped to nodes of the same type
