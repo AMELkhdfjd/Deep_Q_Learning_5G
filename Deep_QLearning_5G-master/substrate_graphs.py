@@ -350,7 +350,7 @@ def get_graph(n): ## returns a substrate of graph depending on the number of nod
 
     ## to draw the graph:
 # create an empty graph
-    G = nx.Graph()
+    """G = nx.Graph()
 
 # add nodes
     for node in substrate.graph["nodes"]:
@@ -379,7 +379,7 @@ def get_graph(n): ## returns a substrate of graph depending on the number of nod
 
 # show plot
     plt.axis('off')
-    plt.savefig("substrate_graph.png") # save as png   
+    plt.savefig("substrate_graph.png") # save as png   """
 
     return substrate 
 

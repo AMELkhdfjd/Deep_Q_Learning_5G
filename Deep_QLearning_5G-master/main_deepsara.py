@@ -10,6 +10,8 @@ import ql
 import dql
 import telegram_bot as bot
 import time
+import networkx as nx
+import matplotlib.pyplot as plt
 #from SimGNN_DQL import SimGNNTrainer ## for the gcn
 from param_parser import parameter_parser ## for the gcn
 
@@ -69,6 +71,7 @@ class Evento:
 ## class for the controller
 class Controlador:
     def __init__(self):
+        self.cpt = 0
         #metricas
         self.total_profit = 0   ## profit for different types: node, links, services, type of nodes
         #self.reability_profit=0
@@ -121,7 +124,7 @@ class Sim:
         self.reject_r_issue = 0
         self.reject_nslr = 0
         self.accepted_reqs = 0
-        self.cpt = 0
+        
   
                    
 
@@ -314,7 +317,7 @@ def update_resources(substrate,nslr,kill):  ## updates the ressources consumed f
 
 
 
-def resource_allocation(cn, index, already_backup, a): #cn=controller
+def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=controller
    #makes allocation for the set of nslrs captured in a time window ##and returns the profits calculated for the global allocations
     # the metrics calculated here correspond to a step
      
@@ -331,7 +334,7 @@ def resource_allocation(cn, index, already_backup, a): #cn=controller
     vnf = vnfs[index]
     reliability = 0    
 
-    rejected, reliability, already_backup = nsl_placement.nsl_placement(req, index, substrate, already_backup, a)#mapping  ## here try to allocate the nslr req in the substrate graph
+    rejected, reliability, already_backup = nsl_placement.nsl_placement(req, index, substrate, already_backup, a, reliability_total)#mapping  ## here try to allocate the nslr req in the substrate graph
         
     if not rejected: ## successfully mapped
          
@@ -485,7 +488,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         a =   agente.step(state,r)  
         print("THE ACTION : ", a)
 
-        profit_reliability, already_backup = resource_allocation(c, index, already_backup, a)
+        profit_reliability, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         r = profit_reliability
         reliability_total = reliability_total*r 
         print("THE REWARD : ", r)
@@ -529,18 +532,130 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
 def func_terminate(c,evt):   ## terminates a request, updates the ressources and reduced the number of instantiated reqs list
-    global counter_termination
+    
     sim = c.simulation
     
     print("*******************  terminating")
+    G = nx.Graph()
+   
+
+############## BEFORE 
+
+    
+    if c.cpt == 0:
+        for node in c.substrate.graph["nodes"]:
+            G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
+            print("node:, ", node["id"])
+
+# Add edges
+        for link in c.substrate.graph["links"]:
+            G.add_edge(link["source"], link["target"], bw=link["bw"])
+
+# Set positions of nodes (using spring layout)
+        pos = nx.spring_layout(G, 0.5)
+        plt.figure() 
+
+# Draw nodes
+        nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightblue')
+
+# Draw edges
+        nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
+
+# Add node labels (displaying id, cpu, and p information)
+        node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nP: {node['p']}" for node in c.substrate.graph["nodes"]}
+        nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
+
+# Add edge labels (displaying bandwidth information)
+        edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in c.substrate.graph["links"]}
+        nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+
+# Show plot
+        plt.axis('off')
+        plt.savefig("BEFORE.png") # save as png 
+       
+        
+
+
+
     print("BEFORE \n", c.substrate.graph["nodes"], c.substrate.graph["links"],"\n\n")
     
     request = evt.extra
     print("the request terminated: \n ", request.nsl_graph)
 
     update_resources(c.substrate,request,True)
+
+############ REQUEST
+    
+
+    if c.cpt == 0:
+        for node in request.nsl_graph["vnfs"]:
+            G.add_node(node["id"], cpu=node["cpu"], mapped=node["mapped_to"])
+            
+
+# Add edges
+        for link in request.nsl_graph["vlinks"]:
+            G.add_edge(link["source"], link["target"], bw=link["bw"])
+
+# Set positions of nodes (using spring layout)
+        pos = nx.spring_layout(G, 0.5)
+        plt.figure() 
+
+# Draw nodes
+        nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightgrey')
+
+# Draw edges
+        nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
+
+# Add node labels (displaying id, cpu, and p information)
+        node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nmpped_to: {node['mapped_to']}" for node in request.nsl_graph["vnfs"]}
+        nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
+
+# Add edge labels (displaying bandwidth information)
+        edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in request.nsl_graph["vlinks"]}
+        nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+
+# Show plot
+        plt.axis('off')
+        plt.savefig("req.png") # save as png 
+
+
+
     print("AFTER ", c.substrate.graph["nodes"], c.substrate.graph["links"])
 
+################ AFTER
+    
+    if c.cpt == 0:
+        for node in c.substrate.graph["nodes"]:
+            G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
+            print("node:, ", node["id"])
+
+# Add edges
+        for link in c.substrate.graph["links"]:
+            G.add_edge(link["source"], link["target"], bw=link["bw"])
+
+# Set positions of nodes (using spring layout)
+        pos = nx.spring_layout(G, 0.5)
+        plt.figure() 
+# Draw nodes
+        nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightblue')
+
+# Draw edges
+        nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
+
+# Add node labels (displaying id, cpu, and p information)
+        node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nP: {node['p']}" for node in c.substrate.graph["nodes"]}
+        nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
+
+# Add edge labels (displaying bandwidth information)
+        edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in c.substrate.graph["links"]}
+        nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+
+# Show plot
+        plt.axis('off')
+        plt.savefig("AFTER.png") # save as png 
+        c.cpt +=1
+        
+    
   
 
 
@@ -726,7 +841,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(0.7)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     

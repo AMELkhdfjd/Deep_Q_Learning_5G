@@ -32,7 +32,7 @@ ranked_nodes_cpu = []
 nsl_graph_red = {} #reduced nsl graph
 
 
-def nsl_placement(req, index, substrate, already_backup, a):  ## need to know why we are passing the substrate
+def nsl_placement(req, index, substrate, already_backup, a, reliability_total):  ## need to know why we are passing the substrate
    ## a is containing the id of the physical node the agent chosen 
     global ranked_nodes_cpu
     profit_nodes = 0
@@ -84,7 +84,7 @@ def nsl_placement(req, index, substrate, already_backup, a):  ## need to know wh
     #print("vnodes list: ", nsl_graph_red["vnodes"])
     vnfs = req.nsl_graph["vnfs"]
     vnf = req.nsl_graph["vnfs"][index]
-
+    vlinks = req.nsl_graph["vlinks"]
 
     if vnf["cpu"] <= n["cpu"] :
                         
@@ -104,7 +104,15 @@ def nsl_placement(req, index, substrate, already_backup, a):  ## need to know wh
                             rejected = True    
                             #print("enter to insufficient ressources")
 
+    if (index == len(vnfs)-1): ## we are on the last vnf
+            print("the total reliability:  ", reliability_total)
+            if(reliability_total <= req.nsl_graph["reliability"]):
+                reliability = -1
+                rejected = True
+               
+                print("REABIILTY ISSUE --------------------- ")
 
+            
 
     if rejected: ## free the ressources taken in the allocation process
         for vnf in vnfs:#the nodes of the reduced graph of the accepted nslr are traversed   
@@ -112,6 +120,24 @@ def nsl_placement(req, index, substrate, already_backup, a):  ## need to know wh
                 n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] ) )## returns the phisical node mapped to the vnode                
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
                 substrate.graph["centralized_cpu"] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
+        
+
+        links = copy.deepcopy(substrate.graph["links"])
+        ## update the links in case reject of the request
+        for vlink in vlinks:
+            try:#when two vnfs are instantiated in the same node there is no link
+                path = vlink["mapped_to"]            
+            except KeyError:
+                path=[]
+            for i in range(len(path)-1):
+                try:
+                    l = next(l for l in links if ( (l["source"]==path[i] and l["target"]==path[i+1]) or (l["source"]==path[i+1] and l["target"]==path[i]) ) )              
+                  
+                    l["bw"] += vlink["bw"]
+                    substrate.graph["bw"] += vlink["bw"]
+                   
+                except StopIteration:
+                    pass
                
         
    

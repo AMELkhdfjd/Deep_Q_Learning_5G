@@ -156,7 +156,7 @@ def get_nslr(id,service_type,mean_operation_time):## generates a NSLR request fr
     ### in order to draw the NSLR graph
 
     # create an empty graph
-    G = nx.Graph()
+    """G = nx.Graph()
     ##print("printing the nslr graph  ")
 
     # add nodes to the graph
@@ -172,7 +172,7 @@ def get_nslr(id,service_type,mean_operation_time):## generates a NSLR request fr
     nx.draw_networkx_nodes(G, pos)
     nx.draw_networkx_edges(G, pos)
     nx.draw_networkx_labels(G, pos)
-    plt.savefig("NSLR_test.png") # save as png 
+    #plt.savefig("NSLR_test.png") # save as png """
 
     
     return request
