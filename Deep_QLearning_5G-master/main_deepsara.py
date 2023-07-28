@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 20 #240##350
 
 
 
@@ -124,7 +124,7 @@ class Sim:
         self.reject_r_issue = 0
         self.reject_nslr = 0
         self.accepted_reqs = 0
-        
+        self.terminate_events = 0
   
                    
 
@@ -346,7 +346,7 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
             if(len(vnfs) -1   == index ): ## check here if its index-1, which means its not rejected and its the last vnf, create a termination event
                 sim.request.set_end_time(sim.horario+sim.request.operation_time)
                
-                print("the accepted reqs: ", sim.accepted_reqs)
+                #print("the accepted reqs: ", sim.accepted_reqs)
                 #print("END TIME:  ", sim.request.end_time)
 
                 evt = sim.create_event(type="termination",start=sim.request.end_time, extra=sim.request, f=func_terminate) ## add the event to the list of events
@@ -488,14 +488,14 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
         #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
         # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
-        print("the state is : ", state)
+        #print("the state is : ", state)
         a =   agente.step(state,r)  
-        print("THE ACTION : ", a)
+        #print("THE ACTION : ", a)
 
         profit_reliability, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         r = profit_reliability
         reliability_total = reliability_total*r 
-        print("THE REWARD : ", r)
+        #print("THE REWARD : ", r)
         ## adding the reward of the entire nslr
         if (index == len(vnfs)-1): ## we are on the last vnf
             if(reliability_total <= sim.request.nsl_graph["reliability"]):
@@ -537,6 +537,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     sim = c.simulation
     
     print("*******************  terminating")
+    sim.terminate_events += 1
     G = nx.Graph()
    
 
@@ -788,7 +789,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
@@ -796,7 +797,7 @@ def main():
                 print("the lost requests: ", controller.simulation.reject_nslr)
                 print("the attended requests: ", controller.simulation.attended_reqs)
                 print("the accepted requests: ", controller.simulation.accepted_reqs)
-
+                print ("the terminated events: ", controller.simulation.terminate_events)
                 print("the acceptence ratio: ", (controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100 )
 
 
@@ -869,11 +870,11 @@ def main():
             
 
 if __name__ == '__main__':
-    #bot.sendMessage("Simulation starts!")
+    bot.sendMessage("Simulation starts!")
     start = time.time()## in order to receive the current time
     print("start time: ",start)
     main()
     end = time.time()
     print("end time: ",end)
-    #bot.sendMessage("Simulation finishes!")
-    #bot.sendMessage("total time: " + str(end-start))
+    bot.sendMessage("Simulation finishes!")
+    bot.sendMessage("total time: " + str(end-start))

@@ -106,7 +106,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
 
     if (index == len(vnfs)-1): ## we are on the last vnf
             print("the total reliability:  ", reliability_total)
-            if(reliability_total <= req.nsl_graph["reliability"]):
+            if(reliability_total*reliability <= req.nsl_graph["reliability"]):
                 reliability = -1
                 rejected = True
                
@@ -149,7 +149,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
     ################## vlinks admission #################ù
     #print("placement done ! entering now to the analyse links function :")
     if not rejected:
-        print("VNF n°:  ", index, "MAPPED TO : ",  n["id"], "with profit:  ", n["p"])
+        #print("VNF n°:  ", index, "MAPPED TO : ",  n["id"], "with profit:  ", n["p"])
         rejected, n_hops = analyze_links(req.nsl_graph,index, substrate)
         #print("decision after analyse links", rejected, "number of hops", n_hops)
     #else:

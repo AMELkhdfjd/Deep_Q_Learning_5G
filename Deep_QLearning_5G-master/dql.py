@@ -15,9 +15,10 @@ import collections as cns
 ## ATT x here is a layer that we are passing as argument to calculate in the activation function
 def dense(x, weights, bias, activation=tf.identity, **activation_kwargs):
     """Dense layer."""
-    x = x.astype("float32")
-    print("##x",x)
-    print("##weights",weights)
+    #x = x.astype("float32")
+    x = tf.cast(x, tf.float32) ## for the error with the previous one
+    #print("##x",x)
+    #print("##weights",weights)
     z = tf.matmul(x, weights) + bias
     return activation(z, **activation_kwargs)
 
