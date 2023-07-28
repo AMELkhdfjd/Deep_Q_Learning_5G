@@ -15,9 +15,9 @@ import collections as cns
 ## ATT x here is a layer that we are passing as argument to calculate in the activation function
 def dense(x, weights, bias, activation=tf.identity, **activation_kwargs):
     """Dense layer."""
-    #x = x.astype("float32")
-    #print("##x",x)
-    #print("##weights",weights)
+    x = x.astype("float32")
+    print("##x",x)
+    print("##weights",weights)
     z = tf.matmul(x, weights) + bias
     return activation(z, **activation_kwargs)
 
@@ -28,6 +28,7 @@ def dense(x, weights, bias, activation=tf.identity, **activation_kwargs):
 
 
 def init_weights(shape, initializer):
+
     """Initialize weights for tensorflow layer. Initializer input is a function that takes the shape of the weights"""
     weights = tf.Variable(
         initializer(shape),
@@ -91,10 +92,11 @@ class Network(object):
 
     ## creating the model of the layers with weights and bias and using an activation function
     def model(self, inputs):
+
         """Given a state vector, return the Q values of actions.  ??? need to confirm this """
         h1 = dense(inputs, self.weights[0], self.biases[0], tf.nn.relu) #hidden layer 1 activation with relu and its dense attt, attt check the h1 and h2 how they are passed as arguments
-        h2 = dense(h1, self.weights[1], self.biases[1], tf.nn.relu) #hidden layer 2 
 
+        h2 = dense(h1, self.weights[1], self.biases[1], tf.nn.relu) #hidden layer 2 
         out = dense(h2, self.weights[2], self.biases[2])## output layer with weights and bias and tf.identity activation bcz we dont have the last argument
 
         return out

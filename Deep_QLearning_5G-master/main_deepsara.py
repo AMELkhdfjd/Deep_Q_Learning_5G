@@ -12,7 +12,7 @@ import telegram_bot as bot
 import time
 import networkx as nx
 import matplotlib.pyplot as plt
-#from SimGNN_DQL import SimGNNTrainer ## for the gcn
+from SimGNN_DQL import SimGNNTrainer ## for the gcn
 from param_parser import parameter_parser ## for the gcn
 
 
@@ -347,12 +347,12 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
                 sim.request.set_end_time(sim.horario+sim.request.operation_time)
                
                 print("the accepted reqs: ", sim.accepted_reqs)
-                print("END TIME:  ", sim.request.end_time)
+                #print("END TIME:  ", sim.request.end_time)
 
                 evt = sim.create_event(type="termination",start=sim.request.end_time, extra=sim.request, f=func_terminate) ## add the event to the list of events
                 sim.add_event(evt)
-                print("TERMINATTION:   " )
-                print(str(evt), end=" > \n")
+                #print("TERMINATTION:   " )
+                #print(str(evt), end=" > \n")
 
 
                 ## add here the final reward to get
@@ -423,10 +423,10 @@ def get_state(substrate,simulation, index): ## returns the state of 9 parmas
     "labels_1": labels_1,
     "graph_1": graph_1
     }
-    labels_2 = [[node["cpu"]] for node in simulation.request["vnfs"]]
+    labels_2 = [[node["cpu"]] for node in simulation.request.nsl_graph["vnfs"]]
 
 # Extract links' "source" and "target" values into "graph_1"
-    graph_2 = [[link["source"], link["vnfs"]["target"]] for link in simulation.request["vnfs"]]
+    graph_2 = [[link["source"], link["target"]] for link in simulation.request.nsl_graph["vlinks"]]
 
 # Create the desired format in the "graph" variable
     graph_v = {
@@ -435,8 +435,8 @@ def get_state(substrate,simulation, index): ## returns the state of 9 parmas
     }
 
 
-    trainer = SimGNNTrainer(args, graph_s, graph_v, index)
-    state = trainer.fit()
+    trainer = SimGNNTrainer(args, graph_s, graph_v)
+    state = trainer.fit(index)
    
 
     return state
@@ -461,7 +461,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     #sim.request = sim.request_list[sim.cpt]
 
     sim.request = nsl_request.get_nslr(evt.extra["id"],evt.extra["service_type"],mean_operation_time)
-    print("toto: ", sim.request.nsl_graph, sim.request.id)
+    #print("toto: ", sim.request.nsl_graph, sim.request.id)
    
     vnfs = sim.request.nsl_graph["vnfs"]
     vlinks = sim.request.nsl_graph["vlinks"]
@@ -474,17 +474,21 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
            
     else:
             r = evt.extra["current_reward"]
-            print("the reward outside the loop is : ", r)
+            #print("the reward outside the loop is : ", r)
 
 
     for index, vnf in enumerate(vnfs):
 
         
 
-         #state = get_state(c.substrate,c.simulation, index)
-        state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
-         0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
+        state = get_state(c.substrate,c.simulation, index)
 
+
+        state = state.tolist()[0]
+
+        #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
+        # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
+        print("the state is : ", state)
         a =   agente.step(state,r)  
         print("THE ACTION : ", a)
 
@@ -494,16 +498,13 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         print("THE REWARD : ", r)
         ## adding the reward of the entire nslr
         if (index == len(vnfs)-1): ## we are on the last vnf
-            print("the total reliability:  ", reliability_total)
             if(reliability_total <= sim.request.nsl_graph["reliability"]):
                 r = -1
                 sim.reject_r_issue = sim.reject_r_issue+1
-                print("REABIILTY ISSUE --------------------- ")
-
                 break
             else: ## means we have instantiated one whole nslr
                 sim.accepted_reqs = sim.accepted_reqs +1
-                print("accepted requests: ", sim.accepted_reqs)
+                #print("accepted requests: ", sim.accepted_reqs)
         else:
             if(r == -1):
                 sim.reject_nslr = sim.reject_nslr +1
@@ -545,43 +546,21 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     if c.cpt == 0:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
-            print("node:, ", node["id"])
-
-# Add edges
+            #print("node:, ", node["id"])
         for link in c.substrate.graph["links"]:
             G.add_edge(link["source"], link["target"], bw=link["bw"])
-
-# Set positions of nodes (using spring layout)
         pos = nx.spring_layout(G, 0.5)
         plt.figure() 
-
-# Draw nodes
         nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightblue')
-
-# Draw edges
         nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
-
-# Add node labels (displaying id, cpu, and p information)
         node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nP: {node['p']}" for node in c.substrate.graph["nodes"]}
         nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
-
-# Add edge labels (displaying bandwidth information)
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in c.substrate.graph["links"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
-
-# Show plot
         plt.axis('off')
         plt.savefig("BEFORE.png") # save as png 
        
-        
-
-
-
-    print("BEFORE \n", c.substrate.graph["nodes"], c.substrate.graph["links"],"\n\n")
-    
     request = evt.extra
-    print("the request terminated: \n ", request.nsl_graph)
-
     update_resources(c.substrate,request,True)
 
 ############ REQUEST
@@ -591,74 +570,42 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
         for node in request.nsl_graph["vnfs"]:
             G.add_node(node["id"], cpu=node["cpu"], mapped=node["mapped_to"])
             
-
-# Add edges
         for link in request.nsl_graph["vlinks"]:
             G.add_edge(link["source"], link["target"], bw=link["bw"])
-
-# Set positions of nodes (using spring layout)
         pos = nx.spring_layout(G, 0.5)
         plt.figure() 
-
-# Draw nodes
         nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightgrey')
-
-# Draw edges
         nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
-
-# Add node labels (displaying id, cpu, and p information)
         node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nmpped_to: {node['mapped_to']}" for node in request.nsl_graph["vnfs"]}
         nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
-
-# Add edge labels (displaying bandwidth information)
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in request.nsl_graph["vlinks"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
-
-# Show plot
         plt.axis('off')
         plt.savefig("req.png") # save as png 
 
-
-
-    print("AFTER ", c.substrate.graph["nodes"], c.substrate.graph["links"])
 
 ################ AFTER
     
     if c.cpt == 0:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
-            print("node:, ", node["id"])
-
-# Add edges
+            #print("node:, ", node["id"])
         for link in c.substrate.graph["links"]:
             G.add_edge(link["source"], link["target"], bw=link["bw"])
-
-# Set positions of nodes (using spring layout)
         pos = nx.spring_layout(G, 0.5)
         plt.figure() 
-# Draw nodes
         nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightblue')
-
-# Draw edges
         nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
-
-# Add node labels (displaying id, cpu, and p information)
         node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nP: {node['p']}" for node in c.substrate.graph["nodes"]}
         nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
-
-# Add edge labels (displaying bandwidth information)
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in c.substrate.graph["links"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
-
-# Show plot
         plt.axis('off')
         plt.savefig("AFTER.png") # save as png 
         c.cpt +=1
         
     
   
-
-
 """def func_twindow(c,evt):  ## recursive function need to understand it more
     #the time sale has expired. The nslrs collected so far will be analyzed for admission.
     global counter_windows
@@ -823,7 +770,7 @@ def main():
 
             print("################ REPITITION LOOP #####################", i)                       
             #agente = ql.Qagent(0.9, 0.9, 0.9, episodes, n_states, n_actions) #(alpha, gamma, epsilon, episodes, n_states, n_actions)
-            agente = dql.Agent(12,10) ## here we pass the state size and the action size
+            agente = dql.Agent(16,10) ## here we pass the state size and the action size
                                             ## 
                                             ## the action size is the number of nodes in the phisical graph, we take it 10
             for j in range(episodes): ## 1
@@ -841,7 +788,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(0.7)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     

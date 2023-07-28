@@ -85,7 +85,7 @@ class SimGNN(torch.nn.Module):
         ## NTN step
         scores = self.tensor_network(pooled_features_1, pooled_features_2)  ## a vector of similarity
         scores = torch.t(scores) ## transposition
-        print(" the final result:    ", scores)
+        #print(" the final result:    ", scores)
    
        
         return scores
@@ -116,7 +116,7 @@ class SimGNNTrainer(object):
         """
         Collecting the unique node idsentifiers.
         """
-        print("\nEnumerating unique labels.\n")
+        #print("\nEnumerating unique labels.\n")
         self.global_labels = set()
         
         #data = process_pair(str(self.graphs))
@@ -198,16 +198,16 @@ class SimGNNTrainer(object):
     
         return scores
 
-    def fit(self):
+    def fit(self, index):
         """
         Fitting a model.
         """
-        print("\nModel training.\n")
+        #print("\nModel training.\n")
         
         self.model.train() ## here its a default function, set the params for training phase for the GNN model, maybe it will remain
-        index=3 ## for ex: we are instanciating the third vnf
+        #index=3 ## for ex: we are instanciating the third vnf
         vector = self.process_batch(index) ## apply this funciton on the file of the two graphs as input
-        print("the vector is : ", vector)
+        #print("the vector is : ", vector)
         return vector
               
                 
@@ -219,7 +219,7 @@ class SimGNNTrainer(object):
 
 
 
-args = parameter_parser()
+"""args = parameter_parser()
 tab_printer(args)
 
 graph_1 = {"labels_1": [[0.9,200], [0.1,100], [0.2,300], [0.3,200], [0.5,100], [0.8,400], [0.6,100], [0.2,300], [0.7,300], [0.3,400], [0.5,200], [0.9,400], [0.8,300], [0.7,200], [0.2,700], [0.9,400]], "graph_1": [[0, 3], [0, 4], [0, 5], [0, 6], [0, 10], [0, 11], [0, 12], [0, 14], [0, 15], [1, 2], [1, 3], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 11], [1, 12], [1, 13], [2, 3], [2, 5], [2, 6], [2, 7], [2, 9], [2, 10], [2, 11], [2, 13], [2, 14], [3, 9], [3, 10], [3, 12], [3, 13], [3, 15], [4, 5], [4, 7], [4, 8], [4, 9], [4, 10], [4, 15], [5, 6], [5, 7], [5, 9], [5, 10], [5, 11], [5, 14], [5, 15], [6, 7], [6, 8], [6, 9], [6, 10], [6, 15], [7, 11], [7, 12], [7, 14], [8, 11], [8, 12], [8, 13], [8, 14], [8, 15], [9, 10], [9, 11], [9, 13], [9, 15], [10, 11], [10, 12], [10, 13], [10, 14], [10, 15], [11, 12], [11, 14], [12, 13], [12, 14], [12, 15], [13, 14], [13, 15]]}
@@ -227,4 +227,4 @@ graph_2 = {"labels_2": [[0.7,100], [0.9,300], [0.4,100], [0.5,100], [0.3,300], [
 
 
 trainer = SimGNNTrainer(args, graph_1, graph_2)
-trainer.fit()
+trainer.fit()"""
