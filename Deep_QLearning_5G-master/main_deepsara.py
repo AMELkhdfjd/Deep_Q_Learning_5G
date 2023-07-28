@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 20 #240##350
+episodes = 80 #240##350
 
 
 
@@ -739,7 +739,7 @@ def main():
         urllc_1_utl_rep = []
           
         
-        for i in range(episodes): ## we loop the set of episodes which is 350 global var 
+        for i in range(1): ## we loop the set of episodes which is 350 global var 
                                   ## here creation of empty lists
                                   ## 1
             total_profit_rep.append([])
@@ -765,7 +765,7 @@ def main():
 
 
         
-        for i in range(repetitions): ## repetitions=33 global 
+        for i in range(1): ## repetitions=33 global 
                                      ## 1
 
 
@@ -802,31 +802,27 @@ def main():
 
 
 
-                total_profit_rep[j].append(controller.total_profit) ## update all params for the episode j
-                """latency_profit_rep[j].append(controller.latency_profit)        
-                reability_profit_rep[j].append(controller.reability_profit)
-                central_profit_rep[j].append(controller.central_profit)
-                profit_urllc_1_rep[j].append(controller.urllc_1_profit)
-                profit_urllc_2_rep[j].append(controller.urllc_2_profit)
-                profit_urllc_3_rep[j].append(controller.urllc_3_profit)
-                        
-                acpt_rate_rep[j].append(controller.simulation.accepted_reqs/controller.simulation.total_reqs)
-                acpt_rate_urllc_1_rep[j].append(controller.simulation.urllc_1_accepted_reqs/controller.simulation.total_urllc_1_reqs)
-                acpt_rate_urllc_2_rep[j].append(controller.simulation.urllc_2_accepted_reqs/controller.simulation.total_urllc_2_reqs)
-                acpt_rate_urllc_3_rep[j].append(controller.simulation.urllc_3_accepted_reqs/controller.simulation.total_urllc_3_reqs)"""
-                
-                """total_utl_rep[j].append(controller.total_utl)
-                link_utl_rep[j].append(controller.link_utl)
-                node_utl_rep[j].append(controller.node_utl)
-                central_utl_rep[j].append(controller.central_utl) 
-                urllc_1_utl_rep[j].append(controller.urllc_1_utl)
-                urllc_2_utl_rep[j].append(controller.urllc_2_utl)
-                urllc_3_utl_rep[j].append(controller.urllc_3_utl)"""
+
+                f = open("deepsara_"+str(m)+ "episode" + str(j)+"_10BA_80epi_run-time15.txt","w+")
+           
+               
+                f.write("the lost requests r issue: "+ str(controller.simulation.reject_r_issue))
+                f.write("the lost requests ressource issue: "+ str(controller.simulation.reject_nslr))
+                f.write("the attended requests: "+ str(controller.simulation.attended_reqs))
+                f.write("the accepted requests: "+ str(controller.simulation.accepted_reqs))
+                f.write("the terminated events: "+  str(controller.simulation.terminate_events))
+                f.write("the acceptence ratio: "+ str((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100))
+                f.close()
+
 
             #bot.sendMessage("Repetition " + str(i) + " finishes!")
             
-            f = open("deepsara_"+str(m)+"_16BA_9de10sta_30actv22_wWWWW2_maxexpl05_btchsz15_rpsrtsz400_anrate1-400_1h150ns_350epi_prioritizerv6.txt","w+")
+            #f = open("deepsara_"+str(m)+"_16BA_9de10sta_30actv22_wWWWW2_maxexpl05_btchsz15_rpsrtsz400_anrate1-400_1h150ns_350epi_prioritizerv6.txt","w+")
+            
+
 """
+            
+
             f.write("Repetition: "+str(i)+"\n")
             f.write("**Reward:\n")
             f.write(str(total_profit_rep)+"\n\n")

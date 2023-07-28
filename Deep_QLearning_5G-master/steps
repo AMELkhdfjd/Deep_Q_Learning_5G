@@ -49,7 +49,7 @@ then execute the file with python3 not python, att we've reinstalled all the AI 
 
 ATTTT:  you sould be on the myenv in order to work, if not you need to reinstall the libraries for the base env like networkx
 
-6. install torch for the GCN modules, using pip3 install torch
+6. install torch for the GCN modules, using:   conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 
 ############### GIT problem of Commit ################
 rm -rf .git
