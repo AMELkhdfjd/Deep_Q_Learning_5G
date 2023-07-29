@@ -1,2 +1,104 @@
+the episode: 0
 
+the lost requests r issue: 0
+
+the lost requests ressource issue: 5
+
+the attended requests: 96
+
+the accepted requests: 91
+
+the terminated events: 78
+
+the acceptence ratio: 94.79166666666666
+
+the episode: 1
+
+the lost requests r issue: 0
+
+the lost requests ressource issue: 26
+
+the attended requests: 130
+
+the accepted requests: 104
+
+the terminated events: 96
+
+the acceptence ratio: 80.0
+
+the episode: 2
+
+the lost requests r issue: 0
+
+the lost requests ressource issue: 11
+
+the attended requests: 103
+
+the accepted requests: 92
+
+the terminated events: 86
+
+the acceptence ratio: 89.32038834951457
+
+the episode: 0
+
+the lost requests r issue: 0
+
+the lost requests ressource issue: 22
+
+the attended requests: 124
+
+the accepted requests: 102
+
+the terminated events: 92
+
+the acceptence ratio: 82.25806451612904
+
+the episode: 1
+
+the lost requests r issue: 0
+
+the lost requests ressource issue: 23
+
+the attended requests: 122
+
+the accepted requests: 99
+
+the terminated events: 91
+
+the acceptence ratio: 81.14754098360656
+
+the episode: 2
+
+the lost requests r issue: 0
+
+the lost requests ressource issue: 18
+
+the attended requests: 115
+
+the accepted requests: 97
+
+the terminated events: 86
+
+the acceptence ratio: 84.34782608695653
+
+the episode: 0
+
+the lost requests r issue: 0
+
+the lost requests ressource issue: 67
+
+the attended requests: 179
+
+the accepted requests: 112
+
+the terminated events: 112
+
+the acceptence ratio: 62.56983240223464
+
+the episode profit 0.8698594470218517
+
+the episode_profit_r2c 0.9170604354577764
+
+the episode_profit_reability 0.7990579643679642
 

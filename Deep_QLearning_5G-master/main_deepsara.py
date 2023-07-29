@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 100 #240##350
 
 
 
@@ -120,6 +120,10 @@ class Sim:
         #self.total_urllc_2_reqs = 0
         #self.total_urllc_3_reqs = 0
         self.attended_reqs = 0
+        self.list_profit_r2c = []
+        self.list_profit_reability = []
+        self.list_profit = []
+
     
         self.reject_r_issue = 0
         self.reject_nslr = 0
@@ -493,8 +497,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         #print("the state is : ", state)
 
         a =   agente.step(state,r)  
-        #print("THE ACTION : ", a)
-        print("THE ID : ", index)
+     
 
         profit_reliability, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
@@ -521,7 +524,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 for i in range(len(vnfs)):
                     revenue += vnfs[i]["cpu"] 
                     cout += vnfs[i]["cpu"] 
-                    print("the cpu is  : ",vnfs[i]["cpu"])
+                    #print("the cpu is  : ",vnfs[i]["cpu"])
                     
                 for j in range(len(vlinks)):
                     revenue += vlinks[j]["bw"]
@@ -529,12 +532,15 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                     if "mapped_to" in vlinks[j]:
 
                         cout +=  vlinks[j]["bw"] * len(vlinks[j]["mapped_to"])
-                        print("the bw is : ", vlinks[j]["bw"], "mapped_to", vlinks[j]["mapped_to"], len(vlinks[j]["mapped_to"]))
+                        #print("the bw is : ", vlinks[j]["bw"], "mapped_to", vlinks[j]["mapped_to"], len(vlinks[j]["mapped_to"]))
 
                     else:
                         cout += 0
                 
                 r = 0.6*(revenue/cout) + 0.4*reliability_total
+                sim.list_profit_reability.append(reliability_total)
+                sim.list_profit_r2c.append(revenue/cout)
+                sim.list_profit.append(r)
 
                 print("the reward total: ", r)
 
@@ -828,10 +834,15 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(2)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
-                controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
+                controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
+                episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
+                episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
+                episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
+ 
+
                 print("the lost requests: ", controller.simulation.reject_r_issue)
                 print("the lost requests: ", controller.simulation.reject_nslr)
                 print("the attended requests: ", controller.simulation.attended_reqs)
@@ -839,19 +850,19 @@ def main():
                 print ("the terminated events: ", controller.simulation.terminate_events)
                 print("the acceptence ratio: ", (controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100 )
 
-
-
-
-                f = open("deepsara_"+str(m)+ "_10BA_1epi_run-time15.txt","w+")
-           
+                f = open("deepsara_"+str(m)+ "_10BA_1epi_run-time15.txt","a+")
                 f.write("the episode: "+ str(j)+"\n\n")
-
                 f.write("the lost requests r issue: "+ str(controller.simulation.reject_r_issue)+"\n\n")
                 f.write("the lost requests ressource issue: "+ str(controller.simulation.reject_nslr)+"\n\n")
                 f.write("the attended requests: "+ str(controller.simulation.attended_reqs)+"\n\n")
                 f.write("the accepted requests: "+ str(controller.simulation.accepted_reqs)+"\n\n")
                 f.write("the terminated events: "+  str(controller.simulation.terminate_events)+"\n\n")
                 f.write("the acceptence ratio: "+ str((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)+"\n\n")
+                f.write("the episode profit "+  str(episode_profit)+"\n\n")
+                f.write("the episode_profit_r2c "+  str(episode_profit_r2c)+"\n\n")
+                f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
+
+
                 f.close()
 
 

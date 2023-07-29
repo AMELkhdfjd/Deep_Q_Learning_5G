@@ -105,7 +105,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                             #print("enter to insufficient ressources")
 
     if (index == len(vnfs)-1): ## we are on the last vnf
-            print("the total reliability:  ", reliability_total)
+            #print("the total reliability:  ", reliability_total)
             if(reliability_total*reliability <= req.nsl_graph["reliability"]):
                 reliability = -1
                 rejected = True
@@ -216,11 +216,11 @@ def analyze_links(nsl_graph, index, substrate): ## returns the length of the pat
     vnf = nsl_graph["vnfs"][index] ## att: we work only with vnodes 
     vnfs = nsl_graph["vnfs"]
     path = []
-    print("the vnf to place is : ", vnf["id"])
-    print("the vnfs: ", vnfs)
+    #print("the vnf to place is : ", vnf["id"])
+    #print("the vnfs: ", vnfs)
     for vlink in vlinks:
         #print("the target vlink : ", vlink["target"])
-        print("the error here: ", vnf["id"], vlink["source"], vlink["target"])
+        #print("the error here: ", vnf["id"], vlink["source"], vlink["target"])
         if vnf["id"] == vlink["target"]: 
             substrate_dst = vnf["mapped_to"]
             #print("the substrate_dst :", vnf["mapped_to"])
