@@ -216,10 +216,11 @@ def analyze_links(nsl_graph, index, substrate): ## returns the length of the pat
     vnf = nsl_graph["vnfs"][index] ## att: we work only with vnodes 
     vnfs = nsl_graph["vnfs"]
     path = []
-    #print("the vnf to place is : ", vnf["id"])
+    print("the vnf to place is : ", vnf["id"])
+    print("the vnfs: ", vnfs)
     for vlink in vlinks:
         #print("the target vlink : ", vlink["target"])
-        #print("the error here: ", vnf["id"], vlink["source"], vlink["target"])
+        print("the error here: ", vnf["id"], vlink["source"], vlink["target"])
         if vnf["id"] == vlink["target"]: 
             substrate_dst = vnf["mapped_to"]
             #print("the substrate_dst :", vnf["mapped_to"])

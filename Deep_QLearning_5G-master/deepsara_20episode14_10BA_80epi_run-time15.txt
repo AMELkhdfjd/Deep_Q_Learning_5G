@@ -1,1 +1,0 @@
-the lost requests r issue: 37the lost requests ressource issue: 656the attended requests: 868the accepted requests: 175the terminated events: 175the acceptence ratio: 20.161290322580644

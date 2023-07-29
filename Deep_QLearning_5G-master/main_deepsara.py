@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 80 #240##350
+episodes = 1 #240##350
 
 
 
@@ -457,7 +457,8 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     already_backup =[[], []]
     reliability_total = 1
     actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
-    revenu = 0
+    revenue = 0
+    cout  =0
 
     #sim.request = sim.request_list[sim.cpt]
 
@@ -493,11 +494,17 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
         a =   agente.step(state,r)  
         #print("THE ACTION : ", a)
+        print("THE ID : ", index)
 
         profit_reliability, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
         
-        
+        if (profit_reliability == -1): ## vnf rejected
+            r= -1
+            sim.reject_nslr = sim.reject_nslr +1
+            print("RESSOURCES ISSUE ____________________ ")
+            break
+
         reliability_total = reliability_total*profit_reliability
         r = 0
         #print("THE REWARD : ", r)
@@ -511,21 +518,36 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 sim.accepted_reqs = sim.accepted_reqs +1
 
                 ## define the new reward here:
-                for i in range(vnfs):
-                    revenue += vnfs["vnfs"]["cpu"] + vnfs["vlinks"]["bw"]
-                    cout += vnfs["vnfs"]["cpu"] + vnfs["vlinks"]["bw"] * len(vnfs["vlinks"]["mapped_to"])
-                    print("the path  is cout : ",len(vnfs["vlinks"]["mapped_to"], vnfs["vlinks"]["mapped_to"] ))
-                    print("cpu of revenu and bw: ", vnfs["vnfs"]["cpu"] , vnfs["vlinks"]["bw"])
-                    r = 0.6*(revenue/cout) + 0.4*reliability_total
+                for i in range(len(vnfs)):
+                    revenue += vnfs[i]["cpu"] 
+                    cout += vnfs[i]["cpu"] 
+                    print("the cpu is  : ",vnfs[i]["cpu"])
+                    
+                for j in range(len(vlinks)):
+                    revenue += vlinks[j]["bw"]
+                   
+                    if "mapped_to" in vlinks[j]:
+
+                        cout +=  vlinks[j]["bw"] * len(vlinks[j]["mapped_to"])
+                        print("the bw is : ", vlinks[j]["bw"], "mapped_to", vlinks[j]["mapped_to"], len(vlinks[j]["mapped_to"]))
+
+                    else:
+                        cout += 0
+                
+                r = 0.6*(revenue/cout) + 0.4*reliability_total
+
+                print("the reward total: ", r)
+
+
         
 
 
                 
-        else:
+        """else:
             if(r == -1):
                 sim.reject_nslr = sim.reject_nslr +1
                 print("RESSOURCES ISSUE ____________________ ")
-                break
+                break"""
             
 
     ## the original func_arrival
@@ -806,7 +828,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(2)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event     
@@ -820,15 +842,16 @@ def main():
 
 
 
-                f = open("deepsara_"+str(m)+ "episode" + str(j)+"_10BA_80epi_run-time15.txt","w+")
+                f = open("deepsara_"+str(m)+ "_10BA_1epi_run-time15.txt","w+")
            
-               
-                f.write("the lost requests r issue: "+ str(controller.simulation.reject_r_issue))
-                f.write("the lost requests ressource issue: "+ str(controller.simulation.reject_nslr))
-                f.write("the attended requests: "+ str(controller.simulation.attended_reqs))
-                f.write("the accepted requests: "+ str(controller.simulation.accepted_reqs))
-                f.write("the terminated events: "+  str(controller.simulation.terminate_events))
-                f.write("the acceptence ratio: "+ str((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100))
+                f.write("the episode: "+ str(j)+"\n\n")
+
+                f.write("the lost requests r issue: "+ str(controller.simulation.reject_r_issue)+"\n\n")
+                f.write("the lost requests ressource issue: "+ str(controller.simulation.reject_nslr)+"\n\n")
+                f.write("the attended requests: "+ str(controller.simulation.attended_reqs)+"\n\n")
+                f.write("the accepted requests: "+ str(controller.simulation.accepted_reqs)+"\n\n")
+                f.write("the terminated events: "+  str(controller.simulation.terminate_events)+"\n\n")
+                f.write("the acceptence ratio: "+ str((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)+"\n\n")
                 f.close()
 
 
