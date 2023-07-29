@@ -151,7 +151,8 @@ class Agent(object):
                  max_explore=1,
                  min_explore=0.05,
                  anneal_rate=(1/5000), #100000),
-                 replay_memory_size=100000,
+                 #replay_memory_size=100000,
+                 replay_memory_size=1000000000,
                  replay_start_size= 500): #500): #10000): #despues de n steps comienza el replay
         """Set parameters, initialize network."""
         self.action_space_size = action_space_size

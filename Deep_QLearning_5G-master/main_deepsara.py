@@ -457,6 +457,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     already_backup =[[], []]
     reliability_total = 1
     actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
+    revenu = 0
 
     #sim.request = sim.request_list[sim.cpt]
 
@@ -489,12 +490,16 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
         # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
         #print("the state is : ", state)
+
         a =   agente.step(state,r)  
         #print("THE ACTION : ", a)
 
         profit_reliability, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
-        r = profit_reliability
-        reliability_total = reliability_total*r 
+        #r = profit_reliability  #here for the first solution
+        
+        
+        reliability_total = reliability_total*profit_reliability
+        r = 0
         #print("THE REWARD : ", r)
         ## adding the reward of the entire nslr
         if (index == len(vnfs)-1): ## we are on the last vnf
@@ -504,7 +509,18 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 break
             else: ## means we have instantiated one whole nslr
                 sim.accepted_reqs = sim.accepted_reqs +1
-                #print("accepted requests: ", sim.accepted_reqs)
+
+                ## define the new reward here:
+                for i in range(vnfs):
+                    revenue += vnfs["vnfs"]["cpu"] + vnfs["vlinks"]["bw"]
+                    cout += vnfs["vnfs"]["cpu"] + vnfs["vlinks"]["bw"] * len(vnfs["vlinks"]["mapped_to"])
+                    print("the path  is cout : ",len(vnfs["vlinks"]["mapped_to"], vnfs["vlinks"]["mapped_to"] ))
+                    print("cpu of revenu and bw: ", vnfs["vnfs"]["cpu"] , vnfs["vlinks"]["bw"])
+                    r = 0.6*(revenue/cout) + 0.4*reliability_total
+        
+
+
+                
         else:
             if(r == -1):
                 sim.reject_nslr = sim.reject_nslr +1
@@ -538,13 +554,14 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     
     print("*******************  terminating")
     sim.terminate_events += 1
+    
     G = nx.Graph()
    
 
 ############## BEFORE 
 
     
-    if c.cpt == 0:
+    if sim.terminate_events == 20:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             #print("node:, ", node["id"])
@@ -567,7 +584,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 ############ REQUEST
     
 
-    if c.cpt == 0:
+    if sim.terminate_events == 20:
         for node in request.nsl_graph["vnfs"]:
             G.add_node(node["id"], cpu=node["cpu"], mapped=node["mapped_to"])
             
@@ -587,7 +604,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 
 ################ AFTER
     
-    if c.cpt == 0:
+    if sim.terminate_events == 20:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             #print("node:, ", node["id"])
