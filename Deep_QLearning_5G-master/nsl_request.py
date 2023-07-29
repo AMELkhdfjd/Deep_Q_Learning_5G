@@ -107,7 +107,7 @@ def get_operation_time(mean_operation_time):
     if round(value[0])== 0: #and round(value[0]) <= 180: #60: #para evitar duraciones de 0 y mayores a un valor
         value[0] = 1 ## to times under 1    
     #return round(value[0])
-    return 0.3
+    return 0.2
    
    
 
