@@ -93,5 +93,9 @@ pip3 install matplotlib
 
 
 
+Notes:
+
+on the vm, all the env is installed, u can delete the directory and clone again with no issue
+
 
 gcloud compute ssh --zone "europe-west2-c" "pfe" --project "atlantean-glyph-387919"

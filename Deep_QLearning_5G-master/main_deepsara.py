@@ -843,6 +843,7 @@ def main():
                 episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
  
 
+
                 print("the lost requests: ", controller.simulation.reject_r_issue)
                 print("the lost requests: ", controller.simulation.reject_nslr)
                 print("the attended requests: ", controller.simulation.attended_reqs)
