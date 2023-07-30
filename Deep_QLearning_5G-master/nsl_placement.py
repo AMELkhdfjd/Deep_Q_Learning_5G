@@ -97,17 +97,20 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                         substrate.graph["nodes"][n["id"]]["cpu"]  = substrate.graph["nodes"][n["id"]]["cpu"] - vnf["cpu"] ## to update the ressource of the node, new
                         #n["cpu"]  = n["cpu"] - vnf["cpu"] 
                         substrate.graph["centralized_cpu"] -= vnf["cpu"]
+                        print("ACCEPT VNF")
                         
                 
     else: # insufficient resource, vnode rejected    
 
                                                                 ## we are in the last vnode
                             rejected = True    
+                            print("REJECT VNF")
                             #print("enter to insufficient ressources")
 
     if (index == len(vnfs)-1): ## we are on the last vnf
             #print("the total reliability:  ", reliability_total)
             if(reliability_total*reliability <= req.nsl_graph["reliability"]):
+                print("coucou :", reliability_total*reliability)
                 reliability = -1
                 rejected = True
                 rejected_r = True

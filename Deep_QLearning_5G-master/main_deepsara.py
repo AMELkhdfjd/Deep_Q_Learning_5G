@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 3 #240##350
 
 
 
@@ -451,13 +451,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     global counter_windows
     sim = c.simulation 
     
-    
-    num_urllc_1 = 0
-    num_urllc_2 = 0
-    num_urllc_3 = 0
-    step_urllc_1_profit_reability =0
-    step_urllc_2_profit_reability =0
-    step_urllc_3_profit_reability =0
+
     already_backup =[[], []]
     reliability_total = 1
     actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
@@ -491,17 +485,19 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
         state = state.tolist()[0]
+        print("THE ID ", index)
 
         #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
         # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
         #print("the state is : ", state)
 
         a =   agente.step(state,r)  
+        print("THE ACTION", a)
        
-     
 
         profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
+        print("REA VNF: ", profit_reliability)
         r = 0
          
         if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
@@ -509,24 +505,29 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
                 sim.reject_nslr = sim.reject_nslr +1
+                print("VNF REJECT --- RSC")
                 
                 break
             else: ## its the last one
                 if(rejected_r): ## reliability issue
                     r = -1
                     sim.reject_r_issue = sim.reject_r_issue+1
-                    print("AMEEEEEl")
+                    print("VNF REJECT --- REA")
                     break
                 else: ## last vnf and ressource issue
                     r = -1
                     sim.reject_nslr = sim.reject_nslr +1
+                    print("VNF REJECT --- RSC LAST")
                    
                     break
         else:
+            reliability_total = reliability_total*profit_reliability ##### ATT erreur grave
+            print("the reability till now: ", reliability_total)
             if (index == len(vnfs)-1):
-                reliability_total = reliability_total*profit_reliability
+
+                
                 sim.accepted_reqs = sim.accepted_reqs +1
-                print("accept")
+                print("ACCEPT")
 
                 ## define the new reward here:
                 for i in range(len(vnfs)):
@@ -539,16 +540,20 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                    
                     if "mapped_to" in vlinks[j]:
 
-                        cout +=  vlinks[j]["bw"] * len(vlinks[j]["mapped_to"])
-                        #print("the bw is : ", vlinks[j]["bw"], "mapped_to", vlinks[j]["mapped_to"], len(vlinks[j]["mapped_to"]))
+                        cout +=  vlinks[j]["bw"] * (len(vlinks[j]["mapped_to"])-1)
+                        print("the bw is : ", vlinks[j]["bw"], "mapped_to", vlinks[j]["mapped_to"], len(vlinks[j]["mapped_to"]))
 
                     else:
                         cout += 0
+                print("revenu: ", revenue)
+                print("cout: ", cout)
                 
                 r = 0.6*(revenue/cout) + 0.4*reliability_total
                 sim.list_profit_reability.append(reliability_total)
                 sim.list_profit_r2c.append(revenue/cout)
+                
                 sim.list_profit.append(r)
+               
 
                 print("the reward total: ", r)
 
@@ -841,7 +846,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
@@ -856,6 +861,8 @@ def main():
                 print("the accepted requests: ", controller.simulation.accepted_reqs)
                 print ("the terminated events: ", controller.simulation.terminate_events)
                 print("the acceptence ratio: ", (controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100 )
+
+                print ("the reability total of each request ", controller.simulation.list_profit_reability)
 
                 f = open("deepsara_"+str(m)+ "_10BA_1epi_run-time15.txt","a+")
                 f.write("the episode: "+ str(j)+"\n\n")
@@ -875,52 +882,7 @@ def main():
 
             #bot.sendMessage("Repetition " + str(i) + " finishes!")
             
-            #f = open("deepsara_"+str(m)+"_16BA_9de10sta_30actv22_wWWWW2_maxexpl05_btchsz15_rpsrtsz400_anrate1-400_1h150ns_350epi_prioritizerv6.txt","w+")
-            
-
-"""
-            
-
-            f.write("Repetition: "+str(i)+"\n")
-            f.write("**Reward:\n")
-            f.write(str(total_profit_rep)+"\n\n")
-            f.write("**latency_profit_rep:\n")
-            f.write(str(latency_profit_rep)+"\n\n")
-            f.write("**reability_profit_rep:\n")
-            f.write(str(reability_profit_rep)+"\n\n")
-            f.write("**central_profit_rep:\n")
-            f.write(str(central_profit_rep)+"\n\n")
-            f.write("**profit_urllc_1_rep:\n")
-            f.write(str(profit_urllc_1_rep)+"\n\n")
-            f.write("**profit_urllc_2_rep:\n")
-            f.write(str(profit_urllc_2_rep)+"\n\n")
-            f.write("**profit_urllc_3_rep:\n")
-            f.write(str(profit_urllc_3_rep)+"\n\n")
-
-            f.write("**Acceptance Rate:\n")
-            f.write(str(acpt_rate_rep)+"\n\n")
-            f.write("**acpt_rate_urllc_1_rep:\n")
-            f.write(str(acpt_rate_urllc_1_rep)+"\n\n")
-            f.write("**acpt_rate_urllc_2_rep:\n")
-            f.write(str(acpt_rate_urllc_2_rep)+"\n\n")
-            f.write("**acpt_rate_urllc_3_rep:\n")
-            f.write(str(acpt_rate_urllc_3_rep)+"\n\n")"""
-
-"""f.write("**total_utl_rep:\n")
-            f.write(str(total_utl_rep)+"\n\n")
-            f.write("**node_utl_rep:\n")
-            f.write(str(node_utl_rep)+"\n\n")
-            f.write("**link_utl_rep:\n")
-            f.write(str(link_utl_rep)+"\n\n")
-            f.write("**central_utl_rep:\n")
-            f.write(str(central_utl_rep)+"\n\n")
-            f.write("**urllc_1_utl_rep:\n")
-            f.write(str(urllc_1_utl_rep)+"\n\n")
-            f.write("**urllc_2_utl_rep:\n")
-            f.write(str(urllc_2_utl_rep)+"\n\n")
-            f.write("**urllc_3_utl_rep:\n")
-            f.write(str(urllc_3_utl_rep)+"\n\n")        
-            f.close()"""
+  
             
 
 if __name__ == '__main__':
