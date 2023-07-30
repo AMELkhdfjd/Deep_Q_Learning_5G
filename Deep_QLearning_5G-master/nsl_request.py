@@ -37,7 +37,7 @@ nsl_graph_urllc_1 =  {
                         #{"source":4,"target":6}
 
             ], 
-            "reliability":0.7
+            "reliability":0.95
 }
 
 nsl_graph_urllc_2 =  {
@@ -66,7 +66,7 @@ nsl_graph_urllc_2 =  {
                         {"source":1,"target":5},
                         {"source":3,"target":4}
             ],
-            "reliability":0.7
+            "reliability":0.95
 }
 nsl_graph_urllc_3 =  {
             "vnfs": [
@@ -82,7 +82,7 @@ nsl_graph_urllc_3 =  {
                         {"source":2,"target":3},
                         {"source":3,"target":4}
             ],
-            "reliability":0.7
+            "reliability":0.95
 }
 
 class NSLR():

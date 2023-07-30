@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 100 #240##350
+episodes = 1 #240##350
 
 
 
@@ -338,7 +338,7 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
     vnf = vnfs[index]
     reliability = 0    
 
-    rejected, reliability, already_backup = nsl_placement.nsl_placement(req, index, substrate, already_backup, a, reliability_total)#mapping  ## here try to allocate the nslr req in the substrate graph
+    rejected, rejected_r, reliability, already_backup = nsl_placement.nsl_placement(req, index, substrate, already_backup, a, reliability_total)#mapping  ## here try to allocate the nslr req in the substrate graph
         
     if not rejected: ## successfully mapped
          
@@ -367,7 +367,7 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
             
         
              
-    return profit_reliability, already_backup
+    return profit_reliability, rejected_r, already_backup
 
 
 
@@ -497,28 +497,36 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         #print("the state is : ", state)
 
         a =   agente.step(state,r)  
+       
      
 
-        profit_reliability, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
+        profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
-        
-        if (profit_reliability == -1): ## vnf rejected
-            r= -1
-            sim.reject_nslr = sim.reject_nslr +1
-            print("RESSOURCES ISSUE ____________________ ")
-            break
-
-        reliability_total = reliability_total*profit_reliability
         r = 0
-        #print("THE REWARD : ", r)
-        ## adding the reward of the entire nslr
-        if (index == len(vnfs)-1): ## we are on the last vnf
-            if(reliability_total <= sim.request.nsl_graph["reliability"]):
+         
+        if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
+
+            if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
-                sim.reject_r_issue = sim.reject_r_issue+1
+                sim.reject_nslr = sim.reject_nslr +1
+                
                 break
-            else: ## means we have instantiated one whole nslr
+            else: ## its the last one
+                if(rejected_r): ## reliability issue
+                    r = -1
+                    sim.reject_r_issue = sim.reject_r_issue+1
+                    print("AMEEEEEl")
+                    break
+                else: ## last vnf and ressource issue
+                    r = -1
+                    sim.reject_nslr = sim.reject_nslr +1
+                   
+                    break
+        else:
+            if (index == len(vnfs)-1):
+                reliability_total = reliability_total*profit_reliability
                 sim.accepted_reqs = sim.accepted_reqs +1
+                print("accept")
 
                 ## define the new reward here:
                 for i in range(len(vnfs)):
@@ -543,7 +551,6 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 sim.list_profit.append(r)
 
                 print("the reward total: ", r)
-
 
         
 
@@ -589,7 +596,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 ############## BEFORE 
 
     
-    if sim.terminate_events == 20:
+    if sim.terminate_events == 50:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             #print("node:, ", node["id"])
@@ -612,7 +619,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 ############ REQUEST
     
 
-    if sim.terminate_events == 20:
+    if sim.terminate_events == 50:
         for node in request.nsl_graph["vnfs"]:
             G.add_node(node["id"], cpu=node["cpu"], mapped=node["mapped_to"])
             
@@ -632,7 +639,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 
 ################ AFTER
     
-    if sim.terminate_events == 20:
+    if sim.terminate_events == 50:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             #print("node:, ", node["id"])
@@ -834,7 +841,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
@@ -842,7 +849,6 @@ def main():
                 episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
                 episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
  
-
 
                 print("the lost requests: ", controller.simulation.reject_r_issue)
                 print("the lost requests: ", controller.simulation.reject_nslr)

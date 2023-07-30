@@ -76,6 +76,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
     ################### vnfs admission #################  
     ## here we have only two vnodes according if the vnfs are primary or backup, then aleardy will be used to put them in different nodes 
     rejected = False
+    rejected_r = False
     n = substrate.graph["nodes"][a]
     reliability = 0
     #already_backup = [[],[]] #list of nodes that already hold a vnode
@@ -109,6 +110,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
             if(reliability_total*reliability <= req.nsl_graph["reliability"]):
                 reliability = -1
                 rejected = True
+                rejected_r = True
                
                 print("REABIILTY ISSUE --------------------- ")
 
@@ -158,7 +160,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
     #if rejected:
          #print("\n\n","***rejected by the lack of link rsc","\n\n")
     
-    return rejected, reliability, already_backup
+    return rejected, rejected_r, reliability, already_backup
 
 
 

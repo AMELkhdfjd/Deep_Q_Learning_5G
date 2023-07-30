@@ -99,3 +99,12 @@ on the vm, all the env is installed, u can delete the directory and clone again 
 
 
 gcloud compute ssh --zone "europe-west2-c" "pfe" --project "atlantean-glyph-387919"
+
+
+to clone a repo to my vm: git clone https://AMELkhdfjd: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@github.com/AMELkhdfjd/Deep_Q_Learning_5G.git  --branch=main PFE
+
+
+run in detached mode: nohup python3 /path/to/main.py > output.log 2>&1 &
+
+
+

@@ -1,104 +1,80 @@
 the episode: 0
 
-the lost requests r issue: 0
+the lost requests r issue: 32
 
-the lost requests ressource issue: 5
+the lost requests ressource issue: 824
 
-the attended requests: 96
+the attended requests: 910
 
-the accepted requests: 91
+the accepted requests: 54
 
-the terminated events: 78
+the terminated events: 54
 
-the acceptence ratio: 94.79166666666666
+the acceptence ratio: 5.934065934065933
 
-the episode: 1
+the episode profit 0.9516061995294244
 
-the lost requests r issue: 0
+the episode_profit_r2c 0.9261214436601515
 
-the lost requests ressource issue: 26
+the episode_profit_reability 0.9898333333333329
 
-the attended requests: 130
+the episode: 0
 
-the accepted requests: 104
+the lost requests r issue: 32
 
-the terminated events: 96
+the lost requests ressource issue: 180
 
-the acceptence ratio: 80.0
+the attended requests: 280
 
-the episode: 2
+the accepted requests: 68
 
-the lost requests r issue: 0
+the terminated events: 68
 
-the lost requests ressource issue: 11
+the acceptence ratio: 24.285714285714285
 
-the attended requests: 103
+the episode profit 0.9483226703150304
 
-the accepted requests: 92
+the episode_profit_r2c 0.920626019152502
 
-the terminated events: 86
+the episode_profit_reability 0.989867647058823
 
-the acceptence ratio: 89.32038834951457
+the episode: 0
+
+the lost requests r issue: 35
+
+the lost requests ressource issue: 252
+
+the attended requests: 330
+
+the accepted requests: 43
+
+the terminated events: 43
+
+the acceptence ratio: 13.030303030303031
+
+the episode profit 0.9517239984547394
+
+the episode_profit_r2c 0.925912090447822
+
+the episode_profit_reability 0.990441860465116
 
 the episode: 0
 
 the lost requests r issue: 0
 
-the lost requests ressource issue: 22
+the lost requests ressource issue: 0
 
-the attended requests: 124
+the attended requests: 279
 
-the accepted requests: 102
+the accepted requests: 279
 
-the terminated events: 92
+the terminated events: 269
 
-the acceptence ratio: 82.25806451612904
+the acceptence ratio: 100.0
 
-the episode: 1
+the episode profit 0.9474479072388524
 
-the lost requests r issue: 0
+the episode_profit_r2c 0.9223558310611708
 
-the lost requests ressource issue: 23
-
-the attended requests: 122
-
-the accepted requests: 99
-
-the terminated events: 91
-
-the acceptence ratio: 81.14754098360656
-
-the episode: 2
-
-the lost requests r issue: 0
-
-the lost requests ressource issue: 18
-
-the attended requests: 115
-
-the accepted requests: 97
-
-the terminated events: 86
-
-the acceptence ratio: 84.34782608695653
-
-the episode: 0
-
-the lost requests r issue: 0
-
-the lost requests ressource issue: 67
-
-the attended requests: 179
-
-the accepted requests: 112
-
-the terminated events: 112
-
-the acceptence ratio: 62.56983240223464
-
-the episode profit 0.8698594470218517
-
-the episode_profit_r2c 0.9170604354577764
-
-the episode_profit_reability 0.7990579643679642
+the episode_profit_reability 0.9850860215053777
 
