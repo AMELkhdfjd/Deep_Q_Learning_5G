@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 6 #240##350
+episodes = 3 #240##350
 
 
 
@@ -590,9 +590,9 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
    
 
 ############## BEFORE 
-"""
+
     
-    if sim.terminate_events == 50:
+    """if sim.terminate_events == 50:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             #print("node:, ", node["id"])
@@ -607,7 +607,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in c.substrate.graph["links"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
         plt.axis('off')
-        plt.savefig("BEFORE.png") # save as png 
+        plt.savefig("BEFORE.png") # save as png """
        
     request = evt.extra
     update_resources(c.substrate,request,True)
@@ -615,7 +615,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
 ############ REQUEST
     
 
-    if sim.terminate_events == 50:
+    """if sim.terminate_events == 50:
         for node in request.nsl_graph["vnfs"]:
             G.add_node(node["id"], cpu=node["cpu"], mapped=node["mapped_to"])
             
@@ -630,12 +630,12 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in request.nsl_graph["vlinks"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
         plt.axis('off')
-        plt.savefig("req.png") # save as png 
+        plt.savefig("req.png")""" # save as png """
 
 
 ################ AFTER
     
-    if sim.terminate_events == 50:
+"""if sim.terminate_events == 50:
         for node in c.substrate.graph["nodes"]:
             G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             #print("node:, ", node["id"])
@@ -837,7 +837,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
