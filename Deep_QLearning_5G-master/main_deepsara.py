@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 6 #240##350
 
 
 
@@ -485,19 +485,19 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
         state = state.tolist()[0]
-        print("THE ID ", index)
+        #print("THE ID ", index)
 
         #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
         # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
         #print("the state is : ", state)
 
         a =   agente.step(state,r)  
-        print("THE ACTION", a)
+        #print("THE ACTION", a)
        
 
         profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
-        print("REA VNF: ", profit_reliability)
+        #print("REA VNF: ", profit_reliability)
         r = 0
          
         if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
@@ -505,29 +505,29 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
                 sim.reject_nslr = sim.reject_nslr +1
-                print("VNF REJECT --- RSC")
+                #print("VNF REJECT --- RSC")
                 
                 break
             else: ## its the last one
                 if(rejected_r): ## reliability issue
                     r = -1
                     sim.reject_r_issue = sim.reject_r_issue+1
-                    print("VNF REJECT --- REA")
+                    #print("VNF REJECT --- REA")
                     break
                 else: ## last vnf and ressource issue
                     r = -1
                     sim.reject_nslr = sim.reject_nslr +1
-                    print("VNF REJECT --- RSC LAST")
+                    #print("VNF REJECT --- RSC LAST")
                    
                     break
         else:
             reliability_total = reliability_total*profit_reliability ##### ATT erreur grave
-            print("the reability till now: ", reliability_total)
+            #print("the reability till now: ", reliability_total)
             if (index == len(vnfs)-1):
 
                 
                 sim.accepted_reqs = sim.accepted_reqs +1
-                print("ACCEPT")
+                #print("ACCEPT")
 
                 ## define the new reward here:
                 for i in range(len(vnfs)):
@@ -545,8 +545,8 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
                     else:
                         cout += 0
-                print("revenu: ", revenue)
-                print("cout: ", cout)
+                #print("revenu: ", revenue)
+                #print("cout: ", cout)
                 
                 r = 0.6*(revenue/cout) + 0.4*reliability_total
                 sim.list_profit_reability.append(reliability_total)
@@ -555,7 +555,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 sim.list_profit.append(r)
                
 
-                print("the reward total: ", r)
+                #print("the reward total: ", r)
 
         
 
@@ -572,8 +572,8 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
 
-    print("EVENTSSSSSSSSSSSSSS ")
-    sim.print_eventos()
+    #print("EVENTSSSSSSSSSSSSSS ")
+    #sim.print_eventos()
 
 
 
@@ -590,7 +590,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
    
 
 ############## BEFORE 
-
+"""
     
     if sim.terminate_events == 50:
         for node in c.substrate.graph["nodes"]:
@@ -651,7 +651,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
         plt.axis('off')
         plt.savefig("AFTER.png") # save as png 
-        c.cpt +=1
+        c.cpt +=1"""
         
     
   
@@ -837,7 +837,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(3)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
