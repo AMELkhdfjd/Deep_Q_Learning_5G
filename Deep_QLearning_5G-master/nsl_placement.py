@@ -143,7 +143,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                 n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] ) )## returns the phisical node mapped to the vnode                
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
                 substrate.graph["nodes"][n["id"]]["cpu"] += vnf["cpu"]
-                print("recharge: ", n["cpu"], substrate.graph["nodes"][n["id"]] , n["id"])
+                #print("recharge: ", n["cpu"], substrate.graph["nodes"][n["id"]] , n["id"])
 
                 
                 substrate.graph["centralized_cpu"] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
