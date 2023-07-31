@@ -117,15 +117,42 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                
                 print("REABIILTY ISSUE --------------------- ")
 
+
+
+    G = nx.Graph()
+
+    for node in substrate.graph["nodes"]:
+            G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
             
+    for link in substrate.graph["links"]:
+            G.add_edge(link["source"], link["target"], bw=link["bw"])
+    pos = nx.spring_layout(G, 0.5)
+    plt.figure() 
+    nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightblue')
+    nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
+    node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nP: {node['p']}" for node in substrate.graph["nodes"]}
+    nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
+    edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in substrate.graph["links"]}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+    plt.axis('off')
+    plt.savefig("Before_UPdate.png")
 
     if rejected: ## free the ressources taken in the allocation process
         for vnf in vnfs:#the nodes of the reduced graph of the accepted nslr are traversed   
             if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
                 n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] ) )## returns the phisical node mapped to the vnode                
                 n["cpu"] = n["cpu"] + vnf["cpu"] ## kill will free the ressources, we will add the cpu taken to the phisical noode's cpu
+                substrate.graph["nodes"][n["id"]]["cpu"] += vnf["cpu"]
+                print("recharge: ", n["cpu"], substrate.graph["nodes"][n["id"]] , n["id"])
+
+                
                 substrate.graph["centralized_cpu"] += vnf["cpu"] ## add the cpu freed to the sum of cpu ressource of all the graph
         
+
+
+
+
+
 
         links = copy.deepcopy(substrate.graph["links"])
         ## update the links in case reject of the request
@@ -143,6 +170,22 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                    
                 except StopIteration:
                     pass
+        G = nx.Graph()
+        for node in substrate.graph["nodes"]:
+                G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
+
+        for link in substrate.graph["links"]:
+                G.add_edge(link["source"], link["target"], bw=link["bw"])
+        pos = nx.spring_layout(G, 0.5)
+        plt.figure() 
+        nx.draw_networkx_nodes(G, pos, node_size=2000, node_color='lightblue')
+        nx.draw_networkx_edges(G, pos, width=1, alpha=0.9, edge_color='gray')
+        node_labels = {node["id"]: f"ID: {node['id']}\nCPU: {node['cpu']}\nP: {node['p']}" for node in substrate.graph["nodes"]}
+        nx.draw_networkx_labels(G, pos, node_labels, font_size=10, font_color='black', verticalalignment='center')
+        edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in substrate.graph["links"]}
+        nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
+        plt.axis('off')
+        plt.savefig("After_update.png")
                
         
    
@@ -156,6 +199,8 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
     if not rejected:
         #print("VNF n°:  ", index, "MAPPED TO : ",  n["id"], "with profit:  ", n["p"])
         rejected, n_hops = analyze_links(req.nsl_graph,index, substrate)
+        if rejected:
+            print("LIIIIIIINKS", rejected)
         #print("decision after analyse links", rejected, "number of hops", n_hops)
     #else:
          #print("\n\n","***rejected by the lack of node rsc","\n\n")

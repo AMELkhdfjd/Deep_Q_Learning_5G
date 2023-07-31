@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 3 #240##350
+episodes = 1 #240##350
 
 
 
@@ -559,13 +559,6 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
         
 
-
-                
-        """else:
-            if(r == -1):
-                sim.reject_nslr = sim.reject_nslr +1
-                print("RESSOURCES ISSUE ____________________ ")
-                break"""
             
 
     ## the original func_arrival
@@ -579,10 +572,8 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
 
-    #print("EVENTSSSSSSSSSSSSSS ")
-    #print(str(evt), end=" > \n")
-    #sim.print_eventos()
-    ## the request variable will be changed here, and storing the new urllc request for the arriving event
+    print("EVENTSSSSSSSSSSSSSS ")
+    sim.print_eventos()
 
 
 
@@ -846,7 +837,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(3)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
