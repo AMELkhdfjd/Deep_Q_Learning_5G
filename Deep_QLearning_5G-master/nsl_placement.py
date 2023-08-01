@@ -122,7 +122,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
  
 
     if rejected: ## free the ressources taken in the allocation process
-        G = nx.Graph()
+        """G = nx.Graph()
 
         for node in substrate.graph["nodes"]:
                 G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
@@ -138,7 +138,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in substrate.graph["links"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
         plt.axis('off')
-        plt.savefig("Before_UPdate.png")
+        plt.savefig("Before_UPdate.png")"""
         for vnf in vnfs:#the nodes of the reduced graph of the accepted nslr are traversed   
             if "mapped_to" in vnf:## the vnode is mapped to one of the phisical nodes
                 n = next(n for n in nodes if (n["id"] == vnf["mapped_to"] ) )## returns the phisical node mapped to the vnode                
@@ -172,7 +172,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                    
                 except StopIteration:
                     pass
-        G = nx.Graph()
+        """G = nx.Graph()
         for node in substrate.graph["nodes"]:
                 G.add_node(node["id"], cpu=node["cpu"], p=node["p"])
 
@@ -187,7 +187,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
         edge_labels = {(link["source"], link["target"]): str(link["bw"]) for link in substrate.graph["links"]}
         nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8, font_color='black')
         plt.axis('off')
-        plt.savefig("After_update.png")
+        plt.savefig("After_update.png")"""
                
         
    

@@ -21,6 +21,9 @@ from param_parser import parameter_parser ## for the gcn
 # seed = 0
 repetitions = 1 #33
 twindow_length = 1
+
+global last_reward
+last_reward = 0
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
 # urllc_3_arrival_rate = 10 #5#1#2 #reqXsecond
@@ -452,6 +455,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
     global counter_windows
+    global last_reward
     sim = c.simulation 
     
 
@@ -471,15 +475,17 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     sim.attended_reqs = sim.attended_reqs +1
     print("TYPE  : ", evt.extra["service_type"])
     ## here we should take the action and state from the last request placement:
-    if(evt.extra["first_event"] == True):
+    """if(evt.extra["first_event"] == True):
             r = 0
             #a = agente.step(state,0) ## this returns the action taken, here we call the function step from the dql file, give state, reward, training=true, 
            
     else:
-            r = evt.extra["current_reward"]
+            #r = evt.extra["current_reward"]
+            r = last_reward"""
             #print("the reward outside the loop is : ", r)
 
-
+    r = last_reward
+    #print("the last reward of nslr", last_reward)
     for index, vnf in enumerate(vnfs):
 
         
@@ -493,33 +499,37 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
         # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
         #print("the state is : ", state)
-
+        #print("the reward updated: ", r)
         a = agente.step(state,r)  
       
        
 
         profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
-        print("ACTION : ", a,"REAB VNF: ", profit_reliability)
+        #print("ACTION : ", a,"REAB VNF: ", profit_reliability)
         r = 0
          
         if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
+            
 
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
                 sim.reject_nslr = sim.reject_nslr +1
                 #print("VNF REJECT --- RSC")
+                last_reward = r
                 
                 break
             else: ## its the last one
                 if(rejected_r): ## reliability issue
                     r = -1
                     sim.reject_r_issue = sim.reject_r_issue+1
-                    #print("VNF REJECT --- REA")
+                    #print("VNF REJECT --- REA", r)
+                    last_reward = r
                     break
                 else: ## last vnf and ressource issue
                     r = -1
                     sim.reject_nslr = sim.reject_nslr +1
+                    last_reward = r
                     #print("VNF REJECT --- RSC LAST")
                    
                     break
@@ -556,6 +566,11 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 sim.list_profit_r2c.append(revenue/cout)
                 
                 sim.list_profit.append(r)
+                last_reward = r
+
+     
+       
+        
                
 
                 #print("the reward total: ", r)
