@@ -45,7 +45,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
     #calculate_resource_potential(substrate,"cpu") ## for each node, sum of its links bw * node's cpu ATTTT: to rank the nodes based on the ones with more conx links and cpu capacity
     nodes = substrate.graph["nodes"] #copy to temporarily work with it
     #ranked_nodes_cpu = sort_nodes(nodes,"node_potential") #ranked list of nodes by potential considering cpu and conections     
-
+    links = substrate.graph["links"]
     rejected = False
     flag = False # to know if a vnode has not been mapped to nodes of the same type
     
@@ -79,6 +79,8 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
     rejected_r = False
     node = substrate.graph["nodes"][a]
     reliability = 0
+    latency_totale = 0
+
     #already_backup = [[],[]] #list of nodes that already hold a vnode
                              ## edit: getting the list from the ressource allocation function outside
     ### print("ranked nodes",ranked_nodes_cpu)
@@ -97,6 +99,8 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                         node["cpu"]  = node["cpu"] - vnf["cpu"] 
                         substrate.graph["centralized_cpu"] -= vnf["cpu"]
                         #print("ACCEPT VNF")
+                        ## need to update the links here
+
                         
                 
     else: # insufficient resource, vnode rejected    
@@ -108,7 +112,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
 
     if (index == len(vnfs)-1): ## we are on the last vnf
             #print("the total reliability:  ", reliability_total)
-            if(reliability_total*reliability <= req.nsl_graph["reliability"]):
+            if(reliability_total*reliability < req.nsl_graph["reliability"]):
                 #print("coucou :", reliability_total*reliability)
                 reliability = -1
                 rejected = True
@@ -203,12 +207,28 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
         rejected, n_hops = analyze_links(req.nsl_graph,index, substrate)
         if rejected:
             print("LIIIIIIINKS", rejected)
-        #print("decision after analyse links", rejected, "number of hops", n_hops)
-    #else:
-         #print("\n\n","***rejected by the lack of node rsc","\n\n")
-    ################### ------------- #################
-    #if rejected:
-         #print("\n\n","***rejected by the lack of link rsc","\n\n")
+        else:
+            if (index == len(vnfs)-1): 
+                for v in vnfs:
+                    latency_totale += nodes[v["mapped_to"]]["l"]
+                    #print("the latency of node: ", nodes[v["mapped_to"]]["l"], v["mapped_to"])
+                for vl in vlinks:
+                  if "mapped_to" in vl:
+                    path = vl["mapped_to"] ## path = [2, 3, 0, 7]
+                    print("the path:", path)
+                    for i in range(len(path)-1):
+                         source = path[i]
+                         destination = path[i+1]
+                         for j in range(len(links)):
+                            if (links[j]["source"] == source and links[j]["target"] == destination) or (links[j]["source"] == destination and links[j]["target"] == source):
+                                 latency_totale += links[j]["l"]
+                                 #print("the latency of link: ", links[j]["l"])
+                     
+                print("total latency: ", latency_totale)      
+                if (latency_totale  > )                                                                                                                                                                                                                                                               
+             
+        
+
     
     return rejected, rejected_r, reliability, already_backup
 

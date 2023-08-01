@@ -46,7 +46,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 2 #240##350
+episodes = 1 #240##350
 
 
 
@@ -500,16 +500,13 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
         state = state.tolist()[0]
         sim.nb_steps +=1
-        print("STEP: ", sim.nb_steps)
-        #print("THE ID ", index)
-        #print("the reward updated: ", r)
         a = agente.step(state,r)  
       
        
 
         profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
-        #print("ACTION : ", a,"REAB VNF: ", profit_reliability)
+        print("ACTION : ", a,"REAB VNF: ", profit_reliability)
         r = 0
          
         if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
@@ -518,7 +515,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
                 sim.reject_nslr = sim.reject_nslr +1
-                #print("VNF REJECT --- RSC")
+                print("VNF REJECT --- RSC")
                 last_reward = r
                 
                 break
@@ -526,14 +523,14 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 if(rejected_r): ## reliability issue
                     r = -1
                     sim.reject_r_issue = sim.reject_r_issue+1
-                    #print("VNF REJECT --- REA", r)
+                    print("VNF REJECT --- REA", r)
                     last_reward = r
                     break
                 else: ## last vnf and ressource issue
                     r = -1
                     sim.reject_nslr = sim.reject_nslr +1
                     last_reward = r
-                    #print("VNF REJECT --- RSC LAST")
+                    print("VNF REJECT --- RSC LAST")
                    
                     break
         else:
@@ -543,7 +540,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
                 
                 sim.accepted_reqs = sim.accepted_reqs +1
-                #print("ACCEPT")
+                print("ACCEPT")
 
                 ## define the new reward here:
                 for i in range(len(vnfs)):
@@ -871,7 +868,7 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(0.2)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
