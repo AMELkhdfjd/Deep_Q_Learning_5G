@@ -40,7 +40,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 4 #240##350
+episodes = 1 #240##350
 
 
 
@@ -417,7 +417,10 @@ def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 
 def get_state(substrate,simulation, index): ## returns the state of 9 parmas   
     args = parameter_parser()
 
-    labels_1 = [[node["p"], node["cpu"]] for node in substrate.graph["nodes"]]
+    #labels_1 = [[node["p"], node["cpu"]] for node in substrate.graph["nodes"]]
+    # Latency solution
+    labels_1 = [[node["p"], node["cpu"], node["l"]] for node in substrate.graph["nodes"]]
+
 
 # Extract links' "source" and "target" values into "graph_1"
     graph_1 = [[link["source"], link["target"]] for link in substrate.graph["links"]]
@@ -457,11 +460,11 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
     revenue = 0
     cout  =0
+ 
 
-    #sim.request = sim.request_list[sim.cpt]
+
 
     sim.request = nsl_request.get_nslr(evt.extra["id"],evt.extra["service_type"],mean_operation_time)
-    #print("toto: ", sim.request.nsl_graph, sim.request.id)
    
     vnfs = sim.request.nsl_graph["vnfs"]
     vlinks = sim.request.nsl_graph["vlinks"]
@@ -491,13 +494,13 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
         # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
         #print("the state is : ", state)
 
-        a =   agente.step(state,r)  
-        #print("THE ACTION", a)
+        a = agente.step(state,r)  
+      
        
 
         profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
-        #print("REA VNF: ", profit_reliability)
+        print("ACTION : ", a,"REAB VNF: ", profit_reliability)
         r = 0
          
         if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
@@ -574,8 +577,6 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
     #print("EVENTSSSSSSSSSSSSSS ")
     #sim.print_eventos()
-
-
 
 
 
@@ -837,7 +838,7 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(15)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(0.1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
