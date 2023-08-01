@@ -24,6 +24,9 @@ twindow_length = 1
 
 global last_reward
 last_reward = 0
+
+global episode 
+episode = 0
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
 # urllc_3_arrival_rate = 10 #5#1#2 #reqXsecond
@@ -119,6 +122,7 @@ class Sim:
                          ## more likely its the start time of the current event that is being treated
         self.run_till = 1 ## initially was -1
         self.total_reqs = 0
+        self.nb_steps =0
         #self.total_urllc_1_reqs = 0
         #self.total_urllc_2_reqs = 0
         #self.total_urllc_3_reqs = 0
@@ -456,6 +460,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
     global counter_windows
     global last_reward
+    global episode
     sim = c.simulation 
     
 
@@ -494,11 +499,9 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
         state = state.tolist()[0]
+        sim.nb_steps +=1
+        print("STEP: ", sim.nb_steps)
         #print("THE ID ", index)
-
-        #state = [0.3703, 0.3540, 0.0000, 0.7822, 0.0000, 0.0000, 0.0000, 0.0000, 0.901,
-        # 0.5891, 0.6244, 0.0000, 0.1250, 0.1847, 0.2786, 0.0000]
-        #print("the state is : ", state)
         #print("the reward updated: ", r)
         a = agente.step(state,r)  
       
@@ -567,6 +570,39 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 
                 sim.list_profit.append(r)
                 last_reward = r
+
+
+        """if sim.nb_steps == 100:
+
+            f = open("deepsara_"+ "_10BA_1epi_run-time15.txt","a+")
+            episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
+            episode_profit_r2c = sum(sim.list_profit_r2c) / len(sim.list_profit_r2c) 
+            episode_profit_reability = sum(sim.list_profit_reability) / len(sim.list_profit_reability) 
+
+        
+            f.write("the episode: "+ str(episode)+"\n\n")
+            f.write("the lost requests r issue: "+ str(sim.reject_r_issue)+"\n\n")
+            f.write("the lost requests ressource issue: "+ str(sim.reject_nslr)+"\n\n")
+            f.write("the attended requests: "+ str(sim.attended_reqs)+"\n\n")
+            f.write("the accepted requests: "+ str(sim.accepted_reqs)+"\n\n")
+            f.write("the terminated events: "+  str(sim.terminate_events)+"\n\n")
+            f.write("the acceptence ratio: "+ str((sim.accepted_reqs/ sim.attended_reqs)*100)+"\n\n")
+            f.write("the episode profit "+  str(episode_profit)+"\n\n")
+            f.write("the episode_profit_r2c "+  str(episode_profit_r2c)+"\n\n")
+            f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
+
+
+            f.close()
+            sim.nb_steps = 0
+            episode +=1
+            sim.reject_r_issue =0
+            sim.reject_nslr =0
+            sim.attended_reqs =0
+            sim.accepted_reqs =0
+            sim.terminate_events =0
+            sim.list_profit =[]
+            sim.list_profit_r2c =[]
+            sim.list_profit_reability =[]"""
 
      
        
@@ -853,7 +889,8 @@ def main():
                 # controller.substrate = copy.deepcopy(substrate_graphs.get_graph("abilene")) #get substrate    
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
-                controller.simulation.set_run_till(0.1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+
+                controller.simulation.set_run_till(4)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
@@ -861,7 +898,7 @@ def main():
                 episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
                 episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
  
-
+               
                 print("the lost requests: ", controller.simulation.reject_r_issue)
                 print("the lost requests: ", controller.simulation.reject_nslr)
                 print("the attended requests: ", controller.simulation.attended_reqs)

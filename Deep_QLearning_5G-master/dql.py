@@ -130,7 +130,7 @@ class Memory(object):
         """Sample a batch of experiences from the buffer."""
         ## forms a batch buffer from the replay memory
         buffer_size = len(self.buffer)
-        print("**",buffer_size)
+        #print("**",buffer_size)
         index = np.random.choice(np.arange(buffer_size), size=batch_size, replace=False)
         return [self.buffer[i] for i in index] ## return the batch buffer
 
