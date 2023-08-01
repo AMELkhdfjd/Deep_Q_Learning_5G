@@ -1,0 +1,18 @@
+attended req [57, 73]
+
+accepted req [45, 58]
+
+terminated_req [27, 34]
+
+lost_r_issue [12, 15]
+
+list_lost_resc [0, 0]
+
+list_acceptance_ratio [78.94736842105263, 79.45205479452055]
+
+list_epi_profit [0.9468416841834199, 0.950477337484317]
+
+list_epi_r2c_profit [0.9563680506591292, 0.9621876835479112]
+
+list_epi_reability_profit [0.9325521344698553, 0.932911818388926]
+

@@ -46,7 +46,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 2 #240##350
 
 
 
@@ -572,7 +572,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        """if sim.nb_steps == 100:
+        """if sim.nb_steps == 120:
 
             f = open("deepsara_"+ "_10BA_1epi_run-time15.txt","a+")
             episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
@@ -822,47 +822,28 @@ def main():
     for m in arrival_rates:  ### the most global loop, arrival_rates = [100,80,60,40,30,25,20,15,10,7,5,3,1]
         #urllc_1_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
         urllc_1_arrival_rate = m   ## we have only one service type, logically take the arival rate as it is
-               
         
-        total_profit_rep = []
+        
+        list_attended_req = []
+        list_accepted_req = []
+        list_terminated_req = []
+        list_lost_r_issue = []
+        list_lost_resc = []
+        list_acceptance_ratio = []
+        list_epi_profit = []
+        list_epi_r2c_profit = []
+        list_epi_reability_profit = []
+
+
+
+
+        
      
-        profit_urllc_1_rep = []
-       
-        
-        acpt_rate_rep = []
-        acpt_rate_urllc_1_rep = []
-      
-        total_utl_rep = []
-        link_utl_rep = []
-        node_utl_rep = []
-      
-        urllc_1_utl_rep = []
           
         
-        for i in range(1): ## we loop the set of episodes which is 350 global var 
-                                  ## here creation of empty lists
-                                  ## 1
-            total_profit_rep.append([])
-            #reability_profit_rep.append([])
-            #latency_profit_rep.append([])
-            #central_profit_rep.append([])
-            profit_urllc_1_rep.append([])
-            #profit_urllc_2_rep.append([])
-            #profit_urllc_3_rep.append([])
+
+
             
-            acpt_rate_rep.append([])
-            acpt_rate_urllc_1_rep.append([])
-            #acpt_rate_urllc_2_rep.append([])
-            #acpt_rate_urllc_3_rep.append([])
-
-            total_utl_rep.append([])
-            link_utl_rep.append([])
-            node_utl_rep.append([])
-            #central_utl_rep.append([])
-            urllc_1_utl_rep.append([])
-            #urllc_2_utl_rep.append([])
-            #urllc_3_utl_rep.append([])
-
 
         
         for i in range(1): ## repetitions=33 global 
@@ -890,7 +871,7 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(4)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
@@ -921,11 +902,37 @@ def main():
                 f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
 
 
+
+                list_attended_req.append(controller.simulation.attended_reqs)
+                list_accepted_req.append(controller.simulation.accepted_reqs)
+                list_terminated_req.append(controller.simulation.terminate_events)
+                list_lost_r_issue.append(controller.simulation.reject_r_issue)
+                list_lost_resc.append(controller.simulation.reject_nslr)
+                list_acceptance_ratio.append((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)
+                list_epi_profit.append(episode_profit)
+                list_epi_r2c_profit.append(episode_profit_r2c)
+                list_epi_reability_profit.append(episode_profit_reability)
+
+
+
+
                 f.close()
+        f = open("Results_10BA_200epi_run-time20.txt","a+")
+        f.write("attended req "+  str(list_attended_req)+"\n\n")
+        f.write("accepted req "+  str(list_accepted_req)+"\n\n")
+        f.write("terminated_req "+  str(list_terminated_req)+"\n\n")
+        f.write("lost_r_issue "+  str(list_lost_r_issue)+"\n\n")
+        f.write("list_lost_resc "+  str(list_lost_resc)+"\n\n")
+        f.write("list_acceptance_ratio "+  str(list_acceptance_ratio)+"\n\n")
+        f.write("list_epi_profit "+  str(list_epi_profit)+"\n\n")
+        f.write("list_epi_r2c_profit "+  str(list_epi_r2c_profit)+"\n\n")
+        f.write("list_epi_reability_profit "+  str(list_epi_reability_profit)+"\n\n")
+    
+
 
 
             #bot.sendMessage("Repetition " + str(i) + " finishes!")
-            
+
   
             
 
@@ -938,3 +945,4 @@ if __name__ == '__main__':
     print("end time: ",end)
     bot.sendMessage("Simulation finishes!")
     bot.sendMessage("total time: " + str(end-start))
+
