@@ -596,7 +596,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 #print("revenu: ", revenue)
                 #print("cout: ", cout)
                 
-                r = 0.6*(revenue/cout) + 0.4*reliability_total
+                r = 0.8*(revenue/cout) + 0.2*reliability_total
                 sim.list_profit_reability.append(reliability_total)
                 sim.list_profit_r2c.append(revenue/cout)
                 
@@ -604,24 +604,14 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        if sim.nb_steps == 100:
+        """if sim.nb_steps == 100:
 
             f = open("deepsara_"+ "_10BA_1epi_run-time15.txt","a+")
             episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
             episode_profit_r2c = sum(sim.list_profit_r2c) / len(sim.list_profit_r2c) 
             episode_profit_reability = sum(sim.list_profit_reability) / len(sim.list_profit_reability) 
 
-            """
-            f.write("the episode: "+ str(episode)+"\n\n")
-            f.write("the lost requests r issue: "+ str(sim.reject_r_issue)+"\n\n")
-            f.write("the lost requests ressource issue: "+ str(sim.reject_nslr)+"\n\n")
-            f.write("the attended requests: "+ str(sim.attended_reqs)+"\n\n")
-            f.write("the accepted requests: "+ str(sim.accepted_reqs)+"\n\n")
-            f.write("the terminated events: "+  str(sim.terminate_events)+"\n\n")
-            f.write("the acceptence ratio: "+ str((sim.accepted_reqs/ sim.attended_reqs)*100)+"\n\n")
-            f.write("the episode profit "+  str(episode_profit)+"\n\n")
-            f.write("the episode_profit_r2c "+  str(episode_profit_r2c)+"\n\n")
-            f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")"""
+          
 
             list_attended_req.append(sim.attended_reqs)
             list_accepted_req.append(sim.accepted_reqs)
@@ -643,7 +633,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             sim.terminate_events =0
             sim.list_profit =[]
             sim.list_profit_r2c =[]
-            sim.list_profit_reability =[]
+            sim.list_profit_reability =[]"""
 
      
        
@@ -748,86 +738,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
         
     
   
-"""def func_twindow(c,evt):  ## recursive function need to understand it more
-    #the time sale has expired. The nslrs collected so far will be analyzed for admission.
-    global counter_windows
-    sim = c.simulation 
-    counter_windows += 1
-    num_urllc_1 = 0
-    num_urllc_2 = 0
-    num_urllc_3 = 0
-    step_urllc_1_profit_reability =0
-    step_urllc_2_profit_reability =0
-    step_urllc_3_profit_reability =0
-    
-    if evt.extra["first_state"]: ## if its the first state
-        #first state index
-        #all resources at 100% (with granularity of 5)
-        state = get_state(c.substrate,c.simulation)
-        
-        #s = translateStateToIndex(state)
-        #a = agente.take_action(s,True)
-        
-        a = agente.step(state,0) ## this returns the action taken, here we call the function step from the dql file, give state, reward, training=true, 
-        print("the action taken",actions[a])
-    else:## its not the first state, still ambigus why we dont call the step function 
-                                    ##edit: we dont need to calculate the next step bcz we have the action here, before we dont have since its the first state
-        s = evt.extra["current_state"] ## the state
-        a = evt.extra["action"]  ## the action of the event
-        print("the action taken",a)
-      
-    sim.granted_req_list, remaining_req_list, num_urllc_1, num_urllc_2, num_urllc_3 = prioritizer(sim.window_req_list, a) #the list of reqs is filtered depending on the action
-    #print("results of prioritizer: num_urllc1, num_urllc2, num_urllc3:  ", num_urllc_1, num_urllc_2, num_urllc_3)
-    #the list is sent to the Resource Allocation module
-    step_latency_profit,step_urllc_1_profit_latency,step_urllc_2_profit_latency,step_urllc_3_profit_latency, urllc_1_accepted_reqs, urllc_2_accepted_reqs, urllc_3_accepted_reqs = resource_allocation(c)
 
-    
-
-
-    step_reability_profit, step_urllc_1_profit_reability, step_urllc_2_profit_reability, step_urllc_3_profit_reability = calculate_metrics.calculate_profit_reability(num_urllc_1,num_urllc_2,num_urllc_3, urllc_1_accepted_reqs,urllc_2_accepted_reqs,urllc_3_accepted_reqs)
-    step_profit = step_latency_profit + step_reability_profit
-
-    step_urllc_1_profit = step_urllc_1_profit_reability + step_urllc_1_profit_latency
-    step_urllc_2_profit = step_urllc_2_profit_reability + step_urllc_2_profit_latency
-    step_urllc_3_profit = step_urllc_3_profit_reability + step_urllc_3_profit_latency
-
-
-
-
-    c.total_profit += step_profit ## here we have the global profits for all steps not only one
-    c.latency_profit += step_latency_profit
-    c.reability_profit += step_reability_profit
-    c.urllc_1_profit += step_urllc_1_profit
-    c.urllc_2_profit += step_urllc_2_profit
-    c.urllc_3_profit += step_urllc_3_profit
-   
-    
-    r = step_profit ### ATT this is the reward to pass to the agent
-    next_state = get_state(c.substrate,c.simulation) #getting the next state    
-    
-    #s_ = translateStateToIndex(next_state) #getting index of the next state
-    #a_ = agente.take_action(s_,False) #select action for the next state    
-    #agente.updateQ(step_profit,s,a,s_,a_,evt.extra["end_state"]) #(reward,s,a,s_,a_end_sate)
-    
-    s_ = next_state
-    a_ = agente.step(s_,r) ## we give the new reward and the current state in order to get the action to take
-                           ## here we are getting the new action, no need to execute the step function above since its no longer the first state
-    a = a_ ## set the next action to the current action
-    s = s_  ## set the next state to the current state
-    if counter_windows  == (sim.run_till/twindow_length) - 2: ## here twindow_length is set to 1 as global, need to figure out why we substrate the 2 to set the end_state to true
-        end_state = True
-        #print("the end state is set to True for the twindow event")
-    else:
-        end_state = False
-        
-    ### ATTT!!! recursive CALL here  |
-    
-    evt = sim.create_event(type="twindow_end",start=sim.horario+twindow_length, extra={"first_state":False,"end_state":end_state,"current_state":s,"action":a}, f=func_twindow)  
-    #print("added a twindow_end event")
-    sim.add_event(evt)
-    sim.window_req_list = [[],[],[]] #
-    #sim.window_req_list = []
-    sim.granted_req_list = [] """
   
 def prepare_sim(s):## prepares the simulation object for all services and sets the params for them
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_1","arrival_rate":urllc_1_arrival_rate, "first_event": True},f=func_arrival) 
@@ -907,11 +818,11 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(10)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(5)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
-                """episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
+                episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
                 episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
                 episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
  
@@ -953,7 +864,7 @@ def main():
 
 
 
-                f.close()"""
+                f.close()
 
         f = open("Results_10BA_200epi_run-time20.txt","a+")
         f.write("attended req "+  str(list_attended_req)+"\n\n")
