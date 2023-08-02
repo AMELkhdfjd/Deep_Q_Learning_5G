@@ -69,7 +69,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 3 #240##350
 
 
 
@@ -484,6 +484,17 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     global counter_windows
     global last_reward
     global episode
+    global list_attended_req
+    global list_accepted_req
+    global list_terminated_req 
+    global list_lost_r_issue 
+    global list_lost_resc 
+    global list_acceptance_ratio 
+    global list_epi_profit 
+    global list_epi_r2c_profit
+    global list_epi_reability_profit 
+    
+
     sim = c.simulation 
     
 
@@ -492,6 +503,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
     revenue = 0
     cout  =0
+
  
 
 
@@ -848,7 +860,7 @@ def main():
         urllc_1_arrival_rate = m   ## we have only one service type, logically take the arival rate as it is
         
         
-        list_attended_req = []
+        """list_attended_req = []
         list_accepted_req = []
         list_terminated_req = []
         list_lost_r_issue = []
@@ -856,7 +868,7 @@ def main():
         list_acceptance_ratio = []
         list_epi_profit = []
         list_epi_r2c_profit = []
-        list_epi_reability_profit = []
+        list_epi_reability_profit = []"""
 
 
 
@@ -942,6 +954,7 @@ def main():
 
 
                 f.close()"""
+
         f = open("Results_10BA_200epi_run-time20.txt","a+")
         f.write("attended req "+  str(list_attended_req)+"\n\n")
         f.write("accepted req "+  str(list_accepted_req)+"\n\n")
@@ -970,4 +983,3 @@ if __name__ == '__main__':
     print("end time: ",end)
     bot.sendMessage("Simulation finishes!")
     bot.sendMessage("total time: " + str(end-start))
-

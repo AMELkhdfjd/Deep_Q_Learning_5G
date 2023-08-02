@@ -1,54 +1,18 @@
-attended req [7]
+attended req [293, 316, 304]
 
-accepted req [5]
+accepted req [172, 161, 149]
 
-terminated_req [0]
+terminated_req [160, 153, 143]
 
-lost_r_issue [2]
+lost_l_issue [27, 30, 29]
 
-list_lost_resc [0]
+list_lost_resc [94, 125, 126]
 
-list_acceptance_ratio [71.42857142857143]
+list_acceptance_ratio [58.703071672354945, 50.9493670886076, 49.01315789473684]
 
-list_epi_profit [0.9462477499608684]
+list_epi_profit [0.9044493641473405, 0.9007262036250476, 0.9001297655959358]
 
-list_epi_r2c_profit [0.9569804881508374]
+list_epi_r2c_profit [0.9758776224161109, 0.9746968818181438, 0.9790359627941214]
 
-list_epi_reability_profit [0.9301486426759149]
-
-attended req [11]
-
-accepted req [10]
-
-terminated_req [0]
-
-lost_r_issue [1]
-
-list_lost_resc [0]
-
-list_acceptance_ratio [90.9090909090909]
-
-list_epi_profit [0.9501434630649545]
-
-list_epi_r2c_profit [0.9667854753741624]
-
-list_epi_reability_profit [0.9251804446011425]
-
-attended req [19]
-
-accepted req [14]
-
-terminated_req [0]
-
-lost_r_issue [5]
-
-list_lost_resc [0]
-
-list_acceptance_ratio [73.68421052631578]
-
-list_epi_profit [0.9520964096714749]
-
-list_epi_r2c_profit [0.967386197467338]
-
-list_epi_reability_profit [0.9291617279776803]
+list_epi_latency_profit [0.797306976744186, 0.7897701863354037, 0.7817704697986576]
 
