@@ -27,6 +27,29 @@ last_reward = 0
 
 global episode 
 episode = 0
+
+
+global  list_attended_req 
+global  list_accepted_req
+global  list_terminated_req 
+global  list_lost_r_issue 
+global  list_lost_resc
+global  list_acceptance_ratio 
+global  list_epi_profit
+global  list_epi_r2c_profit
+global  list_epi_reability_profit 
+
+list_attended_req = []
+list_accepted_req = []
+list_terminated_req  = []
+list_lost_r_issue  = []
+list_lost_resc = []
+list_acceptance_ratio = []
+list_epi_profit = []
+list_epi_r2c_profit = []
+list_epi_r2c_profit = []
+list_epi_reability_profit = []
+
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
 # urllc_3_arrival_rate = 10 #5#1#2 #reqXsecond
@@ -569,14 +592,14 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        """if sim.nb_steps == 120:
+        if sim.nb_steps == 100:
 
             f = open("deepsara_"+ "_10BA_1epi_run-time15.txt","a+")
             episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
             episode_profit_r2c = sum(sim.list_profit_r2c) / len(sim.list_profit_r2c) 
             episode_profit_reability = sum(sim.list_profit_reability) / len(sim.list_profit_reability) 
 
-        
+            """
             f.write("the episode: "+ str(episode)+"\n\n")
             f.write("the lost requests r issue: "+ str(sim.reject_r_issue)+"\n\n")
             f.write("the lost requests ressource issue: "+ str(sim.reject_nslr)+"\n\n")
@@ -586,9 +609,18 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             f.write("the acceptence ratio: "+ str((sim.accepted_reqs/ sim.attended_reqs)*100)+"\n\n")
             f.write("the episode profit "+  str(episode_profit)+"\n\n")
             f.write("the episode_profit_r2c "+  str(episode_profit_r2c)+"\n\n")
-            f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
+            f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")"""
 
-
+            list_attended_req.append(sim.attended_reqs)
+            list_accepted_req.append(sim.accepted_reqs)
+            list_terminated_req.append(sim.terminate_events)
+            list_lost_r_issue.append(sim.reject_r_issue)
+            list_lost_resc.append(sim.reject_nslr)
+            list_acceptance_ratio.append((sim.accepted_reqs/ sim.attended_reqs)*100)
+            list_epi_profit.append(episode_profit)
+            list_epi_r2c_profit.append(episode_profit_r2c)
+            list_epi_reability_profit.append(episode_profit_reability)
+            
             f.close()
             sim.nb_steps = 0
             episode +=1
@@ -599,7 +631,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             sim.terminate_events =0
             sim.list_profit =[]
             sim.list_profit_r2c =[]
-            sim.list_profit_reability =[]"""
+            sim.list_profit_reability =[]
 
      
        
@@ -792,12 +824,8 @@ def prepare_sim(s):## prepares the simulation object for all services and sets t
     s.add_event(evt)
     evt = s.create_event(type="arrival",start=s.horario+get_interarrival_time(urllc_1_arrival_rate),extra={"service_type":"urllc_3","arrival_rate":urllc_1_arrival_rate, "first_event": True},f=func_arrival)    
     s.add_event(evt)
-    ## here maybe its the first state
-    #evt = s.create_event(type="twindow_end",start=s.horario+twindow_length,extra={"first_state":True,"end_state":False},f=func_twindow)## att here the function is different
-    #s.add_event(evt)
-
-
-                                
+  
+                         
 def main():
                                               
 # ▀████▄     ▄███▀     ██     ▀████▀███▄   ▀███▀
@@ -813,8 +841,7 @@ def main():
     global bw_initial
     global agente
     global urllc_1_arrival_rate
-    #global urllc_2_arrival_rate
-    #global urllc_3_arrival_rate
+  
     
     for m in arrival_rates:  ### the most global loop, arrival_rates = [100,80,60,40,30,25,20,15,10,7,5,3,1]
         #urllc_1_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
@@ -868,11 +895,11 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(0.2)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(10)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
-                episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
+                """episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
                 episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
                 episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
  
@@ -885,6 +912,7 @@ def main():
                 print("the acceptence ratio: ", (controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100 )
 
                 print ("the reability total of each request ", controller.simulation.list_profit_reability)
+
 
                 f = open("deepsara_"+str(m)+ "_10BA_1epi_run-time15.txt","a+")
                 f.write("the episode: "+ str(j)+"\n\n")
@@ -913,7 +941,7 @@ def main():
 
 
 
-                f.close()
+                f.close()"""
         f = open("Results_10BA_200epi_run-time20.txt","a+")
         f.write("attended req "+  str(list_attended_req)+"\n\n")
         f.write("accepted req "+  str(list_accepted_req)+"\n\n")

@@ -207,7 +207,9 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
         rejected, n_hops = analyze_links(req.nsl_graph,index, substrate)
         if rejected:
             print("LIIIIIIINKS", rejected)
-        else:
+        
+        ## Latency section
+        """else:
             if (index == len(vnfs)-1): 
                 for v in vnfs:
                     latency_totale += nodes[v["mapped_to"]]["l"]
@@ -225,7 +227,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                                  #print("the latency of link: ", links[j]["l"])
                      
                 print("total latency: ", latency_totale)      
-                if (latency_totale  > )                                                                                                                                                                                                                                                               
+                if (latency_totale  > )   """                                                                                                                                                                                                                                                            
              
         
 
