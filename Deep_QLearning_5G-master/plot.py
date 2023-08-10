@@ -268,7 +268,8 @@ plt.ylabel('Profit')
 plt.legend(fontsize = 14,loc='lower right', fancybox=True, shadow=True)
 # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 0.1), fancybox=True, shadow=True, ncol=3)
 #plt.show() 
-plt.savefig("profit_"+arrival_rate+"_"+topologies[0]+".png",bbox_inches = 'tight') 
+#plt.savefig("profit_"+arrival_rate+"_"+topologies[0]+".png",bbox_inches = 'tight') 
+plt.savefig("Amel.png",bbox_inches = 'tight') 
 plt.close()
 
 # # Aceptance rate

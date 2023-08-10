@@ -69,7 +69,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 50 #240##350
+episodes = 1 #240##350
 
 
 
@@ -818,7 +818,7 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(6)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(100)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
