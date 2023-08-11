@@ -69,7 +69,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 1 #240##350
+episodes = 400 #240##350
 
 
 
@@ -604,7 +604,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        if sim.nb_steps == 600:
+        """if sim.nb_steps == 600:
 
             #f = open("deepsara_"+ "_10BA_300epi_run-time4.txt","a+")
             episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
@@ -633,7 +633,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             sim.terminate_events =0
             sim.list_profit =[]
             sim.list_profit_r2c =[]
-            sim.list_profit_reability =[]
+            sim.list_profit_reability =[]"""
 
      
        
@@ -818,11 +818,11 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(1600)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(4)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
-                """episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
+                episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
                 episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
                 episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
  
@@ -859,12 +859,10 @@ def main():
                 list_acceptance_ratio.append((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)
                 list_epi_profit.append(episode_profit)
                 list_epi_r2c_profit.append(episode_profit_r2c)
-                list_epi_reability_profit.append(episode_profit_reability)"""
+                list_epi_reability_profit.append(episode_profit_reability)
 
 
-
-
-              
+     
 
         f = open("Results_10BA_300epi_run-time6.txt","a+")
         f.write("attended req "+  str(list_attended_req)+"\n\n")
