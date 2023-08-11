@@ -604,7 +604,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        if sim.nb_steps == 200:
+        if sim.nb_steps == 600:
 
             #f = open("deepsara_"+ "_10BA_300epi_run-time4.txt","a+")
             episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
@@ -818,7 +818,7 @@ def main():
                 centralized_initial = controller.substrate.graph["centralized_cpu"]
                 bw_initial = controller.substrate.graph["bw"]
 
-                controller.simulation.set_run_till(100)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
+                controller.simulation.set_run_till(1600)   ## set the run_till variable of SIm to 15, the end of the simulatin is after 15 time units
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
