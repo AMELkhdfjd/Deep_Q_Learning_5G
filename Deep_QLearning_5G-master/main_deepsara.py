@@ -69,7 +69,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 300 #240##350
+episodes = 3 #240##350
 
 
 
@@ -265,7 +265,7 @@ class Sim:
         while self.horario<self.run_till: ## while the start time of the event that we are going to teate is less than the time the simulation ends, its ok
             #self.print_eventos()
 
-            print("we are inside the run while", self.horario,"<",self.run_till)
+            #print("we are inside the run while", self.horario,"<",self.run_till)
             p = self.get_next_evento()
             if p==None:
                 return    
@@ -513,7 +513,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     vnfs = sim.request.nsl_graph["vnfs"]
     vlinks = sim.request.nsl_graph["vlinks"]
     sim.attended_reqs = sim.attended_reqs +1
-    print("TYPE  : ", evt.extra["service_type"])
+    #print("TYPE  : ", evt.extra["service_type"])
     ## here we should take the action and state from the last request placement:
     """if(evt.extra["first_event"] == True):
             r = 0
@@ -541,7 +541,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
         profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
-        print("ACTION : ", a,"REAB VNF: ", profit_reliability)
+        #print("ACTION : ", a,"REAB VNF: ", profit_reliability)
         r = 0
          
         if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
@@ -550,7 +550,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
                 sim.reject_nslr = sim.reject_nslr +1
-                print("VNF REJECT --- RSC")
+                #print("VNF REJECT --- RSC")
                 last_reward = r
                 
                 break
@@ -558,14 +558,14 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 if(rejected_r): ## reliability issue
                     r = -1
                     sim.reject_r_issue = sim.reject_r_issue+1
-                    print("VNF REJECT --- REA", r)
+                    #print("VNF REJECT --- REA", r)
                     last_reward = r
                     break
                 else: ## last vnf and ressource issue
                     r = -1
                     sim.reject_nslr = sim.reject_nslr +1
                     last_reward = r
-                    print("VNF REJECT --- RSC LAST")
+                    #print("VNF REJECT --- RSC LAST")
                    
                     break
         else:
@@ -575,7 +575,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
                 
                 sim.accepted_reqs = sim.accepted_reqs +1
-                print("ACCEPT")
+                #print("ACCEPT")
 
                 ## define the new reward here:
                 for i in range(len(vnfs)):
@@ -634,6 +634,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             sim.list_profit =[]
             sim.list_profit_r2c =[]
             sim.list_profit_reability =[]
+            print("small episode: ", episode)
 
      
        
@@ -652,7 +653,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    print("treated arrival event ---> creration of another arrival event")
+    #print("treated arrival event ---> creration of another arrival event")
     sim.add_event(evt = sim.create_event(type="arrival",start=sim.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate, "current_reward":r, "first_event": False}, f=func_arrival))
 
 
@@ -666,7 +667,7 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     
     sim = c.simulation
     
-    print("*******************  terminating")
+    #print("*******************  terminating")
     sim.terminate_events += 1
     
     G = nx.Graph()
@@ -806,7 +807,7 @@ def main():
                 agente.handle_episode_start() ## sets last_state and last_action to none
 
 
-                print("\n","episode:",j,"\n")
+                #print("\n","episode:",j,"\n")
                 print("################ EPISODE LOOP #####################", j)
                 controller = None
                 controller = Controlador()                   

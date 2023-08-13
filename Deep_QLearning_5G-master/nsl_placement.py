@@ -118,7 +118,7 @@ def nsl_placement(req, index, substrate, already_backup, a, reliability_total): 
                 rejected = True
                 rejected_r = True
                
-                print("REABIILTY ISSUE --------------------- ")
+                #print("REABIILTY ISSUE --------------------- ")
            
 
 
