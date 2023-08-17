@@ -1,7 +1,9 @@
 You can install TensorFlow using Anaconda by following these steps:
 
 ATTT: do the commits on directory  Deep_Q_Learning_5G not Deep_QLearning_5G-master
-
+ATTT: do the upgrade before installing on the vm, with sudo apt update, sudo apt upgrade
+install tensorflow from the website not here
+this command will fix the issue with the new vm : pip install --upgrade charset_normalizer
 
 
 
