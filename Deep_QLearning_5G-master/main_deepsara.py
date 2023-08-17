@@ -645,7 +645,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        if nb_steps == 40:
+        if nb_steps == 100:
 
 
             #f = open("deepsara_"+ "_10BA_300epi_run-time4.txt","a+")
