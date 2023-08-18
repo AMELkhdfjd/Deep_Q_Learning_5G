@@ -55,33 +55,13 @@ list_epi_reability_profit = []
 
 ## lists for the small episodes
 
-global attended_reqs
-global reject_nslr
-global reject_r_issue
-global accepted_reqs
-global list_profit_reability
-global list_profit_r2c
-global list_profit
-global terminate_events
-global nb_steps
 
 
 
 
-
-attended_reqs = 0
-reject_nslr = 0
-reject_r_issue = 0
-accepted_reqs = 0
-list_profit_reability = []
-list_profit_r2c = []
-list_profit = []
-terminate_events = 0
-nb_steps = 0
-
-
-
-
+# urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
+# urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
+# urllc_3_arrival_rate = 10 #5#1#2 #reqXsecond
 
 urllc_1_arrival_rate = 0
 #urllc_2_arrival_rate = 0
@@ -98,7 +78,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 50 #240##350
+episodes = 10 #240##350
 
 
 
@@ -175,8 +155,10 @@ class Sim:
                          ## more likely its the start time of the current event that is being treated
         self.run_till = 1 ## initially was -1
         self.total_reqs = 0
-        """self.nb_steps =0
-      
+        self.nb_steps =0
+        #self.total_urllc_1_reqs = 0
+        #self.total_urllc_2_reqs = 0
+        #self.total_urllc_3_reqs = 0
         self.attended_reqs = 0
         self.list_profit_r2c = []
         self.list_profit_reability = []
@@ -186,7 +168,7 @@ class Sim:
         self.reject_r_issue = 0
         self.reject_nslr = 0
         self.accepted_reqs = 0
-        self.terminate_events = 0"""
+        self.terminate_events = 0
   
                    
 
@@ -525,15 +507,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
 ## for the lists for small episodes
-    global attended_reqs
-    global reject_nslr
-    global reject_r_issue
-    global accepted_reqs
-    global list_profit_reability
-    global list_profit_r2c
-    global list_profit
-    global terminate_events
-    global nb_steps
+   
     
 
     sim = c.simulation 
@@ -553,7 +527,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
    
     vnfs = sim.request.nsl_graph["vnfs"]
     vlinks = sim.request.nsl_graph["vlinks"]
-    attended_reqs = attended_reqs +1
+    sim.attended_reqs = sim.attended_reqs +1
     #print("TYPE  : ", evt.extra["service_type"])
     ## here we should take the action and state from the last request placement:
     """if(evt.extra["first_event"] == True):
@@ -575,7 +549,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 
         state = state.tolist()[0]
-        nb_steps +=1
+        sim.nb_steps +=1
         a = agente.step(state,r)  
       
        
@@ -590,7 +564,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
                 r = -1
-                reject_nslr = reject_nslr +1
+                sim.reject_nslr = sim.reject_nslr +1
                 #print("VNF REJECT --- RSC")
                 last_reward = r
                 
@@ -598,13 +572,13 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             else: ## its the last one
                 if(rejected_r): ## reliability issue
                     r = -1
-                    reject_r_issue = reject_r_issue+1
+                    sim.reject_r_issue = sim.reject_r_issue+1
                     #print("VNF REJECT --- REA", r)
                     last_reward = r
                     break
                 else: ## last vnf and ressource issue
                     r = -1
-                    reject_nslr = reject_nslr +1
+                    sim.reject_nslr = sim.reject_nslr +1
                     last_reward = r
                     #print("VNF REJECT --- RSC LAST")
                    
@@ -615,7 +589,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
             if (index == len(vnfs)-1):
 
                 
-                accepted_reqs = accepted_reqs +1
+                sim.accepted_reqs = sim.accepted_reqs +1
                 #print("ACCEPT")
 
                 ## define the new reward here:
@@ -638,44 +612,44 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 #print("cout: ", cout)
                 
                 r = 0.9*(revenue/cout) + 0.1*reliability_total
-                list_profit_reability.append(reliability_total)
-                list_profit_r2c.append(revenue/cout)
+                sim.list_profit_reability.append(reliability_total)
+                sim.list_profit_r2c.append(revenue/cout)
                 
-                list_profit.append(r)
+                sim.list_profit.append(r)
                 last_reward = r
 
 
-        if nb_steps == 100:
+        if sim.nb_steps == 100:
 
 
             #f = open("deepsara_"+ "_10BA_300epi_run-time4.txt","a+")
-            episode_profit = sum(list_profit) / len(list_profit) 
-            episode_profit_r2c = sum(list_profit_r2c) / len(list_profit_r2c) 
-            episode_profit_reability = sum(list_profit_reability) / len(list_profit_reability) 
+            episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
+            episode_profit_r2c = sum(sim.list_profit_r2c) / len(sim.list_profit_r2c) 
+            episode_profit_reability = sum(sim.list_profit_reability) / len(sim.list_profit_reability) 
 
           
 
-            list_attended_req.append(attended_reqs)
-            list_accepted_req.append(accepted_reqs)
-            list_terminated_req.append(terminate_events)
-            list_lost_r_issue.append(reject_r_issue)
-            list_lost_resc.append(reject_nslr)
-            list_acceptance_ratio.append((accepted_reqs/ attended_reqs)*100)
+            list_attended_req.append(sim.attended_reqs)
+            list_accepted_req.append(sim.accepted_reqs)
+            list_terminated_req.append(sim.terminate_events)
+            list_lost_r_issue.append(sim.reject_r_issue)
+            list_lost_resc.append(sim.reject_nslr)
+            list_acceptance_ratio.append((sim.accepted_reqs/ sim.attended_reqs)*100)
             list_epi_profit.append(episode_profit)
             list_epi_r2c_profit.append(episode_profit_r2c)
             list_epi_reability_profit.append(episode_profit_reability)
             
-            
-            nb_steps = 0
+           
+            sim.nb_steps = 0
             episode +=1
-            reject_r_issue =0
-            reject_nslr =0
-            attended_reqs =0
-            accepted_reqs =0
-            terminate_events =0
-            list_profit =[]
-            list_profit_r2c =[]
-            list_profit_reability =[]
+            sim.reject_r_issue =0
+            sim.reject_nslr =0
+            sim.attended_reqs =0
+            sim.accepted_reqs =0
+            sim.terminate_events =0
+            sim.list_profit =[]
+            sim.list_profit_r2c =[]
+            sim.list_profit_reability =[]
             print("small episode: ", episode)
 
  
@@ -704,14 +678,10 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
 def func_terminate(c,evt):   ## terminates a request, updates the ressources and reduced the number of instantiated reqs list
     
-
-
-    global terminate_events
-
     sim = c.simulation
     
     #print("*******************  terminating")
-    terminate_events += 1
+    sim.terminate_events += 1
     
     G = nx.Graph()
    
