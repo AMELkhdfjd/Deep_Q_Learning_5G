@@ -78,7 +78,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 10 #240##350
+episodes = 50 #240##350
 
 
 
@@ -620,7 +620,7 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 last_reward = r
 
 
-        if sim.nb_steps == 100:
+        if sim.nb_steps == 200:
 
 
             #f = open("deepsara_"+ "_10BA_300epi_run-time4.txt","a+")
