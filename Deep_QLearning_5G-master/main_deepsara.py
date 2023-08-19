@@ -459,7 +459,8 @@ def get_state(substrate,simulation, index): ## returns the state of 9 parmas
 
     #labels_1 = [[node["p"], node["cpu"]] for node in substrate.graph["nodes"]]
     # Latency solution
-    labels_1 = [[node["p"], node["cpu"], node["l"]] for node in substrate.graph["nodes"]]
+    #labels_1 = [[node["p"], node["cpu"], node["l"]] for node in substrate.graph["nodes"]]
+    labels_1 = [[node["p"], node["cpu"], node["l"]] for node in substrate.graph["nodes"]] ## to test if the latency need to be added here
 
 
 # Extract links' "source" and "target" values into "graph_1"
