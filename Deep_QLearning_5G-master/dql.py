@@ -49,8 +49,7 @@ class Network(object):
     def __init__(self,
                  input_size,
                  output_size,
-                 #hidden_size=[50, 50], # ATTTT: we have here two hidden layers
-                 hidden_size=[128, 64], ## new test here
+                 hidden_size=[50, 50], # ATTTT: we have here two hidden layers
                  weights_initializer=tf.initializers.glorot_uniform(),
                  bias_initializer=tf.initializers.zeros(),
                  optimizer=tf.optimizers.Adam,
@@ -148,8 +147,7 @@ class Agent(object):
                  action_space_size,
                  target_update_freq=100, #1000, #cada n steps se actualiza la target network
                  discount=0.99,
-                 #batch_size=32,
-                 batch_size=300, ## new test here
+                 batch_size=32,
                  max_explore=1,
                  min_explore=0.05,
                  anneal_rate=(1/5000), #100000),
