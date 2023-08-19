@@ -825,7 +825,7 @@ def main():
                 print("################ EPISODE LOOP #####################", j)
                 controller = None
                 controller = Controlador()                   
-                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(10)) #get substrate  with 16 nodes
+                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(16)) #get substrate  with 16 nodes
                                                                                               ## maybe we dont need to pass the agent to the controller
 
 
