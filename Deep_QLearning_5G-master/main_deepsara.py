@@ -78,7 +78,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 5 #240##350
+episodes = 50 #240##350
 
 
 
