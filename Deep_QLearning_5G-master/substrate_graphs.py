@@ -226,22 +226,23 @@ substrate16 = {"directed": False, "multigraph": False,
 
 
 "nodes": [
-    { "p":0.974,  "cpu": 70, "id": 0, "l": 0.0578}, ## all initially set to 100
-    { "p":0.996,  "cpu": 70, "id": 1 , "l": 0.0578}, 
-    { "p":0.982,  "cpu": 70, "id": 2, "l": 0.0578}, 
-    { "p":0.991,  "cpu": 70, "id": 3,  "l": 0.0578}, 
-    { "p":0.975,  "cpu": 70, "id": 4, "l": 0.0578}, 
-    { "p":0.991,  "cpu": 70, "id": 5, "l": 0.0578}, #0.991
-    { "p":0.995,  "cpu": 70, "id": 6, "l": 0.0578}, 
-    { "p":0.989,  "cpu": 70, "id": 7, "l": 0.0578}, 
-    { "p":0.982,  "cpu": 70, "id": 8, "l": 0.0578}, 
-    { "p":0.995,  "cpu": 70, "id": 9, "l": 0.0578}, 
-    { "p":0.976,  "cpu": 70, "id": 10, "l": 0.0578}, 
-    { "p":0.999,  "cpu": 70, "id": 11, "l": 0.0578}, #0.976
-    { "p":0.991,  "cpu": 70, "id": 12, "l": 0.0578}, #0.991
-    { "p":0.982,  "cpu": 70, "id": 13, "l": 0.0578}, 
-    { "p":0.996,  "cpu": 70, "id": 14, "l": 0.0578}, 
-    { "p":0.991,  "cpu": 70, "id": 15, "l": 0.0578}], #0.974
+    { "p":0.974,  "cpu": 80, "id": 0, "l": 0.0578}, ## all initially set to 100
+    { "p":0.996,  "cpu": 80, "id": 1 , "l": 0.0578}, 
+    { "p":0.982,  "cpu": 80, "id": 2, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 3,  "l": 0.0578}, 
+    { "p":0.975,  "cpu": 80, "id": 4, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 5, "l": 0.0578}, #0.991
+    { "p":0.995,  "cpu": 80, "id": 6, "l": 0.0578}, 
+    { "p":0.989,  "cpu": 80, "id": 7, "l": 0.0578}, 
+    { "p":0.982,  "cpu": 80, "id": 8, "l": 0.0578}, 
+    { "p":0.995,  "cpu": 80, "id": 9, "l": 0.0578}, 
+    { "p":0.976,  "cpu": 80, "id": 10, "l": 0.0578}, 
+    { "p":0.999,  "cpu": 80, "id": 11, "l": 0.0578}, #0.976
+    { "p":0.991,  "cpu": 80, "id": 12, "l": 0.0578}, #0.991
+    { "p":0.982,  "cpu": 80, "id": 13, "l": 0.0578}, 
+    { "p":0.996,  "cpu": 80, "id": 14, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 15, "l": 0.0578}], #0.974
+    
 "links": [
     {"bw": 50, "source": 0, "target": 2}, 
     {"bw": 50, "source": 0, "target": 8}, 
@@ -273,6 +274,154 @@ substrate16 = {"directed": False, "multigraph": False,
     {"bw": 50, "source": 9, "target": 13}]
     }
 }
+
+
+
+
+
+
+substrate32 = {"directed": False, "multigraph": False, 
+"graph": {
+    "min_cpu_cost": 4800, "max_cpu_revenue": 9600, 
+    "edge_cpu": 1200, "local_cpu": 0, "centralized_cpu": 1200, "bw":1400, 
+    "min_bw_cost": 700.0, "max_bw_revenue": 5250.0, 
+    "max_cpu_profit": 4800, "max_bw_profit": 4550.0,
+
+
+"nodes": [
+    { "p":0.974,  "cpu": 80, "id": 0, "l": 0.0578}, ## all initially set to 100
+    { "p":0.996,  "cpu": 80, "id": 1 , "l": 0.0578}, 
+    { "p":0.982,  "cpu": 80, "id": 2, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 3,  "l": 0.0578}, 
+    { "p":0.975,  "cpu": 80, "id": 4, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 5, "l": 0.0578}, #0.991
+    { "p":0.995,  "cpu": 80, "id": 6, "l": 0.0578}, 
+    { "p":0.989,  "cpu": 80, "id": 7, "l": 0.0578}, 
+    { "p":0.982,  "cpu": 80, "id": 8, "l": 0.0578}, 
+    { "p":0.995,  "cpu": 80, "id": 9, "l": 0.0578}, 
+    { "p":0.976,  "cpu": 80, "id": 10, "l": 0.0578}, 
+    { "p":0.999,  "cpu": 80, "id": 11, "l": 0.0578}, #0.976
+    { "p":0.991,  "cpu": 80, "id": 12, "l": 0.0578}, #0.991
+    { "p":0.982,  "cpu": 80, "id": 13, "l": 0.0578}, 
+    { "p":0.996,  "cpu": 80, "id": 14, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 15, "l": 0.0578},
+    { "p":0.974,  "cpu": 80, "id": 16, "l": 0.0578}, ## all initially set to 100
+    { "p":0.996,  "cpu": 80, "id": 17 , "l": 0.0578}, 
+    { "p":0.982,  "cpu": 80, "id": 18, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 19,  "l": 0.0578}, 
+    { "p":0.975,  "cpu": 80, "id": 20, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 21, "l": 0.0578}, #0.991
+    { "p":0.995,  "cpu": 80, "id": 22, "l": 0.0578}, 
+    { "p":0.989,  "cpu": 80, "id": 23, "l": 0.0578}, 
+    { "p":0.982,  "cpu": 80, "id": 24, "l": 0.0578}, 
+    { "p":0.995,  "cpu": 80, "id": 25, "l": 0.0578}, 
+    { "p":0.976,  "cpu": 80, "id": 26, "l": 0.0578}, 
+    { "p":0.999,  "cpu": 80, "id": 27, "l": 0.0578}, #0.976
+    { "p":0.991,  "cpu": 80, "id": 28, "l": 0.0578}, #0.991
+    { "p":0.982,  "cpu": 80, "id": 29, "l": 0.0578}, 
+    { "p":0.996,  "cpu": 80, "id": 30, "l": 0.0578}, 
+    { "p":0.991,  "cpu": 80, "id": 31, "l": 0.0578}
+    
+      
+    ], #0.974
+    
+"links": [
+    {"bw": 50, "source": 0, "target": 2}, 
+    {"bw": 50, "source": 0, "target": 8}, 
+    {"bw": 50, "source": 0, "target": 10},
+    {"bw": 50, "source": 0, "target": 12}, 
+    {"bw": 50, "source": 1, "target": 2}, 
+    {"bw": 50, "source": 1, "target": 3}, 
+    {"bw": 50, "source": 1, "target": 5}, 
+    {"bw": 50, "source": 1, "target": 6}, 
+    {"bw": 50, "source": 1, "target": 11}, 
+    {"bw": 50, "source": 1, "target": 13}, 
+    {"bw": 50, "source": 1, "target": 14}, 
+    {"bw": 50, "source": 2, "target": 3}, 
+    {"bw": 50, "source": 2, "target": 4}, 
+    {"bw": 50, "source": 2, "target": 7}, 
+    {"bw": 50, "source": 2, "target": 12}, 
+    {"bw": 50, "source": 2, "target": 15}, 
+    {"bw": 50, "source": 3, "target": 4}, 
+    {"bw": 50, "source": 3, "target": 15}, 
+    {"bw": 50, "source": 4, "target": 5}, 
+    {"bw": 50, "source": 5, "target": 6}, 
+    {"bw": 50, "source": 5, "target": 7}, 
+    {"bw": 50, "source": 5, "target": 9}, 
+    {"bw": 50, "source": 6, "target": 8}, 
+    {"bw": 50, "source": 7, "target": 11}, 
+    {"bw": 50, "source": 8, "target": 9}, 
+    {"bw": 50, "source": 8, "target": 14}, 
+    {"bw": 50, "source": 9, "target": 10}, 
+    {"bw": 50, "source": 9, "target": 13},
+
+
+
+
+# link the two 16 nodes graphs
+
+{"bw": 50, "source": 9, "target": 13},
+{"bw": 50, "source": 14, "target": 16},
+{"bw": 50, "source": 5, "target": 19},
+{"bw": 50, "source": 4, "target": 29},
+{"bw": 50, "source": 10, "target": 20},
+{"bw": 50, "source": 0, "target": 31},
+{"bw": 50, "source": 13, "target": 28},
+{"bw": 50, "source": 8, "target": 17},
+{"bw": 50, "source": 7, "target": 18},
+{"bw": 50, "source": 2, "target": 25},
+{"bw": 50, "source": 3, "target": 27},
+{"bw": 50, "source": 17, "target": 19},
+{"bw": 50, "source": 8, "target": 29},
+
+
+
+
+
+
+
+
+
+{'bw': 50, 'source': 16, 'target': 18},
+ {'bw': 50, 'source': 16, 'target': 24}, 
+ {'bw': 50, 'source': 16, 'target': 26}, 
+ {'bw': 50, 'source': 16, 'target': 28}, 
+ {'bw': 50, 'source': 17, 'target': 18}, 
+ {'bw': 50, 'source': 17, 'target': 19}, 
+ {'bw': 50, 'source': 17, 'target': 21}, 
+ {'bw': 50, 'source': 17, 'target': 22}, 
+ {'bw': 50, 'source': 17, 'target': 27}, 
+ {'bw': 50, 'source': 17, 'target': 29}, 
+ {'bw': 50, 'source': 17, 'target': 30}, 
+ {'bw': 50, 'source': 18, 'target': 19}, #
+ {'bw': 50, 'source': 18, 'target': 20}, 
+ {'bw': 50, 'source': 18, 'target': 23}, 
+ {'bw': 50, 'source': 18, 'target': 28},# 
+ {'bw': 50, 'source': 18, 'target':31}, 
+ {'bw': 50, 'source': 19, 'target': 20}, #
+ {'bw': 50, 'source': 19, 'target': 31}, #
+ {'bw': 50, 'source': 20, 'target': 21},# 
+ {'bw': 50, 'source': 21, 'target': 22}, #
+ {'bw': 50, 'source': 21, 'target': 23},# 
+ {'bw': 50, 'source': 21, 'target': 25}, 
+ {'bw': 50, 'source': 22, 'target': 24}, #
+ {'bw': 50, 'source': 23, 'target': 27}, #
+ {'bw': 50, 'source': 24, 'target': 25},
+ {'bw': 50, 'source': 24, 'target': 30}, #
+ {'bw': 50, 'source': 25, 'target': 26}, #
+ {'bw': 50, 'source': 25, 'target': 29} ]
+
+
+
+
+
+
+
+    }
+}
+
+
+
 
 abilene = {'directed': False, 'multigraph': False, 
 'graph': {
@@ -342,7 +491,9 @@ def get_graph(n): ## returns a substrate of graph depending on the number of nod
         #substrate.set_graph(substrate14["graph"])
         pass#amel
     elif n == 16:        
-        substrate.set_graph(substrate16["graph"])
+        substrate.set_graph(substrate16["graph"])           
+    elif n == 32:        
+        substrate.set_graph(substrate32["graph"])
     elif n == "abilene":
         substrate.set_graph(abilene["graph"])
     else:   

@@ -78,7 +78,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 50 #240##350
+episodes = 5 #240##350
 
 
 
@@ -824,7 +824,7 @@ def main():
                 print("################ EPISODE LOOP #####################", j)
                 controller = None
                 controller = Controlador()                   
-                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(16)) #get substrate  with 16 nodes
+                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(32)) #get substrate  with 16 nodes
                                                                                               ## maybe we dont need to pass the agent to the controller
 
 
