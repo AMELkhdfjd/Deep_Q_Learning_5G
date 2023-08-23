@@ -410,13 +410,6 @@ substrate32 = {"directed": False, "multigraph": False,
  {'bw': 50, 'source': 24, 'target': 30}, #
  {'bw': 50, 'source': 25, 'target': 26}, #
  {'bw': 50, 'source': 25, 'target': 29} ]
-
-
-
-
-
-
-
     }
 }
 
