@@ -19,7 +19,7 @@ class AttentionModule(torch.nn.Module):
         """
         Defining weights.
         """
-        
+
         self.weight_matrix = torch.nn.Parameter(torch.Tensor(self.args.filters_3,
                                                              self.args.filters_3)) ## att: here we set the filter_3 to 32 bcz we have 16 labels like graphs features, in our case it should be updated
 

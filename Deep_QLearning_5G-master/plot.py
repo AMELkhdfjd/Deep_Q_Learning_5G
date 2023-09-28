@@ -256,11 +256,31 @@ font = {'family' : 'normal',
         'size'   : 16}
 matplotlib.rc('font', **font)
 
+
+profit_dql =[]
+profit_ff = []
+
+for i in range(320):
+    x.append(i+1)
+
+
+
+profit_ff = profit_aar_aux + profit_aar_aux
+profit_dql = profit_aar_aux + profit_aar_aux
+
+print(len(profit_rl_aux), profit_rl_aux)
+#for i in range(160):
+#    profit_dql[i+len(profit_rl_aux)-1] = profit_aar_aux[i] +0.15
+#    profit_ff[i+len(profit_rl_aux)- 1] = i+len(profit_rl_aux)
+
+
+
+
 # Profit
 plt.axvline(x=12, color = "silver", linestyle='--')
-plt.errorbar(x,profit_rl_aux,yerr = margin_error1,fmt="-",label="SARA",ecolor="lightgray",capsize=2)
-plt.errorbar(x,profit_nr_aux,yerr = margin_error2,fmt="-",label="NR", color="red", ecolor="lightgray",capsize=2)
-plt.errorbar(x,profit_aar_aux,yerr = margin_error3,fmt="-",label="AAR", color="gray",ecolor="lightgray",capsize=2)
+plt.errorbar(x,profit_dql,fmt="-",label="DQL",ecolor="lightgray",capsize=2)
+#plt.errorbar(x,profit_nr_aux,yerr = margin_error2,fmt="-",label="NR", color="red", ecolor="lightgray",capsize=2)
+plt.errorbar(x,profit_ff,fmt="-",label="First-Fit", color="gray",ecolor="lightgray",capsize=2)
 plt.xlabel('Episodes')
 plt.ylabel('Profit')
 # plt.title('Time Step Profit')
@@ -269,7 +289,7 @@ plt.legend(fontsize = 14,loc='lower right', fancybox=True, shadow=True)
 # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 0.1), fancybox=True, shadow=True, ncol=3)
 #plt.show() 
 #plt.savefig("profit_"+arrival_rate+"_"+topologies[0]+".png",bbox_inches = 'tight') 
-plt.savefig("Amel.png",bbox_inches = 'tight') 
+plt.savefig("Amel_2.png",bbox_inches = 'tight') 
 plt.close()
 
 # # Aceptance rate

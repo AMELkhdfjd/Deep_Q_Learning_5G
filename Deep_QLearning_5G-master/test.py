@@ -71,3 +71,6 @@ plt.axis('off')
 plt.savefig("Before_UPdate_2.png")
 
 
+
+
+

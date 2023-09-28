@@ -38,6 +38,7 @@ global  list_acceptance_ratio
 global  list_epi_profit
 global  list_epi_r2c_profit
 global  list_epi_reability_profit 
+global  list_epi_latency_profit 
 
 list_attended_req = []
 list_accepted_req = []
@@ -48,16 +49,8 @@ list_acceptance_ratio = []
 list_epi_profit = []
 list_epi_r2c_profit = []
 list_epi_r2c_profit = []
-list_epi_reability_profit = []
-
-
-
-
-## lists for the small episodes
-
-
-
-
+#list_epi_reability_profit = []
+list_epi_latency_profit = []
 
 # urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
 # urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
@@ -78,8 +71,7 @@ agente = None
 
 
 #RL-specific parameters 
-episodes = 50 #240##350
-
+episodes = 1 #240##350
 
 
 
@@ -162,10 +154,12 @@ class Sim:
         self.attended_reqs = 0
         self.list_profit_r2c = []
         self.list_profit_reability = []
+        self.list_profit_latency = []
         self.list_profit = []
 
     
         self.reject_r_issue = 0
+        self.reject_l_issue = 0
         self.reject_nslr = 0
         self.accepted_reqs = 0
         self.terminate_events = 0
@@ -378,12 +372,14 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
     vnf = vnfs[index]
     reliability = 0    
 
-    rejected, rejected_r, reliability, already_backup = nsl_placement.nsl_placement(req, index, substrate, already_backup, a, reliability_total)#mapping  ## here try to allocate the nslr req in the substrate graph
+
+    rejected, rejected_l, rejected_r, latency_totale, profit_reliability  = nsl_placement.nsl_placement(req, index, substrate, already_backup, a, reliability_total)#mapping  ## here try to allocate the nslr req in the substrate graph
         
     if not rejected: ## successfully mapped
          
         
-            profit_reliability = reliability
+            
+
             #step_latency_profit += profit_latency 
            
 
@@ -407,8 +403,7 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
             
         
              
-    return profit_reliability, rejected_r, already_backup
-
+    return rejected, rejected_l, rejected_r, latency_totale, profit_reliability
 
 
 def get_code(value):## maps the input value to one of ten codes (0, 1, 2, 3, 4, 5, 6, 7, 8, or 9) based on the range of values that value falls within.
@@ -494,22 +489,6 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     global counter_windows
     global last_reward
     global episode
-    global list_attended_req
-    global list_accepted_req
-    global list_terminated_req 
-    global list_lost_r_issue 
-    global list_lost_resc 
-    global list_acceptance_ratio 
-    global list_epi_profit 
-    global list_epi_r2c_profit
-    global list_epi_reability_profit 
-
-
-
-## for the lists for small episodes
-   
-    
-
     sim = c.simulation 
     
 
@@ -517,9 +496,8 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
     reliability_total = 1
     actions = c.substrate.graph["nodes"]  ### NEW: defenition of the new action here
     revenue = 0
-    cout = 0
+    cout  =0
 
- 
 
 
 
@@ -541,10 +519,10 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
 
     r = last_reward
     #print("the last reward of nslr", last_reward)
+
     for index, vnf in enumerate(vnfs):
 
         
-
         state = get_state(c.substrate,c.simulation, index)
 
 
@@ -554,12 +532,13 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
       
        
 
-        profit_reliability, rejected_r, already_backup = resource_allocation(c, index, already_backup, a, reliability_total)
+        rejected, rejected_l, rejected_r, latency_totale, profit_reliability = resource_allocation(c, index, already_backup, a, reliability_total)
         #r = profit_reliability  #here for the first solution
         #print("ACTION : ", a,"REAB VNF: ", profit_reliability)
         r = 0
          
-        if (profit_reliability == -1):  ## vnf is rejected-->  ressources issue or reability issue
+        if (rejected):  ##rejected due to resc or due to latency
+            #print("ENTER TO REJECT")
             
 
             if (index != len(vnfs)-1): ## its not the last episode, ressources forcly
@@ -567,7 +546,6 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                 sim.reject_nslr = sim.reject_nslr +1
                 #print("VNF REJECT --- RSC")
                 last_reward = r
-                
                 break
             else: ## its the last one
                 if(rejected_r): ## reliability issue
@@ -576,13 +554,25 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                     #print("VNF REJECT --- REA", r)
                     last_reward = r
                     break
+                elif(rejected_l):
+                    r = -1
+                    sim.reject_l_issue = sim.reject_l_issue+1
+                    #print("VNF REJECT --- LAT", r)
+                    last_reward = r
+                    break
+
                 else: ## last vnf and ressource issue
                     r = -1
                     sim.reject_nslr = sim.reject_nslr +1
                     last_reward = r
                     #print("VNF REJECT --- RSC LAST")
-                   
                     break
+
+                 
+                   
+
+                
+
         else:
             reliability_total = reliability_total*profit_reliability ##### ATT erreur grave
             #print("the reability till now: ", reliability_total)
@@ -610,69 +600,80 @@ def func_arrival(c,evt): #NSL arrival, we will treate the one URLLC request arri
                         cout += 0
                 #print("revenu: ", revenue)
                 #print("cout: ", cout)
-                
-                r = 0.9*(revenue/cout) + 0.1*reliability_total
+                #r = 0.6*(revenue/cout) + 0.4*reliability_total
+
+                r = 0.9*(revenue/cout) + 0.1*(reliability_total/latency_totale)
+                #print("the reward ", r)
                 sim.list_profit_reability.append(reliability_total)
+                sim.list_profit_latency.append(latency_totale)
                 sim.list_profit_r2c.append(revenue/cout)
-                
                 sim.list_profit.append(r)
                 last_reward = r
 
 
         if sim.nb_steps == 200:
 
-
             #f = open("deepsara_"+ "_10BA_300epi_run-time4.txt","a+")
             episode_profit = sum(sim.list_profit) / len(sim.list_profit) 
             episode_profit_r2c = sum(sim.list_profit_r2c) / len(sim.list_profit_r2c) 
             episode_profit_reability = sum(sim.list_profit_reability) / len(sim.list_profit_reability) 
+            episode_profit_latency = sum(sim.list_profit_latency) / len(sim.list_profit_latency) 
+
 
           
 
             list_attended_req.append(sim.attended_reqs)
             list_accepted_req.append(sim.accepted_reqs)
             list_terminated_req.append(sim.terminate_events)
-            list_lost_r_issue.append(sim.reject_r_issue)
+            list_lost_r_issue.append(sim.reject_l_issue)
             list_lost_resc.append(sim.reject_nslr)
             list_acceptance_ratio.append((sim.accepted_reqs/ sim.attended_reqs)*100)
             list_epi_profit.append(episode_profit)
             list_epi_r2c_profit.append(episode_profit_r2c)
-            list_epi_reability_profit.append(episode_profit_reability)
+            #list_epi_reability_profit.append(episode_profit_reability)
+            list_epi_latency_profit.append(episode_profit_latency)
+            print("episode: ", episode)
+            print("attended requests:", sim.attended_reqs)
+            print("accepted requests:", sim.accepted_reqs)
+            print("rejected requests:", sim.reject_r_issue+sim.reject_l_issue)
+        
+            print("acceptance_ratio:", (sim.accepted_reqs/ sim.attended_reqs)*100)
+            print("episode reability:", episode_profit_reability)
+            print("episode latency:", episode_profit_latency, "\n")
             
            
             sim.nb_steps = 0
             episode +=1
-            sim.reject_r_issue =0
+            sim.reject_l_issue =0
             sim.reject_nslr =0
             sim.attended_reqs =0
             sim.accepted_reqs =0
             sim.terminate_events =0
             sim.list_profit =[]
             sim.list_profit_r2c =[]
-            sim.list_profit_reability =[]
-            print("small episode: ", episode)
+            #sim.list_profit_reability =[]
+            sim.list_profit_latency =[]
+            #print("the small episode: ", episode)
 
- 
 
-                #print("the reward total: ", r)
+     
+       
+        
+               
+
 
         
 
             
 
-    ## the original func_arrival
+
    
-    # print("**/",evt.extra["arrival_rate"])
+
     arrival_rate = evt.extra["arrival_rate"]
     service_type = evt.extra["service_type"]
     inter_arrival_time = get_interarrival_time(arrival_rate)
-    #print("treated arrival event ---> creration of another arrival event")
     sim.add_event(evt = sim.create_event(type="arrival",start=sim.horario+inter_arrival_time, extra={"service_type":service_type,"arrival_rate":arrival_rate, "current_reward":r, "first_event": False}, f=func_arrival))
 
-
-
-    #print("EVENTSSSSSSSSSSSSSS ")
-    #sim.print_eventos()
 
 
 
@@ -680,7 +681,6 @@ def func_terminate(c,evt):   ## terminates a request, updates the ressources and
     
     sim = c.simulation
     
-    #print("*******************  terminating")
     sim.terminate_events += 1
     
     G = nx.Graph()
@@ -811,7 +811,7 @@ def main():
                                      ## 1
 
 
-            print("################ REPITITION LOOP #####################", i)                       
+            #print("################ REPITITION LOOP #####################", i)                       
             #agente = ql.Qagent(0.9, 0.9, 0.9, episodes, n_states, n_actions) #(alpha, gamma, epsilon, episodes, n_states, n_actions)
             agente = dql.Agent(16,10) ## here we pass the state size and the action size
                                             ## 
@@ -821,10 +821,10 @@ def main():
 
 
                 #print("\n","episode:",j,"\n")
-                print("################ EPISODE LOOP #####################", j)
+                print("################ EPISODE LOOP #####################")
                 controller = None
                 controller = Controlador()                   
-                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(32)) #get substrate  with 16 nodes
+                controller.substrate = copy.deepcopy(substrate_graphs.get_graph(10)) #get substrate  with 16 nodes
                                                                                               ## maybe we dont need to pass the agent to the controller
 
 
@@ -838,7 +838,9 @@ def main():
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
                 """episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
                 episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
-                episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
+                #episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
+                episode_profit_latency = sum(controller.simulation.list_profit_latency) / len(controller.simulation.list_profit_latency) 
+
  
                
                 print("the lost requests: ", controller.simulation.reject_r_issue)
@@ -861,7 +863,7 @@ def main():
                 f.write("the acceptence ratio: "+ str((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)+"\n\n")
                 f.write("the episode profit "+  str(episode_profit)+"\n\n")
                 f.write("the episode_profit_r2c "+  str(episode_profit_r2c)+"\n\n")
-                f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
+                #f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
 
 
 
@@ -873,12 +875,15 @@ def main():
                 list_acceptance_ratio.append((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)
                 list_epi_profit.append(episode_profit)
                 list_epi_r2c_profit.append(episode_profit_r2c)
-                list_epi_reability_profit.append(episode_profit_reability)"""
+                #list_epi_reability_profit.append(episode_profit_reability)
+                list_epi_latency_profit.append(episode_profit_latency)"""
 
 
-     
 
-        f = open("Results_10BA_300epi_run-time6.txt","a+")
+
+              
+
+        f = open("Results_10BA_15epi_run-time6.txt","a+")
         f.write("attended req "+  str(list_attended_req)+"\n\n")
         f.write("accepted req "+  str(list_accepted_req)+"\n\n")
         f.write("terminated_req "+  str(list_terminated_req)+"\n\n")
@@ -887,7 +892,8 @@ def main():
         f.write("list_acceptance_ratio "+  str(list_acceptance_ratio)+"\n\n")
         f.write("list_epi_profit "+  str(list_epi_profit)+"\n\n")
         f.write("list_epi_r2c_profit "+  str(list_epi_r2c_profit)+"\n\n")
-        f.write("list_epi_reability_profit "+  str(list_epi_reability_profit)+"\n\n")
+        #f.write("list_epi_reability_profit "+  str(list_epi_reability_profit)+"\n\n")
+        f.write("list_epi_latency_profit "+  str(list_epi_latency_profit)+"\n\n")
     
 
 
@@ -898,11 +904,12 @@ def main():
             
 
 if __name__ == '__main__':
-    bot.sendMessage("Simulation starts!")
+    #bot.sendMessage("Simulation starts!")
     start = time.time()## in order to receive the current time
     print("start time: ",start)
     main()
     end = time.time()
     print("end time: ",end)
-    bot.sendMessage("Simulation finishes!")
-    bot.sendMessage("total time: " + str(end-start))
+    #bot.sendMessage("Simulation finishes!")
+
+    #bot.sendMessage("total time: " + str(end-start))
