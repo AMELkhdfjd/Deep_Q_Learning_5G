@@ -1,5 +1,5 @@
 # Deep_Q_Learning_5G
-
+##  Intelligent resource placement in an ultra-reliable 5G Core network
 
 Today, with a rapid rise in the number of devices connected via the internet, emerging 5G networks plan to foster new network services. This generation promises to bring upheaval to the telecoms sector and totally transform the user experience.
 
