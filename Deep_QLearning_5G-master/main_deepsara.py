@@ -5,7 +5,6 @@ import nsl_request
 import nsl_placement
 import substrate_graphs
 import copy
-import calculate_metrics 
 import ql
 import dql
 import telegram_bot as bot
@@ -16,9 +15,7 @@ from SimGNN_DQL import SimGNNTrainer ## for the gcn
 from param_parser import parameter_parser ## for the gcn
 
 
-# import bisect
-#simulation parameters
-# seed = 0
+
 repetitions = 1 #33
 twindow_length = 1
 
@@ -52,9 +49,6 @@ list_epi_r2c_profit = []
 #list_epi_reability_profit = []
 list_epi_latency_profit = []
 
-# urllc_1_arrival_rate = 10 #5#1#2 #reqXsecond
-# urllc_2_arrival_rate = 40 #5#2.5 #reqXsecond
-# urllc_3_arrival_rate = 10 #5#1#2 #reqXsecond
 
 urllc_1_arrival_rate = 0
 #urllc_2_arrival_rate = 0
@@ -196,18 +190,10 @@ class Sim:
 
     def add_event(self, evt):  ## inserting a new event into the list of events evt in order and create the nslr and insert it in the appropriate window list according to its service 
         request = {}
-        #encontrar indice y adicionar evt en esa posicion
-        # index = 0
-        # for i in range(len(self.eventos)):
-        #     if self.eventos[i].start > evt.start: 
-        #         index = i 
-        #         break
-        #     else:
-        #         index = i+1 
+
         index = self.binary_search(self.eventos, 0, len(self.eventos)-1, evt.start) ## find where to insert the new event evt since its an ordered array
         self.eventos = self.eventos[:index] + [evt] + self.eventos[index:]  ## insert the new event
-        # self.eventos.insert(index,evt)
-        # self.eventos[index:index] = [evt]  ## maybe here its another alternative
+
 
         if evt.type == "arrival":       ## if its an arrival type     
             #add nslrs in window list
@@ -215,24 +201,7 @@ class Sim:
             evt.extra["id"] = self.total_reqs
             
             service_type = evt.extra["service_type"]## maybe the extra means the additional parameters for the event here we are assigining the service_type
-            #self.request_list.append(nsl_request.get_nslr(self.total_reqs,service_type,mean_operation_time))## here we are calling the fonction from the file imported ATT
-           
-              ## self.total_reqs: to define the id of the new nslr, 
-              ## mean_operation_time = 15 as a global variable
 
-
-            """if evt.extra["service_type"] == "urllc_1":
-                self.total_urllc_1_reqs += 1
-                self.window_req_list[0].append(copy.deepcopy(request))## add the request to the window list according to the type of the service
-            elif evt.extra["service_type"] == "urllc_2":
-                self.total_urllc_2_reqs += 1
-                self.window_req_list[1].append(copy.deepcopy(request))#
-            else: #evt.extra["service_type"] == "urllc_3":
-                self.total_urllc_3_reqs += 1
-                self.window_req_list[2].append(copy.deepcopy(request))#"""
-            
-        #print("print details events:  ")
-        #self.print_eventos()
 
 
 
@@ -361,11 +330,7 @@ def resource_allocation(cn, index, already_backup, a, reliability_total): #cn=co
      
     sim = cn.simulation ## define the object of class Sim which is part of the Controller class
     substrate = cn.substrate ## substrate of the controller class
-    step_urllc_1_profit_latency = 0 
-    step_urllc_2_profit_latency = 0
-    step_urllc_3_profit_latency = 0
-    step_latency_profit=0
-    end_simulation_time = sim.run_till
+
     
     req = sim.request
     vnfs = sim.request.nsl_graph["vnfs"]
@@ -783,28 +748,6 @@ def main():
     for m in arrival_rates:  ### the most global loop, arrival_rates = [100,80,60,40,30,25,20,15,10,7,5,3,1]
         #urllc_1_arrival_rate = m/3 ##  calculate the rate arrival for each service, its logical we devide by 3 here
         urllc_1_arrival_rate = m   ## we have only one service type, logically take the arival rate as it is
-        
-        
-        """list_attended_req = []
-        list_accepted_req = []
-        list_terminated_req = []
-        list_lost_r_issue = []
-        list_lost_resc = []
-        list_acceptance_ratio = []
-        list_epi_profit = []
-        list_epi_r2c_profit = []
-        list_epi_reability_profit = []"""
-
-
-
-
-        
-     
-          
-        
-
-
-            
 
         
         for i in range(1): ## repetitions=33 global 
@@ -836,47 +779,7 @@ def main():
                                                         ## initially was 15
                 prepare_sim(controller.simulation)   ## creates the arrival events and the twindow_end event to prepare the environment          
                 controller.run()    ## runs all the events of the list one by one, here we execute the run of the class SIm, and a function for each event  
-                """episode_profit = sum(controller.simulation.list_profit) / len(controller.simulation.list_profit) 
-                episode_profit_r2c = sum(controller.simulation.list_profit_r2c) / len(controller.simulation.list_profit_r2c) 
-                #episode_profit_reability = sum(controller.simulation.list_profit_reability) / len(controller.simulation.list_profit_reability) 
-                episode_profit_latency = sum(controller.simulation.list_profit_latency) / len(controller.simulation.list_profit_latency) 
-
- 
                
-                print("the lost requests: ", controller.simulation.reject_r_issue)
-                print("the lost requests: ", controller.simulation.reject_nslr)
-                print("the attended requests: ", controller.simulation.attended_reqs)
-                print("the accepted requests: ", controller.simulation.accepted_reqs)
-                print ("the terminated events: ", controller.simulation.terminate_events)
-                print("the acceptence ratio: ", (controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100 )
-
-                print ("the reability total of each request ", controller.simulation.list_profit_reability)
-
-
-                f = open("deepsara_"+str(m)+ "_10BA_1epi_run-time15.txt","a+")
-                f.write("the episode: "+ str(j)+"\n\n")
-                f.write("the lost requests r issue: "+ str(controller.simulation.reject_r_issue)+"\n\n")
-                f.write("the lost requests ressource issue: "+ str(controller.simulation.reject_nslr)+"\n\n")
-                f.write("the attended requests: "+ str(controller.simulation.attended_reqs)+"\n\n")
-                f.write("the accepted requests: "+ str(controller.simulation.accepted_reqs)+"\n\n")
-                f.write("the terminated events: "+  str(controller.simulation.terminate_events)+"\n\n")
-                f.write("the acceptence ratio: "+ str((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)+"\n\n")
-                f.write("the episode profit "+  str(episode_profit)+"\n\n")
-                f.write("the episode_profit_r2c "+  str(episode_profit_r2c)+"\n\n")
-                #f.write("the episode_profit_reability "+  str(episode_profit_reability)+"\n\n")
-
-
-
-                list_attended_req.append(controller.simulation.attended_reqs)
-                list_accepted_req.append(controller.simulation.accepted_reqs)
-                list_terminated_req.append(controller.simulation.terminate_events)
-                list_lost_r_issue.append(controller.simulation.reject_r_issue)
-                list_lost_resc.append(controller.simulation.reject_nslr)
-                list_acceptance_ratio.append((controller.simulation.accepted_reqs/ controller.simulation.attended_reqs)*100)
-                list_epi_profit.append(episode_profit)
-                list_epi_r2c_profit.append(episode_profit_r2c)
-                #list_epi_reability_profit.append(episode_profit_reability)
-                list_epi_latency_profit.append(episode_profit_latency)"""
 
 
 
